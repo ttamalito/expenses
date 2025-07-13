@@ -26,7 +26,8 @@
     "paths": {
       "@clients": ["./src/models/clients.ts"],
       "@routes": ["./src/routes/routes.ts"],
-      "@requests/*": ["./src/hooks/requests/*"]
+      "@requests/*": ["./src/hooks/requests/*"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   },
   "include": ["src"]

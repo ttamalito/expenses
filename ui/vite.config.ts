@@ -18,6 +18,7 @@ export default defineConfig({
       '@clients': path.resolve(__dirname, './src/models/clients.ts'),
       '@routes': path.resolve(__dirname, './src/routes/routes.ts'),
       '@requests': path.resolve(__dirname, './src/hooks/requests'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
     },
   },
   server: {
