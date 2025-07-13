@@ -669,6 +669,11 @@ public class ExpensesRequestsIT {
                             .header("Authorization", bearerToken))
                     .andExpect(status().isNoContent());
         }
+
+        // delete the categories
+        for (int categoryId : categoryIds) {
+            deleteExpenseCategory(bearerToken, categoryId);
+        }
     }
 
     @DisplayName("Total spent on a month in a category")
