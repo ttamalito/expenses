@@ -672,6 +672,86 @@ export interface IUserLoginRequest {
     [key: string]: any;
 }
 
+export class GetUserDto implements IGetUserDto {
+    id?: string;
+    username?: string;
+    email?: string;
+    profilePicture?: string;
+    creationDate?: Date;
+    firstName?: string;
+    lastName?: string;
+    role?: GetUserDtoRole;
+    currencyId?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetUserDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.username = _data["username"];
+            this.email = _data["email"];
+            this.profilePicture = _data["profilePicture"];
+            this.creationDate = _data["creationDate"] ? new Date(_data["creationDate"].toString()) : <any>undefined;
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.role = _data["role"];
+            this.currencyId = _data["currencyId"];
+        }
+    }
+
+    static fromJS(data: any): GetUserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetUserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["username"] = this.username;
+        data["email"] = this.email;
+        data["profilePicture"] = this.profilePicture;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["role"] = this.role;
+        data["currencyId"] = this.currencyId;
+        return data;
+    }
+}
+
+export interface IGetUserDto {
+    id?: string;
+    username?: string;
+    email?: string;
+    profilePicture?: string;
+    creationDate?: Date;
+    firstName?: string;
+    lastName?: string;
+    role?: GetUserDtoRole;
+    currencyId?: number;
+
+    [key: string]: any;
+}
+
 export class GetIncomeDto implements IGetIncomeDto {
     id?: number;
     userId?: string;
@@ -882,6 +962,11 @@ export interface IGetExpenseCategoryDto {
     budget?: number;
 
     [key: string]: any;
+}
+
+export enum GetUserDtoRole {
+    USER = "USER",
+    ADMIN = "ADMIN",
 }
 
 export class ApiException extends Error {

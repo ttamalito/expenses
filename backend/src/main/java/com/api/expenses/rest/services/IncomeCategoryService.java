@@ -60,5 +60,11 @@ public class IncomeCategoryService {
         incomeCategoryRepository.save(category);
     }
 
-
+    /**
+     * Gets all income categories from the database
+     * @return a list of all income categories
+     */
+    public List<IncomeCategory> getAllCategories() {
+        return incomeCategoryRepository.findAll();
+    }
 }

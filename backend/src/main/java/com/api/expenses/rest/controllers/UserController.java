@@ -1,8 +1,10 @@
 package com.api.expenses.rest.controllers;
 
 import com.api.expenses.rest.controllers.utils.ControllersHelper;
+import com.api.expenses.rest.models.Currency;
 import com.api.expenses.rest.models.User;
 import com.api.expenses.rest.models.dtos.CreateUserDto;
+import com.api.expenses.rest.models.dtos.GetUserDto;
 import com.api.expenses.rest.models.dtos.UpdateUserDto;
 import com.api.expenses.rest.models.requestsModels.UserSignupRequest;
 import com.api.expenses.rest.services.UserService;
@@ -57,26 +59,54 @@ public class UserController implements Serializable {
     }
 
     @GetMapping(value = "/{username}", produces = {"application/json", "text/plain"})
-    public ResponseEntity<String> getUserProfileData(@PathVariable String username) {
+    public ResponseEntity<GetUserDto> getUserProfileData(@PathVariable String username) {
         Optional<User> fetchedUser = userService.getUserByUsername(username);
 
         if (fetchedUser.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.badRequest().build();
         }
         User user = fetchedUser.get();
 
         User userMakingRequest = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!userMakingRequest.getUsername().equals(user.getUsername())) {
-            return ResponseEntity.badRequest().body("You are not allowed to view this user's profile");
+            return ResponseEntity.badRequest().build();
         }
 
-        try {
-            String userJson = objectMapper.writeValueAsString(user);
-            return ResponseEntity.ok().body(userJson);
-        } catch (JsonProcessingException e) {
-            LOG.error("An error occurred while serializing the user's data", e);
-            return ResponseEntity.internalServerError().body("An error occurred while fetching the user's data");
-        }
+        GetUserDto getUserDto = new GetUserDto(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getProfilePicture(),
+            user.getCreationDate(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getRole(),
+            user.getCurrencyId()
+        );
+
+        return ResponseEntity.ok(getUserDto);
+    }
+
+    @GetMapping(value = "/data", produces = {"application/json", "text/plain"})
+    public ResponseEntity<GetUserDto> getUserDataFromJwtToken() {
+
+        User userMakingRequest = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        //Currency currency = userMakingRequest.getCurrency();
+
+        GetUserDto getUserDto = new GetUserDto(
+                userMakingRequest.getId(),
+                userMakingRequest.getUsername(),
+                userMakingRequest.getEmail(),
+                userMakingRequest.getProfilePicture(),
+                userMakingRequest.getCreationDate(),
+                userMakingRequest.getFirstName(),
+                userMakingRequest.getLastName(),
+                userMakingRequest.getRole(),
+                userMakingRequest.getCurrencyId()
+        );
+
+        return ResponseEntity.ok(getUserDto);
     }
 
     @DeleteMapping("/delete/{username}")

@@ -10,6 +10,8 @@ export const constants = {
   Year: 'Year',
   Month: 'Month',
   Documentation: 'Documentation',
+  Error: 'Error',
+  NotFound: 'NotFound',
 };
 
 export const routes = {
@@ -34,5 +36,11 @@ export const routes = {
   },
   register: {
     index: `/${constants.Register}`,
+  },
+  error: {
+    index: `/${constants.Error}`,
+  },
+  notFound: {
+    index: `/${constants.NotFound}`,
   },
 };

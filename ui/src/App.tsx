@@ -13,30 +13,38 @@ import Statistics from './pages/content/statistics/Statistics.tsx';
 import MonthlyExpenses from './pages/content/statistics/MonthlyExpenses.tsx';
 import YearlyExpenses from './pages/content/statistics/YearlyExpenses.tsx';
 import Documentation from './pages/documentation/Documentation.tsx';
+import Error from './pages/errors/Error.tsx';
+import NotFound from './pages/errors/NotFound.tsx';
+import { UserDataProvider } from '@hooks/useUserDataContext.tsx';
 
 function App() {
   return (
     <AuthProvider>
-      <Routes>
-        <Route path={'/'} element={<ExpensesLandingPage />} />
-        <Route path={constants.Documentation} element={<Documentation />} />
-        <Route path={constants.Login} element={<Login />} />
-        <Route path={constants.Register} element={<Signup />} />
-        <Route path={constants.Content} element={<ExpensesLayout />}>
-          <Route path={constants.Home} index element={<Home />} />
-          <Route path={constants.Budget} element={<Budget />} />
-          <Route path={constants.Profile} element={<Profile />} />
-          <Route path={constants.Statistics} element={<Statistics />} />
-          <Route
-            path={`${constants.Statistics}/${constants.Year}`}
-            element={<YearlyExpenses />}
-          />
-          <Route
-            path={`${constants.Statistics}/${constants.Month}`}
-            element={<MonthlyExpenses />}
-          />
-        </Route>
-      </Routes>
+      <UserDataProvider>
+        <Routes>
+          <Route path={'/'} element={<ExpensesLandingPage />} />
+          <Route path={constants.Documentation} element={<Documentation />} />
+          <Route path={constants.Login} element={<Login />} />
+          <Route path={constants.Register} element={<Signup />} />
+          <Route path={constants.Error} element={<Error />} />
+          <Route path={constants.NotFound} element={<NotFound />} />
+          <Route path={constants.Content} element={<ExpensesLayout />}>
+            <Route path={constants.Home} index element={<Home />} />
+            <Route path={constants.Budget} element={<Budget />} />
+            <Route path={constants.Profile} element={<Profile />} />
+            <Route path={constants.Statistics} element={<Statistics />} />
+            <Route
+              path={`${constants.Statistics}/${constants.Year}`}
+              element={<YearlyExpenses />}
+            />
+            <Route
+              path={`${constants.Statistics}/${constants.Month}`}
+              element={<MonthlyExpenses />}
+            />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </UserDataProvider>
     </AuthProvider>
   );
 }

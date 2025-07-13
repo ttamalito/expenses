@@ -33,6 +33,19 @@ export const useGetUser = (): [
   return [callback];
 };
 
+/**
+ * Fetches the user data without a username
+ */
+export const useGetUserData = (): [
+  () => Promise<AxiosResponse | undefined>,
+] => {
+  const { get } = useApi();
+  const callback = useCallback(() => {
+    return get(routes.user.data);
+  }, [get]);
+  return [callback];
+};
+
 export const useDeleteUser = (): [
   (username: string) => Promise<AxiosResponse | undefined>,
 ] => {

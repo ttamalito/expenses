@@ -145,4 +145,12 @@ public class IncomeService {
     public boolean hasIncomesLinkedToCategory(int categoryId) {
         return incomeRepository.countByCategoryId(categoryId) > 0;
     }
+
+    /**
+     * Gets all incomes from the database
+     * @return a list of all incomes
+     */
+    public List<Income> getAllIncomes() {
+        return incomeRepository.findAll();
+    }
 }

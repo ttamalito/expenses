@@ -1,10 +1,34 @@
 import { Group, Box, Image, Grid, useMantineTheme, Text } from '@mantine/core';
 import { Outlet, useNavigate } from 'react-router';
 import { routes } from '@routes';
+import { useGetUserData } from '@requests/userRequests.ts';
+import { useEffect } from 'react';
+import { IGetUserDto } from '@clients';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
+import useErrorHandling from '@hooks/useErrorHandling.tsx';
 import SideBar from './SideBar';
+
 export default function ExpensesLayout() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
+  const { setUserData } = useUserDataContext();
+  const [getUser] = useGetUserData();
+  const { handleError } = useErrorHandling();
+
+  useEffect(() => {
+    getUser()
+      .then((response) => {
+        const userData: IGetUserDto | undefined = response?.data;
+        if (userData) {
+          setUserData(userData);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
+        handleError('Error fetching user data: E-101');
+      });
+  }, []);
+
   return (
     <Box
       bg={theme.colors.gray[2]}

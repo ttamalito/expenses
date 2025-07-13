@@ -53,4 +53,12 @@ public class ExpenseCategoryService {
         ExpenseCategory savedCategory = expenseCategoryRepository.save(category);
         return savedCategory.getId();
     }
+
+    /**
+     * Gets all expense categories from the database
+     * @return a list of all expense categories
+     */
+    public List<ExpenseCategory> getAllCategories() {
+        return expenseCategoryRepository.findAll();
+    }
 }
