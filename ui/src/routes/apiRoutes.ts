@@ -42,6 +42,7 @@ export const constants = {
   // User
   user: 'user',
   update: 'update',
+  data: 'data',
 
   // Currency
   currency: 'currency',
@@ -142,6 +143,7 @@ export const routes = {
     get: (username: string) => {
       return `/${constants.user}/${username}`;
     },
+    data: `/${constants.user}/${constants.data}`,
     delete: (username: string) => {
       return `/${constants.user}/${constants.delete}/${username}`;
     },
