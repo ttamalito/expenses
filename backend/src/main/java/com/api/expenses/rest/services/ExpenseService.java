@@ -237,4 +237,11 @@ public class ExpenseService {
         return expenseRepository.countByCategoryId(categoryId) > 0;
     }
 
+    /**
+     * Gets all expenses from the database
+     * @return a list of all expenses
+     */
+    public List<Expense> getAllExpenses() {
+        return expenseRepository.findAll();
+    }
 }

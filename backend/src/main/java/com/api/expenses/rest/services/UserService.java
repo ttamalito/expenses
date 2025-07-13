@@ -153,6 +153,14 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
+    /**
+     * Gets all users from the database
+     * @return a list of all users
+     */
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     private Currency getCurrencyById(int currencyId) {
         return currencyRepository.findById(currencyId).
                 orElseThrow(() -> new RuntimeException("Currency not found")); // TODO: create a custom exception
