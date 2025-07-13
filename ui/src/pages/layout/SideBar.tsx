@@ -16,18 +16,18 @@ import {
   IconUser,
   IconLogout,
 } from '@tabler/icons-react';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface SideBarProps {
-  userName?: string;
   profilePictureUrl?: string;
   onLogout?: () => void;
 }
 
 export default function SideBar({
-  userName = 'User Name',
   profilePictureUrl = '/avatar.png',
   onLogout,
 }: SideBarProps) {
+  const { userData } = useUserDataContext();
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
@@ -66,7 +66,9 @@ export default function SideBar({
         </Group>
 
         {/* User Name */}
-        <Text fw={500}>{userName}</Text>
+        <Text fw={500} ta={'center'}>
+          {userData?.username}
+        </Text>
 
         <Divider />
 

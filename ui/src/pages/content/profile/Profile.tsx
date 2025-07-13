@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Container,
   Title,
@@ -12,20 +12,24 @@ import {
   NativeSelect,
   Box,
   FileInput,
+  Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IUpdateUserDto } from '@clients';
-import { usePostUpdate, useGetUser } from '@requests/userRequests.ts';
+import { usePostUpdate, useGetUserData } from '@requests/userRequests.ts';
 import { useGetAllCurrencies } from '@requests/currencyRequests.ts';
 import ExpenseCategoryTable from './ExpenseCategoryTable';
 import IncomeCategoryTable from './IncomeCategoryTable';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
+import useErrorHandling from '@hooks/useErrorHandling.tsx';
 
 export default function Profile() {
-  const [user, setUser] = useState<any>(null);
+  const { userData, setUserData } = useUserDataContext();
+  const { handleError } = useErrorHandling();
   const [currencies, setCurrencies] = useState<any[]>([]);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [getUser] = useGetUser();
+  const [getUserData] = useGetUserData(); // no username
   const [updateUser] = usePostUpdate();
   const [getAllCurrencies] = useGetAllCurrencies();
 
@@ -33,25 +37,21 @@ export default function Profile() {
     mode: 'uncontrolled',
   });
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(() => {
     try {
       // Assuming we can get the current user's username from somewhere
       // This might need to be adjusted based on your authentication system
-      const username = 'tamalito'; // TODO: CHange it later
-      const response = await getUser(username);
-      console.log(response);
-      if (response?.data) {
-        setUser(response.data);
+      if (userData) {
         form.initialize({
-          firstName: response.data.firstName || '',
-          lastName: response.data.lastName || '',
-          currencyId: response.data.currencyId || 0,
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          currencyId: userData.currencyId || 0,
         });
       }
     } catch (error) {
       console.error('Error fetching user:', error);
     }
-  };
+  }, [userData]);
 
   const fetchCurrencies = async () => {
     try {
@@ -67,18 +67,35 @@ export default function Profile() {
   useEffect(() => {
     fetchUser();
     fetchCurrencies();
-  }, []);
+  }, [userData, fetchUser]);
 
   const handleUpdateProfile = async (values: IUpdateUserDto) => {
     try {
-      const username = 'tamalito';
-      await updateUser(username, values);
-      fetchUser(); // Refresh user data
-      notifications.show({
-        title: 'Success',
-        message: 'User data updated successfully',
-        color: 'green',
-      });
+      const username = userData?.username;
+      if (username) {
+        await updateUser(username, values);
+        fetchUser(); // Refresh user data
+        // update the userData context
+        getUserData() // TODO: make updateUser return the updated user
+          .then((response) => {
+            setUserData(response?.data);
+          })
+          .catch((error) => {
+            console.error('Error updating user data:', error);
+            handleError('Failed to fetch user data. E-101');
+          });
+        notifications.show({
+          title: 'Success',
+          message: 'User data updated successfully',
+          color: 'green',
+        });
+      } else {
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to update user data - E-201', // missing username in userData
+          color: 'red',
+        });
+      }
     } catch (error) {
       console.error('Error updating user:', error);
       notifications.show({
@@ -121,7 +138,7 @@ export default function Profile() {
                 src={
                   profilePicture
                     ? URL.createObjectURL(profilePicture)
-                    : user?.profilePicture
+                    : userData?.profilePicture
                 }
                 mb="md"
               />
@@ -135,10 +152,10 @@ export default function Profile() {
           <Grid.Col span={{ base: 12, md: 9 }}>
             <Box>
               <Text size="xl" fw={700} mb="xs">
-                {user?.username}
+                {userData?.username}
               </Text>
               <Text c="dimmed" mb="md">
-                {user?.email}
+                {userData?.email}
               </Text>
 
               <form onSubmit={form.onSubmit(handleUpdateProfile)}>
@@ -175,7 +192,19 @@ export default function Profile() {
                   </Grid.Col>
                   <Grid.Col span={12}>
                     <Group justify="flex-end">
-                      <Button type="submit">Save Changes</Button>
+                      <Tooltip
+                        label={
+                          'Cannot update profile, cannot read user information: E-101'
+                        }
+                        disabled={userData !== undefined}
+                        color="teal"
+                        withArrow
+                        position="top"
+                      >
+                        <Button disabled={userData === undefined} type="submit">
+                          Save Changes
+                        </Button>
+                      </Tooltip>
                     </Group>
                   </Grid.Col>
                 </Grid>

@@ -9,13 +9,14 @@ import {
   Group,
   Textarea,
   LoadingOverlay,
+  Tooltip,
 } from '@mantine/core';
 import { ICreateExpenseDto } from '@clients';
 import { usePostAdd } from '@requests/expensesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
-import { useGetUser } from '@requests/userRequests.ts';
 import { notifications } from '@mantine/notifications';
 import ExpensesDateInputWrapper from '../../../../components/wrappers/ExpensesDateInputWrapper.tsx';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CategoryOption {
   value: string;
@@ -23,13 +24,13 @@ interface CategoryOption {
 }
 
 export default function AddExpense() {
+  const { userData } = useUserDataContext();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [currencyId, setCurrencyId] = useState<number | null>(null);
+  const [currencyId, setCurrencyId] = useState<number | undefined>(undefined);
 
   const [postAddExpense] = usePostAdd();
   const [getAllCategories] = useGetAllExpenseCategories();
-  const [getUser] = useGetUser();
 
   const form = useForm<ICreateExpenseDto>({
     mode: 'uncontrolled',
@@ -77,24 +78,15 @@ export default function AddExpense() {
 
   // Fetch user currency
   useEffect(() => {
-    const fetchUserCurrency = async () => {
-      try {
-        // Assuming we can get the username from somewhere
-        // For now, we'll use a placeholder
-        const username = 'tamalito'; // This should be replaced with actual username
-        const response = await getUser(username);
-        if (response?.data) {
-          const userData = response.data;
-          setCurrencyId(userData.currencyId);
-          form.setFieldValue('currencyId', userData.currencyId);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
+    try {
+      if (userData?.currencyId !== undefined) {
+        setCurrencyId(userData.currencyId);
+        form.setFieldValue('currencyId', userData.currencyId);
       }
-    };
-
-    fetchUserCurrency();
-  }, []);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  }, [userData]);
 
   const handleSubmit = async (values: ICreateExpenseDto) => {
     setLoading(true);
@@ -174,7 +166,17 @@ export default function AddExpense() {
         />
 
         <Group justify="flex-end" mt="md">
-          <Button type="submit">Add Expense</Button>
+          <Tooltip
+            disabled={currencyId !== undefined}
+            label={'Cannot submit expense, because no currency was found'}
+            color="teal"
+            withArrow
+            position="top"
+          >
+            <Button disabled={currencyId === undefined} type="submit">
+              Add Expense
+            </Button>
+          </Tooltip>
         </Group>
       </form>
     </Paper>
