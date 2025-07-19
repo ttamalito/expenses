@@ -1,7 +1,5 @@
 package com.api.expenses.rest.controllers.utils;
 
-import com.api.expenses.rest.models.requestsModels.UserLoginRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
