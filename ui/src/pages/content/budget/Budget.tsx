@@ -15,6 +15,7 @@ import { notifications } from '@mantine/notifications';
 import { DataTable } from 'mantine-datatable';
 import { IUpdateBudgetDto } from '@clients';
 import { useGetBudget, usePostModify } from '@requests/budgetRequests.ts';
+import BudgetBurndownChart from '../statistics/BudgetBurndownChart.tsx';
 
 interface BudgetItem {
   id: number;
@@ -180,6 +181,7 @@ export default function Budget() {
           </Group>
         </form>
       </Paper>
+      <BudgetBurndownChart />
     </Container>
   );
 }

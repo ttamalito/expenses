@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import CategoryComparisonChart from './CategoryComparisonChart';
 import CashFlowChart from './CashFlowChart';
+import BudgetBurndownChart from './BudgetBurndownChart';
 
 const Statistics: React.FC = () => {
   const navigate = useNavigate();
@@ -112,6 +113,8 @@ const Statistics: React.FC = () => {
         </Paper>
 
         <CashFlowChart />
+
+        {<BudgetBurndownChart />}
 
         <CategoryComparisonChart />
       </Stack>
