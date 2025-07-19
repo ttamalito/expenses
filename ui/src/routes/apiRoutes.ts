@@ -14,6 +14,7 @@ export const constants = {
   // Budget
   budget: 'budget',
   modify: 'modify',
+  burndown: 'burndown',
 
   // Categories
   category: 'category',
@@ -71,6 +72,7 @@ export const routes = {
   budget: {
     get: `/${constants.budget}`,
     modify: `/${constants.budget}/${constants.modify}`,
+    burndown: `/${constants.budget}/${constants.burndown}`,
   },
 
   // Categories Controller

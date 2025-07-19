@@ -27,6 +27,9 @@ Originally built with JavaScript (both frontend and backend), the project has ev
   - View monthly and yearly expense summaries
   - Analyze spending patterns
   - Visual charts and graphs for better insights
+  - Cash flow visualization (income vs. expenses over time)
+  - Category comparison charts to track spending changes between periods
+  - Pie charts showing expense distribution by category
 
 - **User Management**
   - User registration and authentication
@@ -43,7 +46,7 @@ Originally built with JavaScript (both frontend and backend), the project has ev
 - **Framework**: React with TypeScript
 - **Build Tool**: Vite
 - **UI Library**: Mantine UI components
-- **Charts**: Recharts
+- **Charts**: Recharts and @mantine/charts
 - **HTTP Client**: Axios
 - **Routing**: React Router
 - **Testing**: Vitest with React Testing Library
