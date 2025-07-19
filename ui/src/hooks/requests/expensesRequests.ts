@@ -170,3 +170,44 @@ export const useDeleteExpense = (): [
   );
   return [callback];
 };
+
+export const useCompareCategories = (): [
+  (
+    currentPeriodType: string,
+    currentPeriodValue: number,
+    previousPeriodType: string,
+    previousPeriodValue: number,
+    currentYear?: number,
+    previousYear?: number,
+  ) => Promise<AxiosResponse | undefined>,
+] => {
+  const { get } = useApi();
+  const callback = useCallback(
+    (
+      currentPeriodType: string,
+      currentPeriodValue: number,
+      previousPeriodType: string,
+      previousPeriodValue: number,
+      currentYear?: number,
+      previousYear?: number,
+    ) => {
+      const params = new URLSearchParams();
+      params.append('currentPeriodType', currentPeriodType);
+      params.append('currentPeriodValue', currentPeriodValue.toString());
+      params.append('previousPeriodType', previousPeriodType);
+      params.append('previousPeriodValue', previousPeriodValue.toString());
+
+      if (currentYear !== undefined) {
+        params.append('currentYear', currentYear.toString());
+      }
+
+      if (previousYear !== undefined) {
+        params.append('previousYear', previousYear.toString());
+      }
+
+      return get(routes.expenses.compare, params);
+    },
+    [get],
+  );
+  return [callback];
+};

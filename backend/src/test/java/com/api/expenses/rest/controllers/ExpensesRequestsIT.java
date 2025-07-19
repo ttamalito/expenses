@@ -1016,4 +1016,116 @@ public class ExpensesRequestsIT {
         return categoryIds;
     }
 
+    @DisplayName("Compare categories between different time periods")
+    @Test
+    public void compareCategoriesBetweenPeriods() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        // Create categories
+        List<Integer> categoryIds = createMultipleExpenseCategories(bearerToken,
+                "src/test/resources/expenses/categoryComparison/categories.json");
+
+        // Add category IDs to January expenses
+        List<Pair<Integer, Integer>> januaryCategoryPairs = new ArrayList<>();
+        januaryCategoryPairs.add(Pair.of(0, categoryIds.get(0))); // Food expense 1
+        januaryCategoryPairs.add(Pair.of(1, categoryIds.get(0))); // Food expense 2
+        januaryCategoryPairs.add(Pair.of(2, categoryIds.get(1))); // Transportation expense 1
+        januaryCategoryPairs.add(Pair.of(3, categoryIds.get(1))); // Transportation expense 2
+        januaryCategoryPairs.add(Pair.of(4, categoryIds.get(2))); // Entertainment expense
+
+        String januaryExpensesJson = addCategoryToListOfExpensesInSpecificPosition(
+                januaryCategoryPairs,
+                "src/test/resources/expenses/categoryComparison/expensesJanuary2025.json");
+
+        // Add category IDs to February expenses
+        List<Pair<Integer, Integer>> februaryCategoryPairs = new ArrayList<>();
+        februaryCategoryPairs.add(Pair.of(0, categoryIds.get(0))); // Food expense 1
+        februaryCategoryPairs.add(Pair.of(1, categoryIds.get(0))); // Food expense 2
+        februaryCategoryPairs.add(Pair.of(2, categoryIds.get(1))); // Transportation expense 1
+        februaryCategoryPairs.add(Pair.of(3, categoryIds.get(1))); // Transportation expense 2
+        februaryCategoryPairs.add(Pair.of(4, categoryIds.get(2))); // Entertainment expense
+
+        String februaryExpensesJson = addCategoryToListOfExpensesInSpecificPosition(
+                februaryCategoryPairs,
+                "src/test/resources/expenses/categoryComparison/expensesFebruary2025.json");
+
+        // Save expenses
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<CreateExpenseDto> januaryExpenses = new ArrayList<>();
+        List<Integer> januaryExpenseIds = sendAndSaveExpenses(bearerToken, januaryExpensesJson, januaryExpenses);
+
+        List<CreateExpenseDto> februaryExpenses = new ArrayList<>();
+        List<Integer> februaryExpenseIds = sendAndSaveExpenses(bearerToken, februaryExpensesJson, februaryExpenses);
+
+        // Call the comparison endpoint
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/expenses/compare")
+                        .header("Authorization", bearerToken)
+                        .param("currentPeriodType", "month")
+                        .param("currentPeriodValue", "1")
+                        .param("previousPeriodType", "month")
+                        .param("previousPeriodValue", "2")
+                        .param("currentYear", "2025")
+                        .param("previousYear", "2025"))
+                .andExpect(status().isOk());
+
+        String responseJson = result.andReturn().getResponse().getContentAsString();
+
+        // Print the response for debugging
+        System.out.println("[DEBUG_LOG] Response JSON: " + responseJson);
+
+        // Verify the response contains the expected structure
+        assertTrue(responseJson.contains("\"currentPeriodLabel\":\"January 2025\""), 
+                "Response should contain January 2025 as current period label");
+        assertTrue(responseJson.contains("\"previousPeriodLabel\":\"February 2025\""), 
+                "Response should contain February 2025 as previous period label");
+
+        // Verify the response contains categories array
+        assertTrue(responseJson.contains("\"categories\":["), 
+                "Response should contain categories array");
+
+        // Verify each category has the expected fields
+        assertTrue(responseJson.contains("\"categoryId\":"), 
+                "Response should contain categoryId field");
+        assertTrue(responseJson.contains("\"categoryName\":"), 
+                "Response should contain categoryName field");
+        assertTrue(responseJson.contains("\"currentPeriodAmount\":"), 
+                "Response should contain currentPeriodAmount field");
+        assertTrue(responseJson.contains("\"previousPeriodAmount\":"), 
+                "Response should contain previousPeriodAmount field");
+        assertTrue(responseJson.contains("\"difference\":"), 
+                "Response should contain difference field");
+        assertTrue(responseJson.contains("\"percentageChange\":"), 
+                "Response should contain percentageChange field");
+
+        // Verify the response contains totals
+        assertTrue(responseJson.contains("\"totalCurrentPeriod\":"), 
+                "Response should contain totalCurrentPeriod field");
+        assertTrue(responseJson.contains("\"totalPreviousPeriod\":"), 
+                "Response should contain totalPreviousPeriod field");
+        assertTrue(responseJson.contains("\"totalDifference\":"), 
+                "Response should contain totalDifference field");
+        assertTrue(responseJson.contains("\"totalPercentageChange\":"), 
+                "Response should contain totalPercentageChange field");
+
+        // Clean up
+        for (int expenseId : januaryExpenseIds) {
+            mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                            .header("Authorization", bearerToken))
+                    .andExpect(status().isNoContent());
+        }
+
+        for (int expenseId : februaryExpenseIds) {
+            mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                            .header("Authorization", bearerToken))
+                    .andExpect(status().isNoContent());
+        }
+
+        for (int categoryId : categoryIds) {
+            deleteExpenseCategory(bearerToken, categoryId);
+        }
+    }
 }

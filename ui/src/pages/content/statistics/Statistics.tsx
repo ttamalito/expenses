@@ -10,6 +10,7 @@ import {
   Paper,
   Stack,
 } from '@mantine/core';
+import CategoryComparisonChart from './CategoryComparisonChart';
 
 const Statistics: React.FC = () => {
   const navigate = useNavigate();
@@ -108,6 +109,8 @@ const Statistics: React.FC = () => {
             </Button>
           </Group>
         </Paper>
+
+        <CategoryComparisonChart />
       </Stack>
     </Box>
   );

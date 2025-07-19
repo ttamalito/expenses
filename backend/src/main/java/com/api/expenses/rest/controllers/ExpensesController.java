@@ -5,6 +5,7 @@ import com.api.expenses.rest.exceptions.TransactionException;
 import com.api.expenses.rest.exceptions.UserException;
 import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.User;
+import com.api.expenses.rest.models.dtos.CategoryComparisonResponseDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
 import com.api.expenses.rest.services.ExpenseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -200,5 +201,43 @@ public class ExpensesController {
 
     private ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    /**
+     * Compare spending across categories between different time periods.
+     * 
+     * @param currentPeriodType The type of the current period ("month" or "year")
+     * @param currentPeriodValue The value of the current period (month number or year)
+     * @param previousPeriodType The type of the previous period ("month" or "year")
+     * @param previousPeriodValue The value of the previous period (month number or year)
+     * @param currentYear The year of the current period (required if currentPeriodType is "month")
+     * @param previousYear The year of the previous period (required if previousPeriodType is "month")
+     * @return A JSON response containing the comparison data
+     */
+    @GetMapping("/compare")
+    public ResponseEntity<CategoryComparisonResponseDto> compareCategories(
+            @RequestParam String currentPeriodType,
+            @RequestParam int currentPeriodValue,
+            @RequestParam String previousPeriodType,
+            @RequestParam int previousPeriodValue,
+            @RequestParam(required = false) Integer currentYear,
+            @RequestParam(required = false) Integer previousYear) {
+
+        UUID userId = getUserId();
+
+        try {
+            CategoryComparisonResponseDto comparisonData = expenseService.compareCategoriesBetweenPeriods(
+                    userId,
+                    currentPeriodType,
+                    currentPeriodValue,
+                    previousPeriodType,
+                    previousPeriodValue,
+                    currentYear,
+                    previousYear
+            );
+            return ResponseEntity.ok(comparisonData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
