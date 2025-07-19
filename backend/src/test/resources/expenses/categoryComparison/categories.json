@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Food",
+    "description": "Food expenses",
+    "budget": "500.00"
+  },
+  {
+    "name": "Transportation",
+    "description": "Transportation expenses",
+    "budget": "300.00"
+  },
+  {
+    "name": "Entertainment",
+    "description": "Entertainment expenses",
+    "budget": "200.00"
+  }
+]

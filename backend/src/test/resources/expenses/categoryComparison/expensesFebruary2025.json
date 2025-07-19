@@ -1,0 +1,37 @@
+[
+  {
+    "categoryId": 0,
+    "amount": 200.00,
+    "currencyId": 1,
+    "date": "2025-02-05",
+    "description": "Grocery shopping"
+  },
+  {
+    "categoryId": 0,
+    "amount": 100.00,
+    "currencyId": 1,
+    "date": "2025-02-15",
+    "description": "Restaurant dinner"
+  },
+  {
+    "categoryId": 1,
+    "amount": 150.00,
+    "currencyId": 1,
+    "date": "2025-02-10",
+    "description": "Gas"
+  },
+  {
+    "categoryId": 1,
+    "amount": 30.00,
+    "currencyId": 1,
+    "date": "2025-02-20",
+    "description": "Taxi"
+  },
+  {
+    "categoryId": 2,
+    "amount": 60.00,
+    "currencyId": 1,
+    "date": "2025-02-25",
+    "description": "Movie tickets"
+  }
+]

@@ -31,6 +31,7 @@ export const constants = {
   yearly: 'yearly',
   singleType: 'single-type',
   totalSpent: 'total-spent',
+  compare: 'compare',
 
   // Incomes
   incomes: 'incomes',
@@ -113,6 +114,7 @@ export const routes = {
     totalSpentMonthly: `/${constants.expenses}/${constants.totalSpent}/${constants.monthly}`,
     totalSpentMonthlyCategory: `/${constants.expenses}/${constants.totalSpent}/${constants.monthly}/${constants.category}`,
     delete: `/${constants.expenses}/${constants.delete}`,
+    compare: `/${constants.expenses}/${constants.compare}`,
   },
 
   // Incomes Controller
