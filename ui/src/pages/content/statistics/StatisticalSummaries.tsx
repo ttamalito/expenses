@@ -156,9 +156,12 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Highest Spending Day</Text>
                     <Text size="sm">
-                      {formatDate(highestSpending.highestSpendingDay.date)}:
+                      {formatDate(
+                        highestSpending?.highestSpendingDay?.date ?? '01-01-00',
+                      )}
+                      :
                       {formatCurrency(
-                        highestSpending.highestSpendingDay.amount,
+                        highestSpending?.highestSpendingDay?.amount ?? 0,
                       )}
                     </Text>
                   </div>
@@ -171,10 +174,12 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Highest Spending Month</Text>
                     <Text size="sm">
-                      {getMonthName(highestSpending.highestSpendingMonth.month)}
-                      {highestSpending.highestSpendingMonth.year}:
+                      {getMonthName(
+                        highestSpending?.highestSpendingMonth?.month ?? 0,
+                      )}
+                      {highestSpending?.highestSpendingMonth?.year ?? 0}
                       {formatCurrency(
-                        highestSpending.highestSpendingMonth.amount,
+                        highestSpending?.highestSpendingMonth?.amoun ?? 0,
                       )}
                     </Text>
                   </div>
@@ -187,9 +192,9 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Highest Spending Category</Text>
                     <Text size="sm">
-                      {highestSpending.highestSpendingCategory.categoryName}:
+                      {highestSpending?.highestSpendingCategory?.categoryName}:
                       {formatCurrency(
-                        highestSpending.highestSpendingCategory.amount,
+                        highestSpending?.highestSpendingCategory?.amount ?? 0,
                       )}
                     </Text>
                   </div>
@@ -218,7 +223,7 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Average Daily Spend</Text>
                     <Text size="sm">
-                      {formatCurrency(averageSpending.averageDailySpend)}
+                      {formatCurrency(averageSpending?.averageDailySpend ?? 0)}
                     </Text>
                   </div>
                 </Group>
@@ -230,7 +235,7 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Average Weekly Spend</Text>
                     <Text size="sm">
-                      {formatCurrency(averageSpending.averageWeeklySpend)}
+                      {formatCurrency(averageSpending?.averageWeeklySpend ?? 0)}
                     </Text>
                   </div>
                 </Group>
@@ -242,9 +247,9 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Longest Streak Under Budget</Text>
                     <Text size="sm">
-                      {budgetStreak.longestStreakDays} days (
-                      {formatDate(budgetStreak.streakStartDate)} to
-                      {formatDate(budgetStreak.streakEndDate)})
+                      {budgetStreak?.longestStreakDays} days (
+                      {formatDate(budgetStreak?.streakStartDate ?? '0')} to
+                      {formatDate(budgetStreak?.streakEndDate ?? '0')})
                     </Text>
                   </div>
                 </Group>
@@ -260,10 +265,14 @@ const StatisticalSummaries: React.FC = () => {
                   <Title order={5}>Savings</Title>
                   <Badge
                     color={
-                      savings.averageMonthlySavingsRate >= 0 ? 'green' : 'red'
+                      savings &&
+                      savings.averageMonthlySavingsRate !== undefined &&
+                      savings.averageMonthlySavingsRate >= 0
+                        ? 'green'
+                        : 'red'
                     }
                   >
-                    {formatPercentage(savings.averageMonthlySavingsRate)}
+                    {formatPercentage(savings?.averageMonthlySavingsRate ?? 0)}
                   </Badge>
                 </Group>
               </Card.Section>
@@ -271,12 +280,12 @@ const StatisticalSummaries: React.FC = () => {
               <Stack gap="md" mt="md">
                 <Text fw={500}>
                   Average Monthly Savings Rate:
-                  {formatPercentage(savings.averageMonthlySavingsRate)}
+                  {formatPercentage(savings?.averageMonthlySavingsRate ?? 0)}
                 </Text>
 
                 <Text fw={500}>Monthly Savings Percentages:</Text>
                 <Grid>
-                  {Object.entries(savings.monthlySavingsPercentage).map(
+                  {Object.entries(savings?.monthlySavingsPercentage ?? 0).map(
                     ([monthYear, percentage]) => {
                       return (
                         <Grid.Col
