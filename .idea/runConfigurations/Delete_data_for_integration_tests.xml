@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Delete data for integration tests" type="DatabaseScript">
-    <data-source id="80cceb64-9a11-4a40-ae27-234ff0fdf710" namespace="schema/&quot;dev_expensesdb&quot;" />
-    <script-text>DELETE FROM expenses WHERE true;
-DELETE FROM incomes WHERE true;</script-text>
-    <method v="2" />
-  </configuration>
-</component>
