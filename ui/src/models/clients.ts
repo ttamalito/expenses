@@ -752,6 +752,458 @@ export interface IGetUserDto {
     [key: string]: any;
 }
 
+export class AverageSpendingDto implements IAverageSpendingDto {
+    averageDailySpend?: number;
+    averageWeeklySpend?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAverageSpendingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.averageDailySpend = _data["averageDailySpend"];
+            this.averageWeeklySpend = _data["averageWeeklySpend"];
+        }
+    }
+
+    static fromJS(data: any): AverageSpendingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AverageSpendingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["averageDailySpend"] = this.averageDailySpend;
+        data["averageWeeklySpend"] = this.averageWeeklySpend;
+        return data;
+    }
+}
+
+export interface IAverageSpendingDto {
+    averageDailySpend?: number;
+    averageWeeklySpend?: number;
+
+    [key: string]: any;
+}
+
+export class BudgetStreakDto implements IBudgetStreakDto {
+    longestStreakDays?: number;
+    streakStartDate?: string;
+    streakEndDate?: string;
+
+    [key: string]: any;
+
+    constructor(data?: IBudgetStreakDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.longestStreakDays = _data["longestStreakDays"];
+            this.streakStartDate = _data["streakStartDate"];
+            this.streakEndDate = _data["streakEndDate"];
+        }
+    }
+
+    static fromJS(data: any): BudgetStreakDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BudgetStreakDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["longestStreakDays"] = this.longestStreakDays;
+        data["streakStartDate"] = this.streakStartDate;
+        data["streakEndDate"] = this.streakEndDate;
+        return data;
+    }
+}
+
+export interface IBudgetStreakDto {
+    longestStreakDays?: number;
+    streakStartDate?: string;
+    streakEndDate?: string;
+
+    [key: string]: any;
+}
+
+export class CategorySpendingDto implements ICategorySpendingDto {
+    categoryId?: number;
+    categoryName?: string;
+    amount?: number;
+
+    [key: string]: any;
+
+    constructor(data?: ICategorySpendingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.categoryId = _data["categoryId"];
+            this.categoryName = _data["categoryName"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): CategorySpendingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategorySpendingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["categoryId"] = this.categoryId;
+        data["categoryName"] = this.categoryName;
+        data["amount"] = this.amount;
+        return data;
+    }
+}
+
+export interface ICategorySpendingDto {
+    categoryId?: number;
+    categoryName?: string;
+    amount?: number;
+
+    [key: string]: any;
+}
+
+export class DaySpendingDto implements IDaySpendingDto {
+    date?: string;
+    amount?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IDaySpendingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.date = _data["date"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): DaySpendingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DaySpendingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["date"] = this.date;
+        data["amount"] = this.amount;
+        return data;
+    }
+}
+
+export interface IDaySpendingDto {
+    date?: string;
+    amount?: number;
+
+    [key: string]: any;
+}
+
+export class HighestSpendingDto implements IHighestSpendingDto {
+    highestSpendingDay?: DaySpendingDto;
+    highestSpendingMonth?: MonthSpendingDto;
+    highestSpendingCategory?: CategorySpendingDto;
+
+    [key: string]: any;
+
+    constructor(data?: IHighestSpendingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.highestSpendingDay = _data["highestSpendingDay"] ? DaySpendingDto.fromJS(_data["highestSpendingDay"]) : <any>undefined;
+            this.highestSpendingMonth = _data["highestSpendingMonth"] ? MonthSpendingDto.fromJS(_data["highestSpendingMonth"]) : <any>undefined;
+            this.highestSpendingCategory = _data["highestSpendingCategory"] ? CategorySpendingDto.fromJS(_data["highestSpendingCategory"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): HighestSpendingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HighestSpendingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["highestSpendingDay"] = this.highestSpendingDay ? this.highestSpendingDay.toJSON() : <any>undefined;
+        data["highestSpendingMonth"] = this.highestSpendingMonth ? this.highestSpendingMonth.toJSON() : <any>undefined;
+        data["highestSpendingCategory"] = this.highestSpendingCategory ? this.highestSpendingCategory.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IHighestSpendingDto {
+    highestSpendingDay?: DaySpendingDto;
+    highestSpendingMonth?: MonthSpendingDto;
+    highestSpendingCategory?: CategorySpendingDto;
+
+    [key: string]: any;
+}
+
+export class MonthSpendingDto implements IMonthSpendingDto {
+    month?: number;
+    year?: number;
+    amount?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IMonthSpendingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.month = _data["month"];
+            this.year = _data["year"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): MonthSpendingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MonthSpendingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["month"] = this.month;
+        data["year"] = this.year;
+        data["amount"] = this.amount;
+        return data;
+    }
+}
+
+export interface IMonthSpendingDto {
+    month?: number;
+    year?: number;
+    amount?: number;
+
+    [key: string]: any;
+}
+
+export class SavingsDto implements ISavingsDto {
+    averageMonthlySavingsRate?: number;
+    monthlySavingsPercentage?: { [key: string]: number; };
+
+    [key: string]: any;
+
+    constructor(data?: ISavingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.averageMonthlySavingsRate = _data["averageMonthlySavingsRate"];
+            if (_data["monthlySavingsPercentage"]) {
+                this.monthlySavingsPercentage = {} as any;
+                for (let key in _data["monthlySavingsPercentage"]) {
+                    if (_data["monthlySavingsPercentage"].hasOwnProperty(key))
+                        (<any>this.monthlySavingsPercentage)![key] = _data["monthlySavingsPercentage"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SavingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SavingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["averageMonthlySavingsRate"] = this.averageMonthlySavingsRate;
+        if (this.monthlySavingsPercentage) {
+            data["monthlySavingsPercentage"] = {};
+            for (let key in this.monthlySavingsPercentage) {
+                if (this.monthlySavingsPercentage.hasOwnProperty(key))
+                    (<any>data["monthlySavingsPercentage"])[key] = (<any>this.monthlySavingsPercentage)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISavingsDto {
+    averageMonthlySavingsRate?: number;
+    monthlySavingsPercentage?: { [key: string]: number; };
+
+    [key: string]: any;
+}
+
+export class StatisticalSummaryDto implements IStatisticalSummaryDto {
+    highestSpending?: HighestSpendingDto;
+    savings?: SavingsDto;
+    averageSpending?: AverageSpendingDto;
+    budgetStreak?: BudgetStreakDto;
+
+    [key: string]: any;
+
+    constructor(data?: IStatisticalSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.highestSpending = _data["highestSpending"] ? HighestSpendingDto.fromJS(_data["highestSpending"]) : <any>undefined;
+            this.savings = _data["savings"] ? SavingsDto.fromJS(_data["savings"]) : <any>undefined;
+            this.averageSpending = _data["averageSpending"] ? AverageSpendingDto.fromJS(_data["averageSpending"]) : <any>undefined;
+            this.budgetStreak = _data["budgetStreak"] ? BudgetStreakDto.fromJS(_data["budgetStreak"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): StatisticalSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StatisticalSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["highestSpending"] = this.highestSpending ? this.highestSpending.toJSON() : <any>undefined;
+        data["savings"] = this.savings ? this.savings.toJSON() : <any>undefined;
+        data["averageSpending"] = this.averageSpending ? this.averageSpending.toJSON() : <any>undefined;
+        data["budgetStreak"] = this.budgetStreak ? this.budgetStreak.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IStatisticalSummaryDto {
+    highestSpending?: HighestSpendingDto;
+    savings?: SavingsDto;
+    averageSpending?: AverageSpendingDto;
+    budgetStreak?: BudgetStreakDto;
+
+    [key: string]: any;
+}
+
 export class GetIncomeDto implements IGetIncomeDto {
     id?: number;
     userId?: string;
@@ -836,6 +1288,154 @@ export interface IGetIncomeDto {
     week?: number;
     lastUpdate?: Date;
     categoryId?: number;
+
+    [key: string]: any;
+}
+
+export class CategoryComparisonDto implements ICategoryComparisonDto {
+    categoryId?: number;
+    categoryName?: string;
+    currentPeriodAmount?: number;
+    previousPeriodAmount?: number;
+    difference?: number;
+    percentageChange?: number;
+
+    [key: string]: any;
+
+    constructor(data?: ICategoryComparisonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.categoryId = _data["categoryId"];
+            this.categoryName = _data["categoryName"];
+            this.currentPeriodAmount = _data["currentPeriodAmount"];
+            this.previousPeriodAmount = _data["previousPeriodAmount"];
+            this.difference = _data["difference"];
+            this.percentageChange = _data["percentageChange"];
+        }
+    }
+
+    static fromJS(data: any): CategoryComparisonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryComparisonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["categoryId"] = this.categoryId;
+        data["categoryName"] = this.categoryName;
+        data["currentPeriodAmount"] = this.currentPeriodAmount;
+        data["previousPeriodAmount"] = this.previousPeriodAmount;
+        data["difference"] = this.difference;
+        data["percentageChange"] = this.percentageChange;
+        return data;
+    }
+}
+
+export interface ICategoryComparisonDto {
+    categoryId?: number;
+    categoryName?: string;
+    currentPeriodAmount?: number;
+    previousPeriodAmount?: number;
+    difference?: number;
+    percentageChange?: number;
+
+    [key: string]: any;
+}
+
+export class CategoryComparisonResponseDto implements ICategoryComparisonResponseDto {
+    currentPeriodLabel?: string;
+    previousPeriodLabel?: string;
+    categories?: CategoryComparisonDto[];
+    totalCurrentPeriod?: number;
+    totalPreviousPeriod?: number;
+    totalDifference?: number;
+    totalPercentageChange?: number;
+
+    [key: string]: any;
+
+    constructor(data?: ICategoryComparisonResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.currentPeriodLabel = _data["currentPeriodLabel"];
+            this.previousPeriodLabel = _data["previousPeriodLabel"];
+            if (Array.isArray(_data["categories"])) {
+                this.categories = [] as any;
+                for (let item of _data["categories"])
+                    this.categories!.push(CategoryComparisonDto.fromJS(item));
+            }
+            this.totalCurrentPeriod = _data["totalCurrentPeriod"];
+            this.totalPreviousPeriod = _data["totalPreviousPeriod"];
+            this.totalDifference = _data["totalDifference"];
+            this.totalPercentageChange = _data["totalPercentageChange"];
+        }
+    }
+
+    static fromJS(data: any): CategoryComparisonResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryComparisonResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["currentPeriodLabel"] = this.currentPeriodLabel;
+        data["previousPeriodLabel"] = this.previousPeriodLabel;
+        if (Array.isArray(this.categories)) {
+            data["categories"] = [];
+            for (let item of this.categories)
+                data["categories"].push(item.toJSON());
+        }
+        data["totalCurrentPeriod"] = this.totalCurrentPeriod;
+        data["totalPreviousPeriod"] = this.totalPreviousPeriod;
+        data["totalDifference"] = this.totalDifference;
+        data["totalPercentageChange"] = this.totalPercentageChange;
+        return data;
+    }
+}
+
+export interface ICategoryComparisonResponseDto {
+    currentPeriodLabel?: string;
+    previousPeriodLabel?: string;
+    categories?: CategoryComparisonDto[];
+    totalCurrentPeriod?: number;
+    totalPreviousPeriod?: number;
+    totalDifference?: number;
+    totalPercentageChange?: number;
 
     [key: string]: any;
 }
@@ -960,6 +1560,162 @@ export interface IGetExpenseCategoryDto {
     name?: string;
     description?: string;
     budget?: number;
+
+    [key: string]: any;
+}
+
+export class BudgetBurndownDto implements IBudgetBurndownDto {
+    month?: number;
+    year?: number;
+    categories?: CategoryBurndownDto[];
+
+    [key: string]: any;
+
+    constructor(data?: IBudgetBurndownDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.month = _data["month"];
+            this.year = _data["year"];
+            if (Array.isArray(_data["categories"])) {
+                this.categories = [] as any;
+                for (let item of _data["categories"])
+                    this.categories!.push(CategoryBurndownDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): BudgetBurndownDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BudgetBurndownDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["month"] = this.month;
+        data["year"] = this.year;
+        if (Array.isArray(this.categories)) {
+            data["categories"] = [];
+            for (let item of this.categories)
+                data["categories"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IBudgetBurndownDto {
+    month?: number;
+    year?: number;
+    categories?: CategoryBurndownDto[];
+
+    [key: string]: any;
+}
+
+export class CategoryBurndownDto implements ICategoryBurndownDto {
+    categoryId?: number;
+    categoryName?: string;
+    budget?: number;
+    totalSpent?: number;
+    dailySpending?: { [key: string]: number; };
+    remainingBudget?: { [key: string]: number; };
+
+    [key: string]: any;
+
+    constructor(data?: ICategoryBurndownDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.categoryId = _data["categoryId"];
+            this.categoryName = _data["categoryName"];
+            this.budget = _data["budget"];
+            this.totalSpent = _data["totalSpent"];
+            if (_data["dailySpending"]) {
+                this.dailySpending = {} as any;
+                for (let key in _data["dailySpending"]) {
+                    if (_data["dailySpending"].hasOwnProperty(key))
+                        (<any>this.dailySpending)![key] = _data["dailySpending"][key];
+                }
+            }
+            if (_data["remainingBudget"]) {
+                this.remainingBudget = {} as any;
+                for (let key in _data["remainingBudget"]) {
+                    if (_data["remainingBudget"].hasOwnProperty(key))
+                        (<any>this.remainingBudget)![key] = _data["remainingBudget"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): CategoryBurndownDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryBurndownDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["categoryId"] = this.categoryId;
+        data["categoryName"] = this.categoryName;
+        data["budget"] = this.budget;
+        data["totalSpent"] = this.totalSpent;
+        if (this.dailySpending) {
+            data["dailySpending"] = {};
+            for (let key in this.dailySpending) {
+                if (this.dailySpending.hasOwnProperty(key))
+                    (<any>data["dailySpending"])[key] = (<any>this.dailySpending)[key];
+            }
+        }
+        if (this.remainingBudget) {
+            data["remainingBudget"] = {};
+            for (let key in this.remainingBudget) {
+                if (this.remainingBudget.hasOwnProperty(key))
+                    (<any>data["remainingBudget"])[key] = (<any>this.remainingBudget)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ICategoryBurndownDto {
+    categoryId?: number;
+    categoryName?: string;
+    budget?: number;
+    totalSpent?: number;
+    dailySpending?: { [key: string]: number; };
+    remainingBudget?: { [key: string]: number; };
 
     [key: string]: any;
 }

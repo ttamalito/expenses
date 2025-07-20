@@ -48,6 +48,10 @@ export const constants = {
 
   // Currency
   currency: 'currency',
+
+  // Statistics
+  statistics: 'statistics',
+  summary: 'summary',
 };
 
 export const routes = {
@@ -73,6 +77,11 @@ export const routes = {
     get: `/${constants.budget}`,
     modify: `/${constants.budget}/${constants.modify}`,
     burndown: `/${constants.budget}/${constants.burndown}`,
+  },
+
+  // Statistics Controller
+  statistics: {
+    summary: `/${constants.statistics}/${constants.summary}`,
   },
 
   // Categories Controller

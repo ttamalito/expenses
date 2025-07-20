@@ -14,6 +14,7 @@ import CategoryComparisonChart from './CategoryComparisonChart';
 import CashFlowChart from './CashFlowChart';
 import BudgetBurndownChart from './BudgetBurndownChart';
 import SankeyDiagram from './SankeyDiagram';
+import StatisticalSummaries from './StatisticalSummaries';
 
 const Statistics: React.FC = () => {
   const navigate = useNavigate();
@@ -120,6 +121,8 @@ const Statistics: React.FC = () => {
         <SankeyDiagram />
 
         <CategoryComparisonChart />
+
+        <StatisticalSummaries />
       </Stack>
     </Box>
   );
