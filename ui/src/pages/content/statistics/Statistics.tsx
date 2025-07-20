@@ -118,11 +118,11 @@ const Statistics: React.FC = () => {
 
         {<BudgetBurndownChart />}
 
-        <SankeyDiagram />
-
         <CategoryComparisonChart />
 
         <StatisticalSummaries />
+
+        <SankeyDiagram />
       </Stack>
     </Box>
   );
