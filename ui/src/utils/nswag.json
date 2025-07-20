@@ -501,6 +501,51 @@
         }
       }
     },
+    "/user/data": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getUserDataFromJwtToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/summary": {
+      "get": {
+        "tags": [
+          "statistics-controller"
+        ],
+        "operationId": "getStatisticalSummary",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ping": {
       "get": {
         "tags": [
@@ -762,6 +807,26 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/export": {
+      "get": {
+        "tags": [
+          "base-controller"
+        ],
+        "operationId": "exportAllData",
         "responses": {
           "200": {
             "description": "OK",
@@ -1087,6 +1152,80 @@
         }
       }
     },
+    "/expenses/compare": {
+      "get": {
+        "tags": [
+          "expenses-controller"
+        ],
+        "operationId": "compareCategories",
+        "parameters": [
+          {
+            "name": "currentPeriodType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currentPeriodValue",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "previousPeriodType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previousPeriodValue",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "currentYear",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "previousYear",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryComparisonResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/currency/{currencyId}": {
       "get": {
         "tags": [
@@ -1262,6 +1401,46 @@
               "application/json": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/budget/burndown": {
+      "get": {
+        "tags": [
+          "budget-controller"
+        ],
+        "operationId": "getBudgetBurndown",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetBurndownDto"
                 }
               }
             }
@@ -1691,6 +1870,126 @@
           }
         }
       },
+      "AverageSpendingDto": {
+        "type": "object",
+        "properties": {
+          "averageDailySpend": {
+            "type": "number",
+            "format": "float"
+          },
+          "averageWeeklySpend": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "BudgetStreakDto": {
+        "type": "object",
+        "properties": {
+          "longestStreakDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "streakStartDate": {
+            "type": "string"
+          },
+          "streakEndDate": {
+            "type": "string"
+          }
+        }
+      },
+      "CategorySpendingDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "DaySpendingDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "HighestSpendingDto": {
+        "type": "object",
+        "properties": {
+          "highestSpendingDay": {
+            "$ref": "#/components/schemas/DaySpendingDto"
+          },
+          "highestSpendingMonth": {
+            "$ref": "#/components/schemas/MonthSpendingDto"
+          },
+          "highestSpendingCategory": {
+            "$ref": "#/components/schemas/CategorySpendingDto"
+          }
+        }
+      },
+      "MonthSpendingDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "SavingsDto": {
+        "type": "object",
+        "properties": {
+          "averageMonthlySavingsRate": {
+            "type": "number",
+            "format": "float"
+          },
+          "monthlySavingsPercentage": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "float"
+            }
+          }
+        }
+      },
+      "StatisticalSummaryDto": {
+        "type": "object",
+        "properties": {
+          "highestSpending": {
+            "$ref": "#/components/schemas/HighestSpendingDto"
+          },
+          "savings": {
+            "$ref": "#/components/schemas/SavingsDto"
+          },
+          "averageSpending": {
+            "$ref": "#/components/schemas/AverageSpendingDto"
+          },
+          "budgetStreak": {
+            "$ref": "#/components/schemas/BudgetStreakDto"
+          }
+        }
+      },
       "GetIncomeDto": {
         "type": "object",
         "properties": {
@@ -1739,6 +2038,67 @@
           }
         }
       },
+      "CategoryComparisonDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "currentPeriodAmount": {
+            "type": "number",
+            "format": "float"
+          },
+          "previousPeriodAmount": {
+            "type": "number",
+            "format": "float"
+          },
+          "difference": {
+            "type": "number",
+            "format": "float"
+          },
+          "percentageChange": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "CategoryComparisonResponseDto": {
+        "type": "object",
+        "properties": {
+          "currentPeriodLabel": {
+            "type": "string"
+          },
+          "previousPeriodLabel": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryComparisonDto"
+            }
+          },
+          "totalCurrentPeriod": {
+            "type": "number",
+            "format": "float"
+          },
+          "totalPreviousPeriod": {
+            "type": "number",
+            "format": "float"
+          },
+          "totalDifference": {
+            "type": "number",
+            "format": "float"
+          },
+          "totalPercentageChange": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
       "GetIncomeCategoryDto": {
         "type": "object",
         "properties": {
@@ -1778,6 +2138,59 @@
           "budget": {
             "type": "number",
             "format": "float"
+          }
+        }
+      },
+      "BudgetBurndownDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryBurndownDto"
+            }
+          }
+        }
+      },
+      "CategoryBurndownDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "number",
+            "format": "float"
+          },
+          "totalSpent": {
+            "type": "number",
+            "format": "float"
+          },
+          "dailySpending": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "remainingBudget": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "float"
+            }
           }
         }
       }
