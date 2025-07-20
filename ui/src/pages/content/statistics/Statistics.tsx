@@ -15,6 +15,7 @@ import CashFlowChart from './CashFlowChart';
 import BudgetBurndownChart from './BudgetBurndownChart';
 import SankeyDiagram from './SankeyDiagram';
 import StatisticalSummaries from './StatisticalSummaries';
+import CategorySpendingTimelineChart from './CategorySpendingTimelineChart';
 
 const Statistics: React.FC = () => {
   const navigate = useNavigate();
@@ -117,8 +118,9 @@ const Statistics: React.FC = () => {
         <CashFlowChart />
 
         {<BudgetBurndownChart />}
-
         <CategoryComparisonChart />
+
+        <CategorySpendingTimelineChart />
 
         <StatisticalSummaries />
 
