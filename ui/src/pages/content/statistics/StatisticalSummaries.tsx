@@ -179,7 +179,7 @@ const StatisticalSummaries: React.FC = () => {
                       )}
                       {highestSpending?.highestSpendingMonth?.year ?? 0}
                       {formatCurrency(
-                        highestSpending?.highestSpendingMonth?.amoun ?? 0,
+                        highestSpending?.highestSpendingMonth?.amount ?? 0,
                       )}
                     </Text>
                   </div>

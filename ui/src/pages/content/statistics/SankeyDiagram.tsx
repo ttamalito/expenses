@@ -44,7 +44,7 @@ interface SankeyData {
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EUR',
     minimumFractionDigits: 2,
   }).format(value);
 };
@@ -58,21 +58,25 @@ const CustomNode = (props: any) => {
   // We'll consider nodes with index higher than a threshold as expense nodes
   const isExpenseNode = index >= 10; // Adjust this threshold based on your data structure
 
-  // Format the display text with name and value if available
-  const displayText =
-    payload.value !== undefined
-      ? `${payload.name} (${formatCurrency(payload.value)})`
-      : payload.name;
+  const amountOfTargets: string =
+    payload.targetNodes.length > 0 ? `(${payload.targetNodes.length})` : '';
+
+  // Get the name and value separately for two-line display
+  const nodeName = payload.name;
+  let nodeValue = '';
+  if (payload.value !== undefined) {
+    nodeValue = `${formatCurrency(payload.value)} ${amountOfTargets}`;
+  }
 
   // For expense nodes, don't truncate the text
-  const truncatedText = isExpenseNode
-    ? displayText
-    : displayText.length > Math.max(10, Math.floor(containerWidth / 20))
-      ? displayText.substring(
+  const truncatedName = isExpenseNode
+    ? nodeName
+    : nodeName.length > Math.max(10, Math.floor(containerWidth / 20))
+      ? nodeName.substring(
           0,
           Math.max(10, Math.floor(containerWidth / 20)) - 3,
         ) + '...'
-      : displayText;
+      : nodeName;
 
   return (
     <Layer key={`CustomNode${index}`}>
@@ -87,13 +91,20 @@ const CustomNode = (props: any) => {
       <text
         textAnchor={isOut ? 'end' : 'start'}
         x={isOut ? x - 6 : x + width + 6}
-        y={y + height / 2}
+        y={y + height / 2 - 8} // Adjusted to position the text properly for two lines
         fontSize="14"
         stroke="#333"
         style={{ pointerEvents: 'none' }}
-        fontWeight={isExpenseNode ? 'bold' : 'normal'} // Make expense node text bold
+        fontWeight={isExpenseNode ? 'normal' : 'normal'} // Make expense node text bold
       >
-        {truncatedText}
+        <tspan x={isOut ? x - 6 : x + width + 6} dy={'0'}>
+          {truncatedName}
+        </tspan>
+        {nodeValue && (
+          <tspan x={isOut ? x - 6 : x + width + 6} dy={'12'}>
+            {nodeValue}
+          </tspan>
+        )}
       </text>
     </Layer>
   );
@@ -199,7 +210,7 @@ const SankeyDiagram: React.FC = () => {
       expenses.forEach((expense) => {
         const amount = expense.amount || 0;
         nodes.push({
-          name: expense.name || `Expense ${expense.id}`,
+          name: expense.name || `Expense ${expense.id}`, // Think if this should be the description
           value: amount,
         });
       });
@@ -350,38 +361,51 @@ const SankeyDiagram: React.FC = () => {
             <Loader />
           </Center>
         ) : sankeyData.nodes.length > 0 ? (
-          <ResponsiveContainer width="90%" height={500}>
-            <Sankey
-              data={sankeyData}
-              node={<CustomNode />}
-              nodePadding={50}
-              margin={{
-                left: 50,
-                right: 150,
-                top: 50,
-                bottom: 50,
-              }}
-              link={{ stroke: '#77c878' }}
+          <div
+            style={{
+              height: '600px',
+              width: '100%',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              paddingBottom: '20px',
+            }}
+          >
+            <ResponsiveContainer
+              width="90%"
+              height={Math.max(500, sankeyData.nodes.length * 40)}
             >
-              <Tooltip
-                content={({ payload }) => {
-                  if (payload) {
-                    return (
-                      <div
-                        style={{
-                          backgroundColor: 'white',
-                          padding: '5px',
-                          border: '1px solid #ccc',
-                          borderRadius: '4px',
-                        }}
-                      ></div>
-                    );
-                  }
-                  return null;
+              <Sankey
+                data={sankeyData}
+                node={<CustomNode />}
+                nodePadding={50}
+                margin={{
+                  left: 50,
+                  right: 150,
+                  top: 50,
+                  bottom: 150,
                 }}
-              />
-            </Sankey>
-          </ResponsiveContainer>
+                link={{ stroke: '#77c878' }}
+              >
+                <Tooltip
+                  content={({ payload }) => {
+                    if (payload) {
+                      return (
+                        <div
+                          style={{
+                            backgroundColor: 'white',
+                            padding: '5px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                          }}
+                        ></div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </Sankey>
+            </ResponsiveContainer>
+          </div>
         ) : (
           <Center h={400}>
             <Text c="dimmed">
