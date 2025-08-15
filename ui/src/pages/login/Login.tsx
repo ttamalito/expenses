@@ -15,7 +15,7 @@ import {
 import { IconArrowRight } from '@tabler/icons-react';
 import classes from './Login.module.css';
 import { useNavigate } from 'react-router';
-import { useAuth } from '../../hooks/useAuth.tsx';
+import { useAuth } from '@hooks/useAuth.tsx';
 import { useForm } from '@mantine/form';
 import { IUserLoginRequest } from '@clients';
 import { useDisclosure } from '@mantine/hooks';
@@ -48,14 +48,13 @@ function Login() {
       //   return value.trim().length < 1 ? 'loginPage.passwordLengthError' : null;
       // },
     },
-    // transformValues: (values) => {
-    //   const loginViewModel: ILoginViewModel = {
-    //     userName: values.userName!,
-    //     password: values.password!,
-    //     rememberMe: values.rememberMe,
-    //   };
-    //   return loginViewModel;
-    // },
+    transformValues: (values) => {
+      const isEmail = values.email?.includes('@');
+      if (!isEmail) {
+        values.username = values.email;
+      }
+      return values;
+    },
   });
 
   return (
