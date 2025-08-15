@@ -8,6 +8,58 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
+export class UpdateTagDto implements IUpdateTagDto {
+    name?: string;
+    description?: string;
+
+    [key: string]: any;
+
+    constructor(data?: IUpdateTagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): UpdateTagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateTagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface IUpdateTagDto {
+    name?: string;
+    description?: string;
+
+    [key: string]: any;
+}
+
 export class CreateIncomeCategoryDto implements ICreateIncomeCategoryDto {
     description?: string;
     name?: string;
@@ -168,6 +220,118 @@ export interface IUpdateUserDto {
     firstName?: string;
     lastName?: string;
     currencyId?: number;
+
+    [key: string]: any;
+}
+
+export class CreateTagDto implements ICreateTagDto {
+    name?: string;
+    description?: string;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateTagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): CreateTagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface ICreateTagDto {
+    name?: string;
+    description?: string;
+
+    [key: string]: any;
+}
+
+export class GetTagDto implements IGetTagDto {
+    id?: number;
+    name?: string;
+    description?: string;
+    userId?: string;
+
+    [key: string]: any;
+
+    constructor(data?: IGetTagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.userId = _data["userId"];
+        }
+    }
+
+    static fromJS(data: any): GetTagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetTagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["userId"] = this.userId;
+        return data;
+    }
+}
+
+export interface IGetTagDto {
+    id?: number;
+    name?: string;
+    description?: string;
+    userId?: string;
 
     [key: string]: any;
 }

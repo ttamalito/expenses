@@ -12,7 +12,9 @@ public class TransactionException extends Exception {
         UNAUTHORIZED("User is trying to modify an expense that does not belong to him"),
         EXPENSE_NOT_FOUND("Expense not found in the database"),
         CATEGORY_HAS_LINKED_EXPENSES("Cannot delete category because it has linked expenses"),
-        CATEGORY_HAS_LINKED_INCOMES("Cannot delete category because it has linked incomes");
+        CATEGORY_HAS_LINKED_INCOMES("Cannot delete category because it has linked incomes"),
+        TAG_NOT_FOUND("Tag not found in the database"),
+        TAG_ALREADY_EXISTS("A tag with this name already exists for this user");
 
         private String message;
 

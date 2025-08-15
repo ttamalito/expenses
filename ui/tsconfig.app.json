@@ -26,6 +26,7 @@
     "paths": {
       "@clients": ["./src/models/clients.ts"],
       "@routes": ["./src/routes/routes.ts"],
+      "@apiRoutes": ["./src/routes/apiRoutes.ts"],
       "@requests/*": ["./src/hooks/requests/*"],
       "@hooks/*": ["./src/hooks/*"]
     }
