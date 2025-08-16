@@ -12,16 +12,17 @@ import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { ICreateTagDto, IGetTagDto, IUpdateTagDto } from '@clients';
+import { ICreateTagDto, IUpdateTagDto } from '@clients';
 import {
   useDeleteTagById,
   useGetTagsForUser,
   usePostCreateTag,
   usePutUpdateTag,
 } from '@requests/tagRequests.ts';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 export default function TagsTable() {
-  const [tags, setTags] = useState<IGetTagDto[]>([]);
+  const { userTags, setUserTags } = useUserDataContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -51,7 +52,7 @@ export default function TagsTable() {
     getTagsForUser()
       .then((response) => {
         if (response?.data) {
-          setTags(response.data);
+          setUserTags(response.data);
         }
       })
       .catch((error) => {
@@ -156,7 +157,7 @@ export default function TagsTable() {
         striped
         withTableBorder
         withColumnBorders
-        records={tags}
+        records={userTags}
         columns={[
           { accessor: 'name', title: 'Name', noWrap: true },
           { accessor: 'description', title: 'Description' },
