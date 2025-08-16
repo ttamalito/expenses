@@ -29,14 +29,14 @@ public class Expense extends Transaction {
     }
 
     public Expense(int id, User user, ExpenseCategory category, float amount, Date date,
-                   String description, int month, int year, int week, Currency currency) {
-        super(id, user, amount, date, description, month, year, week, currency);
+                   String description, int month, int year, int week, Currency currency, Tag tag) {
+        super(id, user, amount, date, description, month, year, week, currency, tag);
         this.category = category;
     }
 
     public Expense(User user, ExpenseCategory expenseCategory, float amount, Date date,
-                   String description, int month, int year, int week, Currency currency) {
-        super(user, amount, date, description, month, year, week, currency);
+                   String description, int month, int year, int week, Currency currency, Tag tag) {
+        super(user, amount, date, description, month, year, week, currency, tag);
         this.category = expenseCategory;
     }
 

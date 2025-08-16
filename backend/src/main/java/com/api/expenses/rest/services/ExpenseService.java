@@ -2,16 +2,15 @@ package com.api.expenses.rest.services;
 
 import com.api.expenses.rest.exceptions.TransactionException;
 import com.api.expenses.rest.exceptions.UserException;
-import com.api.expenses.rest.models.Currency;
-import com.api.expenses.rest.models.Expense;
-import com.api.expenses.rest.models.ExpenseCategory;
-import com.api.expenses.rest.models.User;
+import com.api.expenses.rest.models.*;
 import com.api.expenses.rest.models.dtos.CategoryComparisonDto;
 import com.api.expenses.rest.models.dtos.CategoryComparisonResponseDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
+import com.api.expenses.rest.models.dtos.GetTagDto;
 import com.api.expenses.rest.repositories.CurrencyRepository;
 import com.api.expenses.rest.repositories.ExpenseCategoryRepository;
 import com.api.expenses.rest.repositories.ExpenseRepository;
+import com.api.expenses.rest.repositories.TagRepository;
 import com.api.expenses.rest.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -34,6 +33,8 @@ public class ExpenseService {
     private final ExpenseCategoryRepository expenseCategoryRepository;
 
     private final CurrencyRepository currencyRepository;
+    private final TagRepository tagRepository;
+    private final TagService tagService;
 
     private final UserService userService;
     private final ExpenseCategoryService expenseCategoryService;
@@ -42,12 +43,17 @@ public class ExpenseService {
     public ExpenseService(ExpenseRepository expenseRepository,
                           @Lazy ExpenseCategoryRepository expenseCategoryRepository,
                           @Lazy CurrencyRepository currencyRepository,
-                          @Lazy UserService userService, ExpenseCategoryService expenseCategoryService) {
+                          @Lazy UserService userService,
+                          ExpenseCategoryService expenseCategoryService,
+                          TagRepository tagRepository,
+                          TagService tagService) {
         this.expenseRepository = expenseRepository;
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.currencyRepository = currencyRepository;
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
+        this.tagRepository = tagRepository;
+        this.tagService = tagService;
     }
 
     public List<Expense> getExpensesForAMonthOfAUser(UUID userId, int month, int year) throws UserException {
@@ -75,6 +81,12 @@ public class ExpenseService {
         Currency currency = currencyRepository.findById(expenseFromRequest.currencyId()).orElseThrow(() ->
                 new TransactionException(TransactionException.TransactionExceptionType.CURRENCY_NOT_FOUND));
 
+        Tag tag = null; // TODO: Check if the user owns the TAG
+        if (expenseFromRequest.tagId() != null && expenseFromRequest.tagId().isPresent()) {
+            tag = tagRepository.findById(expenseFromRequest.tagId().get()).orElseThrow( () ->
+                    new TransactionException(TransactionException.TransactionExceptionType.TAG_NOT_FOUND));
+        }
+
 
         Date date = expenseFromRequest.date();
 
@@ -96,7 +108,8 @@ public class ExpenseService {
                 month,
                 year,
                 week,
-                currency
+                currency,
+                tag
         );
         return expenseRepository.save(expense).getId();
     }
@@ -219,6 +232,12 @@ public class ExpenseService {
                 new TransactionException(TransactionException.TransactionExceptionType.CURRENCY_NOT_FOUND));
 
         expense.setCurrency(currency);
+
+        if (expense.getTagId() != null) {
+            GetTagDto tagDto = tagService.getTagById(expense.getTagId(), user.getId());
+            Tag tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user);
+            expense.setTag(tag);
+        }
 
         Date date = expense.getDate();
         final int week = DateUtils.getWeekOfTheYear(date);

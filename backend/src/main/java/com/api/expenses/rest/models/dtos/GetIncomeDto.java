@@ -1,6 +1,7 @@
 package com.api.expenses.rest.models.dtos;
 
 import java.sql.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 public record GetIncomeDto(
@@ -14,6 +15,7 @@ public record GetIncomeDto(
     int year,
     int week,
     Date lastUpdate,
-    int categoryId
+    int categoryId,
+    Optional<Integer> tagId
 ) {
 }

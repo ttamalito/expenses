@@ -1,14 +1,15 @@
 package com.api.expenses.rest.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Date;
 import java.util.UUID;
 
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @MappedSuperclass // Abstract class is not mapped, but its subclasses are
 public abstract class Transaction {
 
@@ -49,6 +50,22 @@ public abstract class Transaction {
     private int currencyId;
 
     //private Currency currency;
+
+    @JsonIgnore
+    @ManyToOne(
+            cascade = CascadeType.MERGE, // TODO: Check this
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "tag_id",
+            referencedColumnName = "id",
+            nullable = true
+    )
+    private Tag tag;
+
+    @Column(name = "tag_id", insertable = false, updatable = false)
+    private Integer tagId;
+
     @Column(nullable = false)
     private Date date;
     private String description;
@@ -71,7 +88,8 @@ public abstract class Transaction {
                        int month,
                        int year,
                        int week,
-                       Currency currency) {
+                       Currency currency,
+                       Tag tag) {
         this.id = id;
         this.user = user;
         this.amount = amount;
@@ -81,6 +99,7 @@ public abstract class Transaction {
         this.year = year;
         this.week = week;
         this.currency = currency;
+        this.tag = tag;
     }
 
     public Transaction(User user,
@@ -90,7 +109,8 @@ public abstract class Transaction {
                        int month,
                        int year,
                        int week,
-                       Currency currency) {
+                       Currency currency,
+                       Tag tag) {
         this.id = id;
         this.user = user;
         this.amount = amount;
@@ -100,6 +120,7 @@ public abstract class Transaction {
         this.year = year;
         this.week = week;
         this.currency = currency;
+        this.tag = tag;
     }
 
     public int getId() {
@@ -198,5 +219,16 @@ public abstract class Transaction {
         this.currencyId = currencyId;
     }
 
-
+    public Integer getTagId() {
+        return tagId;
+    }
+    public void setTagId(Integer tagId) {
+        this.tagId = tagId;
+    }
+    public Tag getTag() {
+        return tag;
+    }
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
 }

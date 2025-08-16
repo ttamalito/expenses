@@ -11,6 +11,47 @@
     }
   ],
   "paths": {
+    "/tags/update/{id}": {
+      "put": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "updateTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/category/income/create": {
       "put": {
         "tags": [
@@ -109,6 +150,36 @@
               "text/plain": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/create": {
+      "post": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "createTag",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTagDto"
                 }
               }
             }
@@ -526,6 +597,60 @@
         }
       }
     },
+    "/tags/{id}": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getTagById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/user": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getTagsForUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetTagDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/statistics/summary": {
       "get": {
         "tags": [
@@ -773,37 +898,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/greeting": {
-      "get": {
-        "tags": [
-          "greeting-controller"
-        ],
-        "operationId": "greeting",
-        "parameters": [
-          {
-            "name": "name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "World"
             }
           }
         ],
@@ -1498,6 +1592,37 @@
         }
       }
     },
+    "/tags/delete/{id}": {
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/incomes/delete/{id}": {
       "delete": {
         "tags": [
@@ -1618,6 +1743,17 @@
   },
   "components": {
     "schemas": {
+      "UpdateTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "CreateIncomeCategoryDto": {
         "type": "object",
         "properties": {
@@ -1659,6 +1795,36 @@
           }
         }
       },
+      "CreateTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "GetTagDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "CreateIncomeDto": {
         "type": "object",
         "properties": {
@@ -1680,6 +1846,10 @@
           },
           "description": {
             "type": "string"
+          },
+          "tagId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1699,6 +1869,10 @@
             "format": "float"
           },
           "currencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagId": {
             "type": "integer",
             "format": "int32"
           },
@@ -1752,6 +1926,10 @@
           },
           "description": {
             "type": "string"
+          },
+          "tagId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2033,6 +2211,10 @@
             "format": "date-time"
           },
           "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagId": {
             "type": "integer",
             "format": "int32"
           }

@@ -1,59 +1,56 @@
 package com.api.expenses.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.UUID;
 
-@MappedSuperclass
-@JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class AbstractCategory {
+@Entity
+@Table(name = "tags")
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Access(AccessType.PROPERTY) // Only fetch the id
+    // only fetch the id, not the object. to fetch a specific field use the getter
+    //@Access(AccessType.PROPERTY)
     private int id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column
+    private String description;
 
     @JsonIgnore
     @ManyToOne(
-            cascade = CascadeType.MERGE, // when a category is deleted, the user will NOT be deleted
+            cascade = CascadeType.MERGE,
             fetch = FetchType.LAZY
     )
     @JoinColumn(
             name = "user_id",
             referencedColumnName = "id",
             nullable = false
-            //foreignKey = @ForeignKey(name = "fk_category_user_id_"), fk must be unique
     )
     private User user;
 
     @Column(name = "user_id", insertable = false, updatable = false)
     private UUID userId;
 
-    @Column(nullable = false)
-    private String name;
-    private String description;
-
-
-
-    public AbstractCategory() {
+    public Tag() {
     }
 
-    public AbstractCategory(int id, User user, String name, String description) {
+    public Tag(int id, String name, String description, User user) {
         this.id = id;
-        this.user = user;
         this.name = name;
         this.description = description;
-    }
-    public AbstractCategory(User user, String name, String description) {
-        this.id = id;
         this.user = user;
-        this.name = name;
-        this.description = description;
     }
 
+    public Tag(String name, String description,User user) {
+        this.name = name;
+        this.description = description;
+        this.user = user;
+    }
 
     public int getId() {
         return id;
@@ -61,10 +58,6 @@ public abstract class AbstractCategory {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public UUID getUserId() {
-        return userId;
     }
 
     public String getName() {
@@ -81,6 +74,18 @@ public abstract class AbstractCategory {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public UUID getUserId() {
+        return userId;
     }
 
     public void setUserId(UUID userId) {

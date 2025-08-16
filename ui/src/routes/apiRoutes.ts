@@ -52,6 +52,9 @@ export const constants = {
   // Statistics
   statistics: 'statistics',
   summary: 'summary',
+
+  // Tags
+  tags: 'tags',
 };
 
 export const routes = {
@@ -171,6 +174,21 @@ export const routes = {
     create: `/${constants.currency}/${constants.create}`,
     delete: (currencyId: number) => {
       return `/${constants.currency}/${constants.delete}/${currencyId}`;
+    },
+  },
+
+  // Tags Controller
+  tags: {
+    allForUser: `/${constants.tags}/${constants.user}`,
+    getTagById: (tagId: number) => {
+      return `/${constants.tags}/${tagId}`;
+    },
+    create: `/${constants.tags}/${constants.create}`,
+    update: (tagId: number) => {
+      return `/${constants.tags}/${constants.update}/${tagId}`;
+    },
+    delete: (tagId: number) => {
+      return `/${constants.tags}/${constants.delete}/${tagId}`;
     },
   },
 };

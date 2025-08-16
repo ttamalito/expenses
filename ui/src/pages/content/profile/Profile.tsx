@@ -23,6 +23,7 @@ import ExpenseCategoryTable from './ExpenseCategoryTable';
 import IncomeCategoryTable from './IncomeCategoryTable';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import useErrorHandling from '@hooks/useErrorHandling.tsx';
+import TagsTable from './TagsTable.tsx';
 
 export default function Profile() {
   const { userData, setUserData } = useUserDataContext();
@@ -228,6 +229,14 @@ export default function Profile() {
           Income Categories
         </Title>
         <IncomeCategoryTable />
+      </Paper>
+
+      {/* Tags Box */}
+      <Paper shadow="xs" p="md" mb="xl">
+        <Title order={2} mb="md">
+          Tags
+        </Title>
+        <TagsTable />
       </Paper>
     </Container>
   );

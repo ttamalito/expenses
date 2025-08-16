@@ -1,0 +1,8 @@
+{
+  "categoryId": 1,
+  "amount": 1000.32,
+  "currencyId": 1,
+  "date": "2025-01-05",
+  "description": "Test income description",
+  "tagId": 0
+}

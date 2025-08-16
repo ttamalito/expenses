@@ -7,11 +7,14 @@ import { IGetUserDto } from '@clients';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import useErrorHandling from '@hooks/useErrorHandling.tsx';
 import SideBar from './SideBar';
+import { notifications } from '@mantine/notifications';
+import { useGetTagsForUser } from '@requests/tagRequests.ts';
 
 export default function ExpensesLayout() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  const { setUserData } = useUserDataContext();
+  const [getTagsForUser] = useGetTagsForUser();
+  const { setUserData, setUserTags } = useUserDataContext();
   const [getUser] = useGetUserData();
   const { handleError } = useErrorHandling();
 
@@ -26,6 +29,22 @@ export default function ExpensesLayout() {
       .catch((error) => {
         console.error('Error fetching user data:', error);
         handleError('Error fetching user data: E-101');
+      });
+  }, []);
+
+  useEffect(() => {
+    getTagsForUser()
+      .then((response) => {
+        if (response?.data) {
+          setUserTags(response.data);
+        }
+      })
+      .catch(() => {
+        notifications.show({
+          title: 'Error',
+          message: 'Error Fetching Tags',
+          color: 'red',
+        });
       });
   }, []);
 

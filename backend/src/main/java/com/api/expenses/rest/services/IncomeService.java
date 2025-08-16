@@ -1,11 +1,9 @@
 package com.api.expenses.rest.services;
 
 import com.api.expenses.rest.exceptions.TransactionException;
-import com.api.expenses.rest.models.Currency;
-import com.api.expenses.rest.models.Income;
-import com.api.expenses.rest.models.IncomeCategory;
-import com.api.expenses.rest.models.User;
+import com.api.expenses.rest.models.*;
 import com.api.expenses.rest.models.dtos.CreateIncomeDto;
+import com.api.expenses.rest.models.dtos.GetTagDto;
 import com.api.expenses.rest.repositories.IncomeRepository;
 import com.api.expenses.rest.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +22,17 @@ public class IncomeService {
     private final UserService userService;
     private final IncomeCategoryService incomeCategoryService;
     private final CurrencyService currencyService;
+    private final TagService tagService;
 
     @Autowired
     public IncomeService(IncomeRepository incomeRepository, UserService userService,
-                         IncomeCategoryService incomeCategoryService, CurrencyService currencyService) {
+                         IncomeCategoryService incomeCategoryService, CurrencyService currencyService,
+                         TagService tagService) {
         this.incomeRepository = incomeRepository;
         this.userService = userService;
         this.incomeCategoryService = incomeCategoryService;
         this.currencyService = currencyService;
+        this.tagService = tagService;
     }
 
     public boolean incomeExists(int incomeId) {
@@ -62,6 +63,16 @@ public class IncomeService {
                 () -> new TransactionException(TransactionException.TransactionExceptionType.CURRENCY_NOT_FOUND)
         );
 
+        Tag tag = null;
+        if (incomeFromRequest.tagId().isPresent()) {
+            try {
+                GetTagDto tagDto = tagService.getTagById(incomeFromRequest.tagId().get(), userId);
+                tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user);
+            } catch (TransactionException e) {
+                throw new TransactionException(TransactionException.TransactionExceptionType.TAG_NOT_FOUND);
+            }
+        }
+
         if (incomeFromRequest.amount() <= 0) {
             throw new TransactionException(TransactionException.TransactionExceptionType.INVALID_AMOUNT);
         }
@@ -81,7 +92,8 @@ public class IncomeService {
                 month,
                 year,
                 week,
-                currency
+                currency,
+                tag
         );
         return incomeRepository.save(income).getId();
     }

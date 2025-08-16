@@ -7,6 +7,7 @@ import com.api.expenses.rest.models.dtos.GetIncomeDto;
 import com.api.expenses.rest.services.IncomeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
@@ -27,6 +28,7 @@ public class IncomesController {
 
     @Autowired
     public IncomesController(@Lazy IncomeService incomeService) {
+        objectMapper.registerModule(new Jdk8Module());
         this.incomeService = incomeService;
     }
 
@@ -89,7 +91,8 @@ public class IncomesController {
                 incomeObj.getYear(),
                 incomeObj.getWeek(),
                 incomeObj.getLastUpdate(),
-                incomeObj.getCategoryId()
+                incomeObj.getCategoryId(),
+                incomeObj.getTagId() != null ? Optional.of(incomeObj.getTagId()) : Optional.empty()
             );
 
             return ResponseEntity.ok(incomeDto);
@@ -164,7 +167,8 @@ public class IncomesController {
                     income.getYear(),
                     income.getWeek(),
                     income.getLastUpdate(),
-                    income.getCategoryId()
+                    income.getCategoryId(),
+                    income.getTagId() != null ? Optional.of(income.getTagId()) : Optional.empty()
                 );
                 incomeDtos.add(incomeDto);
             }
@@ -196,7 +200,8 @@ public class IncomesController {
                     income.getYear(),
                     income.getWeek(),
                     income.getLastUpdate(),
-                    income.getCategoryId()
+                    income.getCategoryId(),
+                    income.getTagId() != null ? Optional.of(income.getTagId()) : Optional.empty()
                 );
                 incomeDtos.add(incomeDto);
             }

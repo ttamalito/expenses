@@ -11,7 +11,7 @@ import {
   LoadingOverlay,
   Tooltip,
 } from '@mantine/core';
-import { ICreateExpenseDto } from '@clients';
+import { ICreateExpenseDto, IGetTagDto } from '@clients';
 import { usePostAdd } from '@requests/expensesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
 import { notifications } from '@mantine/notifications';
@@ -23,11 +23,21 @@ interface CategoryOption {
   label: string;
 }
 
-export default function AddExpense() {
+interface TagOption {
+  value: string;
+  label: string;
+}
+
+interface IAddExpenseProps {
+  tagsDto: IGetTagDto[];
+}
+
+export default function AddExpense({ tagsDto }: IAddExpenseProps) {
   const { userData } = useUserDataContext();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [currencyId, setCurrencyId] = useState<number | undefined>(undefined);
+  const [tags, setTags] = useState<TagOption[]>([]);
 
   const [postAddExpense] = usePostAdd();
   const [getAllCategories] = useGetAllExpenseCategories();
@@ -75,6 +85,18 @@ export default function AddExpense() {
 
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const tagOptions = [];
+    for (const tag of tagsDto) {
+      const option: TagOption = {
+        value: tag.id?.toString() ?? '0',
+        label: tag.name!,
+      };
+      tagOptions.push(option);
+    }
+    setTags(tagOptions);
+  }, [tagsDto]);
 
   // Fetch user currency
   useEffect(() => {
@@ -163,6 +185,15 @@ export default function AddExpense() {
           mb="md"
           key={form.key('description')}
           {...form.getInputProps('description')}
+        />
+
+        <Select
+          label="Tag"
+          placeholder="Optional Tag"
+          data={tags}
+          mb="md"
+          key={form.key('tagId')}
+          {...form.getInputProps('tagId')}
         />
 
         <Group justify="flex-end" mt="md">
