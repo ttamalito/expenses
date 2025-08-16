@@ -22,6 +22,19 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/hooks'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            const chunks = id.split('node_modules/');
+            return chunks[chunks.length - 1].split('/')[0];
+          }
+          return;
+        },
+      },
+    },
+  },
   server: {
     // https: {
     //   key: '/Users/jjgon/Documents/https_certs/key.pem', //uncomment to use http2 and https
