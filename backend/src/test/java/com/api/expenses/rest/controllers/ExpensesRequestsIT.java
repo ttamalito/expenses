@@ -5,6 +5,8 @@ import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.dtos.CreateExpenseCategoryDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +37,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ExpensesRequestsIT {
 
     private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public ExpensesRequestsIT(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
+    }
+
+    @BeforeEach
+    public void setUp() throws IOException {
+        objectMapper.registerModule(new Jdk8Module());
     }
 
     @Test
@@ -63,7 +71,6 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expenseJson = expenseResult.andReturn().getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         Expense expense = objectMapper.readValue(expenseJson, Expense.class);
         assertEquals(100f, expense.getAmount());
         assertEquals(expenseId, String.valueOf(expense.getId()));
@@ -115,8 +122,7 @@ public class ExpensesRequestsIT {
         categoryIdsPairs.add(pair5);
 
         String expensesToAddAsJson = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs, "src/test/resources/expenses/singleMonth/expensesForAMonth.json");
-
-        ObjectMapper objectMapper = new ObjectMapper();
+        
         List<CreateExpenseDto> expenses = new ArrayList<>();
         List<Integer> expenseIds = sendAndSaveExpenses(bearerToken, expensesToAddAsJson, expenses);
         // TODO: add a request with an expense that is not in the month and year
@@ -194,8 +200,7 @@ public class ExpensesRequestsIT {
         String expenseThatShouldNotBeQueried = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs,
                 "src/test/resources/expenses/singleMonthAndCategory/expensesNotToQuery.json");
 
-
-        ObjectMapper objectMapper = new ObjectMapper();
+        
         List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
         List<Integer> expenseIdsToIgnore = sendAndSaveExpenses(bearerToken,
                 expenseThatShouldNotBeQueried, expensesToSendAndIgnore);
@@ -303,8 +308,7 @@ public class ExpensesRequestsIT {
         String expenseThatShouldNotBeQueried = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs,
                 "src/test/resources/expenses/singleYear/expensesNotToQuery.json");
 
-
-        ObjectMapper objectMapper = new ObjectMapper();
+        
         // add expenses that should not be queried
         List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
         List<Integer> expenseIdsToIgnore = sendAndSaveExpenses(bearerToken,
@@ -411,8 +415,7 @@ public class ExpensesRequestsIT {
         String expenseThatShouldNotBeQueried = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs,
                 "src/test/resources/expenses/singleYearAndCategory/expensesNotToQuery.json");
 
-
-        ObjectMapper objectMapper = new ObjectMapper();
+        
 
         // add expenses that should not be queried
         List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
@@ -792,7 +795,6 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesForTheMonthJson = expensesForTheMonthResult.andReturn().getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         List<Expense> expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
 
         assertEquals(1, expensesForTheMonth.size());
@@ -850,7 +852,6 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesForTheMonthJson = expensesForTheMonthResult.andReturn().getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         List<Expense> expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
 
         int newCategoryId = createExpenseCategory(bearerToken, "src/test/resources/expenses/category.json");
@@ -905,7 +906,6 @@ public class ExpensesRequestsIT {
      * @throws IOException
      */
     private List<Integer> sendAndSaveExpenses(String bearerToken, String serializedListOfExpenses, List<CreateExpenseDto> expenses) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         List<CreateExpenseDto> serializedExpenses = objectMapper.readValue(serializedListOfExpenses, objectMapper.getTypeFactory().constructCollectionType(List.class, CreateExpenseDto.class));
         expenses.addAll(serializedExpenses);
 
@@ -950,10 +950,10 @@ public class ExpensesRequestsIT {
      * @throws IOException
      */
     private String addCategoryIdToExpense(int categoryId, String pathToExpenseJson) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
+        
         String expenseJson = new String(Files.readAllBytes(Path.of(pathToExpenseJson)));
         CreateExpenseDto expense = objectMapper.readValue(expenseJson, CreateExpenseDto.class);
-        CreateExpenseDto modifiedExpense = new CreateExpenseDto(categoryId, expense.amount(), expense.currencyId(), expense.date(), expense.description());
+        CreateExpenseDto modifiedExpense = new CreateExpenseDto(categoryId, expense.amount(), expense.currencyId(), expense.date(), expense.description(), Optional.empty());
         return objectMapper.writeValueAsString(modifiedExpense);
     }
 
@@ -967,14 +967,14 @@ public class ExpensesRequestsIT {
     private String addCategoryToListOfExpensesInSpecificPosition(List<Pair<Integer, Integer>> categoryIds, String pathToListOfExpenses)
             throws IOException {
         String expensesAsJson = new String(Files.readAllBytes(Path.of(pathToListOfExpenses)));
-        ObjectMapper objectMapper = new ObjectMapper();
+        
         List<CreateExpenseDto> serializedExpenses = objectMapper.readValue(expensesAsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, CreateExpenseDto.class));
         List<CreateExpenseDto> modifiedExpenses = new ArrayList<>();
 
         for(Pair<Integer, Integer> categoryId : categoryIds) {
             CreateExpenseDto serializedExpense = serializedExpenses.get(categoryId.getFirst());
             CreateExpenseDto modifiedExpense = new CreateExpenseDto(categoryId.getSecond(), serializedExpense.amount(),
-                    serializedExpense.currencyId(), serializedExpense.date(), serializedExpense.description());
+                    serializedExpense.currencyId(), serializedExpense.date(), serializedExpense.description(), Optional.empty());
             modifiedExpenses.add(modifiedExpense);
         }
         return objectMapper.writeValueAsString(modifiedExpenses);
@@ -995,7 +995,6 @@ public class ExpensesRequestsIT {
      */
     private List<Integer> createMultipleExpenseCategories(String bearerToken, String pathToCategoriesJson)
             throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         List<Integer> categoryIds = new ArrayList<>();
         String categoriesToAdd = new String (Files.readAllBytes(Path.of(pathToCategoriesJson)));
         List<CreateExpenseCategoryDto> serializedCategories = objectMapper.readValue(
@@ -1054,7 +1053,7 @@ public class ExpensesRequestsIT {
                 "src/test/resources/expenses/categoryComparison/expensesFebruary2025.json");
 
         // Save expenses
-        ObjectMapper objectMapper = new ObjectMapper();
+        
         List<CreateExpenseDto> januaryExpenses = new ArrayList<>();
         List<Integer> januaryExpenseIds = sendAndSaveExpenses(bearerToken, januaryExpensesJson, januaryExpenses);
 

@@ -13,7 +13,7 @@ public abstract class AbstractCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Access(AccessType.PROPERTY)
+    @Access(AccessType.PROPERTY) // Only fetch the id
     private int id;
 
     @JsonIgnore

@@ -5,6 +5,9 @@ import com.api.expenses.rest.models.Income;
 import com.api.expenses.rest.models.dtos.CreateIncomeDto;
 import com.api.expenses.rest.models.dtos.GetIncomeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +35,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class IncomesControllerTestsIT {
 
     private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public IncomesControllerTestsIT(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
+    }
+
+    @BeforeEach
+    public void setup() throws Exception {
+        objectMapper.registerModule(new Jdk8Module());
     }
     @Test
     @DisplayName("Add income and delete it")
@@ -62,7 +71,7 @@ public class IncomesControllerTestsIT {
         ).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         String incomeFetchResultString = incomeFetchResult.andReturn().getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
+
         GetIncomeDto income = objectMapper.readValue(incomeFetchResultString, GetIncomeDto.class);
 
         assertEquals(1000.32f, income.amount());
@@ -201,7 +210,6 @@ public class IncomesControllerTestsIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         String responseJson = result.andReturn().getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         List<GetIncomeDto> incomes = objectMapper.readValue(responseJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetIncomeDto.class));
 
         // Verify that we got the expected number of incomes
@@ -243,7 +251,6 @@ public class IncomesControllerTestsIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         String responseJson = result.andReturn().getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         List<GetIncomeDto> incomes = objectMapper.readValue(responseJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetIncomeDto.class));
 
         // Verify that we got the expected number of incomes
@@ -274,7 +281,6 @@ public class IncomesControllerTestsIT {
      * @throws IOException
      */
     private List<Integer> sendAndSaveIncomes(String bearerToken, String serializedIncomesList, List<CreateIncomeDto> incomes) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         List<CreateIncomeDto> serializedIncomes = objectMapper.readValue(serializedIncomesList, objectMapper.getTypeFactory().constructCollectionType(List.class, CreateIncomeDto.class));
         incomes.addAll(serializedIncomes);
 
@@ -305,10 +311,9 @@ public class IncomesControllerTestsIT {
      * @throws IOException
      */
     private String addCategoryIdToIncome(int categoryId, String pathToExpenseJson) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         String expenseJson = new String(Files.readAllBytes(Path.of(pathToExpenseJson)));
         CreateIncomeDto income = objectMapper.readValue(expenseJson, CreateIncomeDto.class);
-        CreateIncomeDto modifiedIncome = new CreateIncomeDto(categoryId, income.amount(), income.date(), income.currencyId(), income.description());
+        CreateIncomeDto modifiedIncome = new CreateIncomeDto(categoryId, income.amount(), income.date(), income.currencyId(), income.description(), Optional.empty());
         return objectMapper.writeValueAsString(modifiedIncome);
     }
 
@@ -335,12 +340,11 @@ public class IncomesControllerTestsIT {
     private String addCategoryToListOfIncomes(int categoryId, String pathToListOfIncomes)
             throws IOException {
         String incomesAsJson = new String(Files.readAllBytes(Path.of(pathToListOfIncomes)));
-        ObjectMapper objectMapper = new ObjectMapper();
         List<CreateIncomeDto> serializedIncomes = objectMapper.readValue(incomesAsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, CreateIncomeDto.class));
         List<CreateIncomeDto> modifiedIncomes = new ArrayList<>();
 
         for(CreateIncomeDto income : serializedIncomes) {
-            CreateIncomeDto modifiedIncome = new CreateIncomeDto(categoryId, income.amount(), income.date(), income.currencyId(), income.description());
+            CreateIncomeDto modifiedIncome = new CreateIncomeDto(categoryId, income.amount(), income.date(), income.currencyId(), income.description(), Optional.empty());
             modifiedIncomes.add(modifiedIncome);
         }
 
