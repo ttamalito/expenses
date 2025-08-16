@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -7,6 +7,7 @@ import { IGetIncomeDto } from '@clients';
 import { useDeleteIncome } from '@requests/incomesRequests.ts';
 import { useGetAllIncomeCategories } from '@requests/categoryRequests.ts';
 import sortBy from 'lodash/sortBy';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CategoryOption {
   value: string;
@@ -19,6 +20,7 @@ interface IncomesTableProps {
 }
 
 export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
+  const { userTags } = useUserDataContext();
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<IGetIncomeDto>
   >({
@@ -99,6 +101,17 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
     }
   };
 
+  const findTagName = useCallback(
+    (tagId?: number) => {
+      if (!tagId) return '';
+      const tag = userTags.find((tag) => {
+        return tag.id === tagId;
+      });
+      return tag?.name;
+    },
+    [userTags],
+  );
+
   return (
     <>
       <DataTable
@@ -140,9 +153,18 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
             accessor: 'date',
             title: 'Date',
             sortable: true,
-            width: '20%',
+            width: '10%',
             render: ({ date }) => {
               return date ? new Date(date).toLocaleDateString() : '';
+            },
+          },
+          {
+            accessor: 'tagId',
+            title: 'Tag',
+            sortable: false,
+            width: '15%',
+            render: ({ tagId }) => {
+              return findTagName(tagId);
             },
           },
           {

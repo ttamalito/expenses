@@ -11,7 +11,7 @@ import {
   LoadingOverlay,
   Tooltip,
 } from '@mantine/core';
-import { ICreateIncomeDto } from '@clients';
+import { ICreateIncomeDto, IGetTagDto } from '@clients';
 import { usePostAdd } from '@requests/incomesRequests';
 import { useGetAllIncomeCategories } from '@requests/categoryRequests';
 import { notifications } from '@mantine/notifications';
@@ -23,11 +23,21 @@ interface CategoryOption {
   label: string;
 }
 
-export default function AddIncome() {
+interface TagOption {
+  value: string;
+  label: string;
+}
+
+interface IAddIncomeProps {
+  tagsDto: IGetTagDto[];
+}
+
+export default function AddIncome({ tagsDto }: IAddIncomeProps) {
   const { userData } = useUserDataContext();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [currencyId, setCurrencyId] = useState<number | undefined>(undefined);
+  const [tags, setTags] = useState<TagOption[]>([]);
 
   const [postAddIncome] = usePostAdd();
   const [getAllCategories] = useGetAllIncomeCategories();
@@ -74,6 +84,18 @@ export default function AddIncome() {
 
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const tagOptions = [];
+    for (const tag of tagsDto) {
+      const option: TagOption = {
+        value: tag.id?.toString() ?? '0',
+        label: tag.name!,
+      };
+      tagOptions.push(option);
+    }
+    setTags(tagOptions);
+  }, [tagsDto]);
 
   // Fetch user currency
   useEffect(() => {
@@ -161,6 +183,15 @@ export default function AddIncome() {
           mb="md"
           key={form.key('description')}
           {...form.getInputProps('description')}
+        />
+
+        <Select
+          label="Tag"
+          placeholder="Optional Tag"
+          data={tags}
+          mb="md"
+          key={form.key('tagId')}
+          {...form.getInputProps('tagId')}
         />
 
         <Group justify="flex-end" mt="md">

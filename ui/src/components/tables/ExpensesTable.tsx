@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -8,6 +8,7 @@ import { useDeleteExpense } from '@requests/expensesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
 import sortBy from 'lodash/sortBy';
 import EditExpenseModal from './editExpenseModal/EditExpenseModal.tsx';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CategoryOption {
   value: string;
@@ -23,6 +24,7 @@ export function ExpensesTable({
   expenses,
   onExpenseUpdated,
 }: ExpensesTableProps) {
+  const { userTags } = useUserDataContext();
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<IExpense>>({
     columnAccessor: 'date',
     direction: 'desc',
@@ -104,6 +106,17 @@ export function ExpensesTable({
     }
   };
 
+  const findTagName = useCallback(
+    (tagId?: number) => {
+      if (!tagId) return '';
+      const tag = userTags.find((tag) => {
+        return tag.id === tagId;
+      });
+      return tag?.name;
+    },
+    [userTags],
+  );
+
   return (
     <>
       <DataTable
@@ -145,9 +158,18 @@ export function ExpensesTable({
             accessor: 'date',
             title: 'Date',
             sortable: true,
-            width: '20%',
+            width: '10%',
             render: ({ date }) => {
               return date ? new Date(date).toLocaleDateString() : '';
+            },
+          },
+          {
+            accessor: 'tagId',
+            title: 'Tag',
+            sortable: false,
+            width: '14%',
+            render: ({ tagId }) => {
+              return findTagName(tagId);
             },
           },
           {

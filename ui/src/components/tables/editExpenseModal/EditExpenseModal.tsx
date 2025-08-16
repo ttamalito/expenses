@@ -16,6 +16,7 @@ import { IconEdit } from '@tabler/icons-react';
 import ExpensesDateInputWrapper from '../../wrappers/ExpensesDateInputWrapper.tsx';
 import { notifications } from '@mantine/notifications';
 import { usePostModify } from '@requests/expensesRequests.ts';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CategoryOption {
   value: string;
@@ -29,6 +30,7 @@ interface IEditExpenseModalProps {
 }
 
 export default function EditExpenseModal(props: IEditExpenseModalProps) {
+  const { userTags } = useUserDataContext();
   const [disabled, setDisabled] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [modifyExpense] = usePostModify();
@@ -94,6 +96,18 @@ export default function EditExpenseModal(props: IEditExpenseModalProps) {
               placeholder="Select date"
               key={form.key('date')}
               {...form.getInputProps('date')}
+            />
+            <Select
+              label="Tag"
+              placeholder="Optional tag"
+              data={userTags.map((tag) => {
+                return {
+                  value: tag.id?.toString() ?? '0',
+                  label: tag.name!,
+                };
+              })}
+              key={form.key('tagId')}
+              {...form.getInputProps('tagId')}
             />
             <Group justify="flex-end" mt="md">
               <Button disabled={disabled} type="submit">

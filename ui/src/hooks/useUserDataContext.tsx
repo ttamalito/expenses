@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { IGetUserDto } from '@clients';
+import { IGetTagDto, IGetUserDto } from '@clients';
 
 type UserDataProviderProps = {
   children: ReactNode;
@@ -15,15 +15,22 @@ type UserDataProviderProps = {
 const UserDataContext = createContext<{
   userData?: IGetUserDto;
   setUserData: (userData: IGetUserDto) => void;
+  userTags: IGetTagDto[];
+  setUserTags: (userTags: IGetTagDto[]) => void;
 }>({
   userData: undefined,
   setUserData: () => {
     console.log('setUserData');
   },
+  userTags: [],
+  setUserTags: () => {
+    console.log('setUserTags');
+  },
 });
 
 export const UserDataProvider = ({ children }: UserDataProviderProps) => {
   const [userData, setUserData] = useState<IGetUserDto | undefined>();
+  const [userTags, setUserTags] = useState<IGetTagDto[]>([]);
 
   const handleUserData = useCallback(
     (userData: IGetUserDto) => {
@@ -32,12 +39,21 @@ export const UserDataProvider = ({ children }: UserDataProviderProps) => {
     [setUserData],
   );
 
+  const handleUserTags = useCallback(
+    (userTags: IGetTagDto[]) => {
+      setUserTags(userTags);
+    },
+    [setUserTags],
+  );
+
   const value = useMemo(() => {
     return {
       userData,
       setUserData: handleUserData,
+      userTags,
+      setUserTags: handleUserTags,
     };
-  }, [handleUserData, userData]);
+  }, [handleUserData, handleUserTags, userData, userTags]);
 
   return (
     <UserDataContext.Provider value={value}>

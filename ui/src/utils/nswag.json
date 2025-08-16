@@ -1846,6 +1846,10 @@
           },
           "description": {
             "type": "string"
+          },
+          "tagId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1865,6 +1869,10 @@
             "format": "float"
           },
           "currencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagId": {
             "type": "integer",
             "format": "int32"
           },
@@ -1918,6 +1926,10 @@
           },
           "description": {
             "type": "string"
+          },
+          "tagId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2199,6 +2211,10 @@
             "format": "date-time"
           },
           "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagId": {
             "type": "integer",
             "format": "int32"
           }
