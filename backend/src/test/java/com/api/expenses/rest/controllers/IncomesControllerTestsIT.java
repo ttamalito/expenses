@@ -4,6 +4,7 @@ import com.api.expenses.rest.controllers.utils.AuthenticationHelper;
 import com.api.expenses.rest.models.Income;
 import com.api.expenses.rest.models.dtos.CreateIncomeDto;
 import com.api.expenses.rest.models.dtos.GetIncomeDto;
+import com.api.expenses.rest.models.dtos.GetTagDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.jupiter.api.BeforeAll;
@@ -270,6 +271,104 @@ public class IncomesControllerTestsIT {
         deleteIncomeCategory(bearerToken, categoryId);
     }
 
+    @Test
+    @DisplayName("Add income with a Tag and delete it")
+    public void addIncomeWithTagAndDeleteIt() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        String tagAsString = new String(Files.readAllBytes(Path.of("src/test/resources/incomes/tags/tagForIncome.json")));
+        ResultActions resultOfCreation = mockMvc.perform(post("/tags/create")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isOk());
+
+        String createdTag = resultOfCreation.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto = objectMapper.readValue(createdTag, GetTagDto.class);
+
+        int categoryId = createIncomeCategory(bearerToken, "src/test/resources/incomes/category.json");
+        String incomeAsJsonString = addTagIdToIncome(createdTagDto.id(), addCategoryIdToIncome(categoryId, "src/test/resources/incomes/validIncomeToAdd.json"));
+
+        ResultActions result = mockMvc.perform(post("/incomes/add")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(incomeAsJsonString)
+        ).andExpect(status().isOk());
+
+        String incomeId = result.andReturn().getResponse().getContentAsString().split(":")[1].replace("\"", "").replace("}", "");
+
+        ResultActions incomeFetchResult = mockMvc.perform(get("/incomes/get/" + incomeId)
+                .header("Authorization",bearerToken)
+        ).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+        String incomeFetchResultString = incomeFetchResult.andReturn().getResponse().getContentAsString();
+
+        GetIncomeDto income = objectMapper.readValue(incomeFetchResultString, GetIncomeDto.class);
+
+        assertEquals(1000.32f, income.amount());
+        assertEquals("2025-01-05", income.date().toString());
+        assertEquals(categoryId, income.categoryId());
+        assertEquals(1, income.currencyId());
+        assertEquals("Test income description", income.description());
+        assertEquals(2, income.week());
+        assertEquals(2025, income.year());
+        assertEquals(1, income.month());
+        assertEquals(createdTagDto.id(), income.tagId().get());
+
+        mockMvc.perform(delete("/incomes/delete/" + incomeId)
+                .header("Authorization",bearerToken)
+        ).andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isNoContent());
+
+        deleteIncomeCategory(bearerToken, categoryId);
+    }
+
+    @Test
+    @DisplayName("Add income with a Tag and delete it")
+    public void addIncomeWithInvalidTag() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        String tagAsString = new String(Files.readAllBytes(Path.of("src/test/resources/incomes/tags/tagForIncome.json")));
+        ResultActions resultOfCreation = mockMvc.perform(post("/tags/create")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isOk());
+
+        String createdTag = resultOfCreation.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto = objectMapper.readValue(createdTag, GetTagDto.class);
+
+        int categoryId = createIncomeCategory(bearerToken, "src/test/resources/incomes/category.json");
+        String incomeAsJsonString = addTagIdToIncome(createdTagDto.id() + 1, addCategoryIdToIncome(categoryId, "src/test/resources/incomes/validIncomeToAdd.json"));
+
+        ResultActions result = mockMvc.perform(post("/incomes/add")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(incomeAsJsonString)
+        ).andExpect(status().isBadRequest());
+
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isNoContent());
+
+        deleteIncomeCategory(bearerToken, categoryId);
+    }
+
     /**
      * Reads the incomes from a file and sends them to the server
      * It populates the incomes list with the incomes that were sent to the server
@@ -314,6 +413,12 @@ public class IncomesControllerTestsIT {
         String expenseJson = new String(Files.readAllBytes(Path.of(pathToExpenseJson)));
         CreateIncomeDto income = objectMapper.readValue(expenseJson, CreateIncomeDto.class);
         CreateIncomeDto modifiedIncome = new CreateIncomeDto(categoryId, income.amount(), income.date(), income.currencyId(), income.description(), Optional.empty());
+        return objectMapper.writeValueAsString(modifiedIncome);
+    }
+
+    private String addTagIdToIncome(int tagId, String incomeAsString) throws IOException {
+        CreateIncomeDto income = objectMapper.readValue(incomeAsString, CreateIncomeDto.class);
+        CreateIncomeDto modifiedIncome = new CreateIncomeDto(income.categoryId(), income.amount(), income.date(), income.currencyId(), income.description(), Optional.of(tagId));
         return objectMapper.writeValueAsString(modifiedIncome);
     }
 

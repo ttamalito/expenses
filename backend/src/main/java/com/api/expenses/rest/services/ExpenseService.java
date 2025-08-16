@@ -6,6 +6,7 @@ import com.api.expenses.rest.models.*;
 import com.api.expenses.rest.models.dtos.CategoryComparisonDto;
 import com.api.expenses.rest.models.dtos.CategoryComparisonResponseDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
+import com.api.expenses.rest.models.dtos.GetTagDto;
 import com.api.expenses.rest.repositories.CurrencyRepository;
 import com.api.expenses.rest.repositories.ExpenseCategoryRepository;
 import com.api.expenses.rest.repositories.ExpenseRepository;
@@ -33,6 +34,7 @@ public class ExpenseService {
 
     private final CurrencyRepository currencyRepository;
     private final TagRepository tagRepository;
+    private final TagService tagService;
 
     private final UserService userService;
     private final ExpenseCategoryService expenseCategoryService;
@@ -43,13 +45,15 @@ public class ExpenseService {
                           @Lazy CurrencyRepository currencyRepository,
                           @Lazy UserService userService,
                           ExpenseCategoryService expenseCategoryService,
-                          TagRepository tagRepository) {
+                          TagRepository tagRepository,
+                          TagService tagService) {
         this.expenseRepository = expenseRepository;
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.currencyRepository = currencyRepository;
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.tagRepository = tagRepository;
+        this.tagService = tagService;
     }
 
     public List<Expense> getExpensesForAMonthOfAUser(UUID userId, int month, int year) throws UserException {
@@ -228,6 +232,12 @@ public class ExpenseService {
                 new TransactionException(TransactionException.TransactionExceptionType.CURRENCY_NOT_FOUND));
 
         expense.setCurrency(currency);
+
+        if (expense.getTagId() != null) {
+            GetTagDto tagDto = tagService.getTagById(expense.getTagId(), user.getId());
+            Tag tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user);
+            expense.setTag(tag);
+        }
 
         Date date = expense.getDate();
         final int week = DateUtils.getWeekOfTheYear(date);

@@ -4,6 +4,7 @@ import com.api.expenses.rest.controllers.utils.AuthenticationHelper;
 import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.dtos.CreateExpenseCategoryDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
+import com.api.expenses.rest.models.dtos.GetTagDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -893,6 +892,219 @@ public class ExpensesRequestsIT {
         deleteExpenseCategory(bearerToken, newCategoryId);
     }
 
+    @Test
+    public void addAndDeleteExpenseWithTag() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        String tagAsString = new String(Files.readAllBytes(Path.of("src/test/resources/expenses/tags/tagForExpense.json")));
+        ResultActions resultOfCreation = mockMvc.perform(post("/tags/create")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isOk());
+
+        String createdTag = resultOfCreation.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto = objectMapper.readValue(createdTag, GetTagDto.class);
+
+        int categoryId = createExpenseCategory(bearerToken, "src/test/resources/expenses/category.json");
+        String json = addTagIdToExpense(createdTagDto.id(), addCategoryIdToExpense(categoryId, "src/test/resources/expenses/tags/expenseWithTag.json"));
+
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/expenses/add")
+                        .header("Authorization", bearerToken)
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isOk());
+        String expenseId = result.andReturn().getResponse().getContentAsString();
+
+        ResultActions expenseResult = mockMvc.perform(MockMvcRequestBuilders.get("/expenses/get/" + expenseId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk());
+        String expenseJson = expenseResult.andReturn().getResponse().getContentAsString();
+        Expense expense = objectMapper.readValue(expenseJson, Expense.class);
+        assertEquals(100f, expense.getAmount());
+        assertEquals(expenseId, String.valueOf(expense.getId()));
+        assertEquals("Test expense description", expense.getDescription());
+        assertEquals(categoryId, expense.getCategoryId());
+        assertEquals(1, expense.getCurrencyId());
+        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
+        assertEquals(7, expense.getMonth());
+        assertEquals(2025, expense.getYear());
+        assertTrue(expense.getWeek() > 0);
+        assertEquals("2025-07-05", expense.getDate().toString());
+        assertEquals(createdTagDto.id(), expense.getTagId());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isNoContent());
+
+        deleteExpenseCategory(bearerToken, categoryId);
+    }
+
+    @Test
+    public void modifyExpenseWithTag() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        String tagAsString = new String(Files.readAllBytes(Path.of("src/test/resources/expenses/tags/tagForExpense.json")));
+        ResultActions resultOfCreation = mockMvc.perform(post("/tags/create")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isOk());
+
+        String createdTag = resultOfCreation.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto = objectMapper.readValue(createdTag, GetTagDto.class);
+
+        int categoryId = createExpenseCategory(bearerToken, "src/test/resources/expenses/category.json");
+        String json = addTagIdToExpense(createdTagDto.id(), addCategoryIdToExpense(categoryId, "src/test/resources/expenses/tags/expenseWithTag.json"));
+
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/expenses/add")
+                        .header("Authorization", bearerToken)
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isOk());
+        String expenseId = result.andReturn().getResponse().getContentAsString();
+
+        ResultActions expenseResult = mockMvc.perform(MockMvcRequestBuilders.get("/expenses/get/" + expenseId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk());
+        String expenseJson = expenseResult.andReturn().getResponse().getContentAsString();
+        Expense expense = objectMapper.readValue(expenseJson, Expense.class);
+
+        String tagAsString2 = new String(Files.readAllBytes(Path.of("src/test/resources/expenses/tags/secondTag.json")));
+        ResultActions resultOfCreation2 = mockMvc.perform(post("/tags/create")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString2)
+        ).andExpect(status().isOk());
+
+        String createdTag2 = resultOfCreation2.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto2 = objectMapper.readValue(createdTag2, GetTagDto.class);
+
+        // modify the expense
+        expense.setTagId(createdTagDto2.id());
+
+        String json2 = objectMapper.writeValueAsString(expense);
+        mockMvc.perform(MockMvcRequestBuilders.post("/expenses/modify")
+                        .header("Authorization", bearerToken)
+                        .contentType("application/json")
+                        .content(json2))
+                .andExpect(status().isNoContent());
+
+        ResultActions expenseResultModified = mockMvc.perform(MockMvcRequestBuilders.get("/expenses/get/" + expenseId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk());
+        String expenseJsonModified = expenseResultModified.andReturn().getResponse().getContentAsString();
+        Expense expenseModified = objectMapper.readValue(expenseJsonModified, Expense.class);
+
+        assertEquals(100f, expenseModified.getAmount());
+        assertEquals(expenseId, String.valueOf(expenseModified.getId()));
+        assertEquals("Test expense description", expenseModified.getDescription());
+        assertEquals(categoryId, expenseModified.getCategoryId());
+        assertEquals(1, expenseModified.getCurrencyId());
+        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
+        assertEquals(7, expenseModified.getMonth());
+        assertEquals(2025, expenseModified.getYear());
+        assertTrue(expenseModified.getWeek() > 0);
+        assertEquals("2025-07-05", expenseModified.getDate().toString());
+        assertEquals(createdTagDto2.id(), expenseModified.getTagId());
+
+
+        // Remove the tag
+        expenseModified.setTagId(null);
+        String json3 = objectMapper.writeValueAsString(expenseModified);
+        mockMvc.perform(MockMvcRequestBuilders.post("/expenses/modify")
+                        .header("Authorization", bearerToken)
+                        .contentType("application/json")
+                        .content(json3))
+                .andExpect(status().isNoContent());
+
+        ResultActions expenseResulNoTag = mockMvc.perform(MockMvcRequestBuilders.get("/expenses/get/" + expenseId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk());
+        String expenseJsonNoTag = expenseResulNoTag.andReturn().getResponse().getContentAsString();
+        Expense expenseNoTag = objectMapper.readValue(expenseJsonNoTag, Expense.class);
+
+        assertEquals(100f, expenseNoTag.getAmount());
+        assertEquals(expenseId, String.valueOf(expenseNoTag.getId()));
+        assertEquals("Test expense description", expenseNoTag.getDescription());
+        assertEquals(categoryId, expenseNoTag.getCategoryId());
+        assertEquals(1, expenseNoTag.getCurrencyId());
+        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
+        assertEquals(7, expenseNoTag.getMonth());
+        assertEquals(2025, expenseNoTag.getYear());
+        assertTrue(expenseNoTag.getWeek() > 0);
+        assertEquals("2025-07-05", expenseNoTag.getDate().toString());
+        assertNull(expenseNoTag.getTagId());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto2.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isNoContent());
+
+        deleteExpenseCategory(bearerToken, categoryId);
+    }
+
+
+    @Test
+    public void createExpenseWithInvalidTag() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        String tagAsString = new String(Files.readAllBytes(Path.of("src/test/resources/expenses/tags/tagForExpense.json")));
+        ResultActions resultOfCreation = mockMvc.perform(post("/tags/create")
+                .header("Authorization",bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isOk());
+
+        String createdTag = resultOfCreation.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto = objectMapper.readValue(createdTag, GetTagDto.class);
+
+        int categoryId = createExpenseCategory(bearerToken, "src/test/resources/expenses/category.json");
+        String json = addTagIdToExpense(createdTagDto.id() + 1, addCategoryIdToExpense(categoryId, "src/test/resources/expenses/tags/expenseWithTag.json"));
+
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/expenses/add")
+                        .header("Authorization", bearerToken)
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isNoContent());
+
+        deleteExpenseCategory(bearerToken, categoryId);
+    }
 
 
     /**
@@ -954,6 +1166,20 @@ public class ExpensesRequestsIT {
         String expenseJson = new String(Files.readAllBytes(Path.of(pathToExpenseJson)));
         CreateExpenseDto expense = objectMapper.readValue(expenseJson, CreateExpenseDto.class);
         CreateExpenseDto modifiedExpense = new CreateExpenseDto(categoryId, expense.amount(), expense.currencyId(), expense.date(), expense.description(), Optional.empty());
+        return objectMapper.writeValueAsString(modifiedExpense);
+    }
+
+    /**
+     * Adds the tag id to the expense
+     * @param tagId
+     * @param expenseAsJson
+     * @return
+     * @throws IOException
+     */
+    private String addTagIdToExpense(int tagId, String expenseAsJson) throws IOException {
+
+        CreateExpenseDto expense = objectMapper.readValue(expenseAsJson, CreateExpenseDto.class);
+        CreateExpenseDto modifiedExpense = new CreateExpenseDto(expense.categoryId(), expense.amount(), expense.currencyId(), expense.date(), expense.description(), Optional.of(tagId));
         return objectMapper.writeValueAsString(modifiedExpense);
     }
 
