@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { DonutChart } from '@mantine/charts';
 import { Paper, Title, Text, Box, Loader, Center, Group } from '@mantine/core';
 import { useGetTotalSpentMonthly } from '@requests/expensesRequests';
@@ -10,7 +10,13 @@ interface ChartData {
   color: string;
 }
 
-export default function HomeDonutBudgetChart() {
+interface HomeDonutBudgetChartProps {
+  updateChart: boolean;
+}
+
+export default function HomeDonutBudgetChart({
+  updateChart,
+}: HomeDonutBudgetChartProps) {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,82 +26,82 @@ export default function HomeDonutBudgetChart() {
   const [getTotalSpentMonthly] = useGetTotalSpentMonthly();
   const [getBudget] = useGetBudget();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const currentDate = new Date();
-        const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
-        const currentYear = currentDate.getFullYear();
+    try {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
+      const currentYear = currentDate.getFullYear();
 
-        // Fetch total spent for current month
-        const spentResponse = await getTotalSpentMonthly(
-          currentMonth,
-          currentYear,
-        );
-        const spent = spentResponse?.data
-          ? parseFloat(spentResponse.data.totalSpent)
-          : 0;
-        setTotalSpent(spent);
+      // Fetch total spent for current month
+      const spentResponse = await getTotalSpentMonthly(
+        currentMonth,
+        currentYear,
+      );
+      const spent = spentResponse?.data
+        ? parseFloat(spentResponse.data.totalSpent)
+        : 0;
+      setTotalSpent(spent);
 
-        // Fetch budget
-        const budgetResponse = await getBudget();
-        const budgets: any[] = budgetResponse?.data.budget;
-        console.log(budgetResponse);
-        const totalBudget: number = budgets.reduce(
-          (accumulator, currentValue) => {
-            return accumulator + currentValue.budget;
-          },
-          0,
-        );
-        const budgetAmount = totalBudget;
-        setBudget(budgetAmount);
+      // Fetch budget
+      const budgetResponse = await getBudget();
+      const budgets: any[] = budgetResponse?.data.budget;
+      console.log(budgetResponse);
+      const totalBudget: number = budgets.reduce(
+        (accumulator, currentValue) => {
+          return accumulator + currentValue.budget;
+        },
+        0,
+      );
+      const budgetAmount = totalBudget;
+      setBudget(budgetAmount);
 
-        // Calculate remaining budget (or overspent amount)
-        const remaining = Math.max(0, budgetAmount - spent);
-        const overspent = spent > budgetAmount ? spent - budgetAmount : 0;
+      // Calculate remaining budget (or overspent amount)
+      const remaining = Math.max(0, budgetAmount - spent);
+      const overspent = spent > budgetAmount ? spent - budgetAmount : 0;
 
-        const newChartData: ChartData[] = [];
+      const newChartData: ChartData[] = [];
 
-        if (spent <= budgetAmount) {
-          // If within budget
-          newChartData.push({
-            name: 'Spent',
-            value: spent,
-            color: 'blue',
-          });
-          newChartData.push({
-            name: 'Remaining',
-            value: remaining,
-            color: 'teal',
-          });
-        } else {
-          // If over budget
-          newChartData.push({
-            name: 'Budget',
-            value: budgetAmount,
-            color: 'red',
-          });
-          newChartData.push({
-            name: 'Overspent',
-            value: overspent,
-            color: 'orange',
-          });
-        }
-
-        setChartData(newChartData);
-      } catch (err) {
-        setError('Failed to load budget data');
-        console.error(err);
-      } finally {
-        setLoading(false);
+      if (spent <= budgetAmount) {
+        // If within budget
+        newChartData.push({
+          name: 'Spent',
+          value: spent,
+          color: 'blue',
+        });
+        newChartData.push({
+          name: 'Remaining',
+          value: remaining,
+          color: 'teal',
+        });
+      } else {
+        // If over budget
+        newChartData.push({
+          name: 'Budget',
+          value: budgetAmount,
+          color: 'red',
+        });
+        newChartData.push({
+          name: 'Overspent',
+          value: overspent,
+          color: 'orange',
+        });
       }
-    };
 
-    fetchData();
+      setChartData(newChartData);
+    } catch (err) {
+      setError('Failed to load budget data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [updateChart]);
 
   if (loading) {
     return (
