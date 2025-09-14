@@ -30,9 +30,13 @@ interface TagOption {
 
 interface IAddIncomeProps {
   tagsDto: IGetTagDto[];
+  setUpdateCharts: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function AddIncome({ tagsDto }: IAddIncomeProps) {
+export default function AddIncome({
+  tagsDto,
+  setUpdateCharts,
+}: IAddIncomeProps) {
   const { userData } = useUserDataContext();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
@@ -120,6 +124,9 @@ export default function AddIncome({ tagsDto }: IAddIncomeProps) {
     postAddIncome(formData)
       .then(() => {
         form.reset();
+        setUpdateCharts((oldValue) => {
+          return !oldValue;
+        });
         notifications.show({
           title: 'Success',
           message: 'Income added successfully',

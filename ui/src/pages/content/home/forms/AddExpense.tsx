@@ -30,9 +30,13 @@ interface TagOption {
 
 interface IAddExpenseProps {
   tagsDto: IGetTagDto[];
+  setUpdateCharts: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function AddExpense({ tagsDto }: IAddExpenseProps) {
+export default function AddExpense({
+  tagsDto,
+  setUpdateCharts,
+}: IAddExpenseProps) {
   const { userData } = useUserDataContext();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
@@ -128,6 +132,9 @@ export default function AddExpense({ tagsDto }: IAddExpenseProps) {
           color: 'green',
         });
         form.reset();
+        setUpdateCharts((oldValue) => {
+          return !oldValue;
+        });
       }
     } catch (error) {
       console.error('Failed to add expense:', error);

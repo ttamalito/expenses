@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { LineChart } from '@mantine/charts';
 import { Paper, Title, Text, Box, Loader, Center } from '@mantine/core';
 import { useGetTotalSpentMonthly } from '@requests/expensesRequests';
@@ -10,7 +10,11 @@ interface ChartData extends Record<string, any> {
   earned: number;
 }
 
-export default function HomeLineChart() {
+interface HomeLineChartProps {
+  updateChart: boolean;
+}
+
+export default function HomeLineChart({ updateChart }: HomeLineChartProps) {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,55 +37,55 @@ export default function HomeLineChart() {
     'Dec',
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const currentYear = new Date().getFullYear();
-        const newChartData: ChartData[] = [];
+    try {
+      const currentYear = new Date().getFullYear();
+      const newChartData: ChartData[] = [];
 
-        // Initialize data structure with all months
-        for (let i = 0; i < 12; i++) {
-          newChartData.push({
-            month: monthNames[i],
-            spent: 0,
-            earned: 0,
-          });
-        }
-
-        // Fetch spent data for each month
-        for (let month = 1; month <= 12; month++) {
-          const spentResponse = await getTotalSpentMonthly(month, currentYear);
-          if (spentResponse?.data) {
-            newChartData[month - 1].spent = parseFloat(
-              spentResponse.data.totalSpent,
-            );
-          }
-        }
-
-        // Fetch earned data for each month
-        for (let month = 1; month <= 12; month++) {
-          const earnedResponse = await getTotalEarnedMonth(month, currentYear);
-          if (earnedResponse?.data) {
-            newChartData[month - 1].earned = parseFloat(
-              earnedResponse.data.total,
-            );
-          }
-        }
-
-        setChartData(newChartData);
-      } catch (err) {
-        setError('Failed to load chart data');
-        console.error(err);
-      } finally {
-        setLoading(false);
+      // Initialize data structure with all months
+      for (let i = 0; i < 12; i++) {
+        newChartData.push({
+          month: monthNames[i],
+          spent: 0,
+          earned: 0,
+        });
       }
-    };
 
-    fetchData();
+      // Fetch spent data for each month
+      for (let month = 1; month <= 12; month++) {
+        const spentResponse = await getTotalSpentMonthly(month, currentYear);
+        if (spentResponse?.data) {
+          newChartData[month - 1].spent = parseFloat(
+            spentResponse.data.totalSpent,
+          );
+        }
+      }
+
+      // Fetch earned data for each month
+      for (let month = 1; month <= 12; month++) {
+        const earnedResponse = await getTotalEarnedMonth(month, currentYear);
+        if (earnedResponse?.data) {
+          newChartData[month - 1].earned = parseFloat(
+            earnedResponse.data.total,
+          );
+        }
+      }
+
+      setChartData(newChartData);
+    } catch (err) {
+      setError('Failed to load chart data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [updateChart]);
 
   if (loading) {
     return (
