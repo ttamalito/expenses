@@ -94,6 +94,16 @@
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
             <version>2.8.9</version>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>11.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>11.15.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -116,6 +126,14 @@
                 </executions>
                 <configuration>
                     <skipITs>${skipTests}</skipITs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>11.15.0</version>
+                <configuration>
+                    <configFiles>src/main/resources/flyway.conf</configFiles>
                 </configuration>
             </plugin>
         </plugins>

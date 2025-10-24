@@ -1,4 +1,5 @@
 #backend
 application.properties
+flyway.conf
 
 /target
