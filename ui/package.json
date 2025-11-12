@@ -52,7 +52,8 @@
     "vitest": "^3.2.0"
   },
   "overrides": {
-    "react-is": "^19.0.0"
+    "react-is": "^19.0.0",
+    "sugarss": "^5.0.0"
   },
   "scripts": {
     "dev": "vite",

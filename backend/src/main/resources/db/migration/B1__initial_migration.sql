@@ -12,7 +12,7 @@ CREATE TABLE expense_categories
     id            INT AUTO_INCREMENT NOT NULL,
     `description` VARCHAR(255)       NULL,
     name          VARCHAR(255)       NOT NULL,
-    user_id       BLOB               NULL,
+    user_id       BINARY(16)               NULL,
     budget        FLOAT              NOT NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
@@ -26,7 +26,7 @@ CREATE TABLE expenses
     `description` VARCHAR(255)       NULL,
     last_update   date               NULL,
     month         INT                NOT NULL,
-    user_id       BLOB               NULL,
+    user_id       BINARY(16)               NULL,
     week          INT                NOT NULL,
     year          INT                NOT NULL,
     category_id   INT                NULL,
@@ -34,27 +34,12 @@ CREATE TABLE expenses
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
 
-CREATE TABLE flyway_schema_history
-(
-    installed_rank INT                     NOT NULL,
-    version        VARCHAR(50)             NULL,
-    `description`  VARCHAR(200)            NOT NULL,
-    type           VARCHAR(20)             NOT NULL,
-    script         VARCHAR(1000)           NOT NULL,
-    checksum       INT                     NULL,
-    installed_by   VARCHAR(100)            NOT NULL,
-    installed_on   timestamp DEFAULT NOW() NOT NULL,
-    execution_time INT                     NOT NULL,
-    success        TINYINT(1)              NOT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (installed_rank)
-);
-
 CREATE TABLE income_categories
 (
     id            INT AUTO_INCREMENT NOT NULL,
     `description` VARCHAR(255)       NULL,
     name          VARCHAR(255)       NOT NULL,
-    user_id       BLOB               NULL,
+    user_id       BINARY(16)               NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
 
@@ -67,7 +52,7 @@ CREATE TABLE incomes
     `description` VARCHAR(255)       NULL,
     last_update   date               NULL,
     month         INT                NOT NULL,
-    user_id       BLOB               NULL,
+    user_id       BINARY(16)               NULL,
     week          INT                NOT NULL,
     year          INT                NOT NULL,
     category_id   INT                NULL,
@@ -80,13 +65,13 @@ CREATE TABLE tags
     id            INT AUTO_INCREMENT NOT NULL,
     `description` VARCHAR(255)       NULL,
     name          VARCHAR(255)       NOT NULL,
-    user_id       BLOB               NULL,
+    user_id       BINARY(16)               NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
 
 CREATE TABLE users
 (
-    id              BLOB         NOT NULL,
+    id              BINARY(16)         NOT NULL,
     creation_date   date         NULL,
     currency_id     INT          NULL,
     email           VARCHAR(255) NOT NULL,
@@ -104,8 +89,6 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT UKr43af9ap4edm43mmtq01oddj6 UNIQUE (username);
-
-CREATE INDEX flyway_schema_history_s_idx ON flyway_schema_history (success);
 
 ALTER TABLE incomes
     ADD CONSTRAINT FK88oslojsu4esbcshis19m212k FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE NO ACTION;
