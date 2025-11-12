@@ -67,7 +67,7 @@ public class IncomeService {
         if (incomeFromRequest.tagId().isPresent()) {
             try {
                 GetTagDto tagDto = tagService.getTagById(incomeFromRequest.tagId().get(), userId);
-                tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user);
+                tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user, tagDto.color());
             } catch (TransactionException e) {
                 throw new TransactionException(TransactionException.TransactionExceptionType.TAG_NOT_FOUND);
             }

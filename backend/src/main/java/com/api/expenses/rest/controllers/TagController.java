@@ -56,7 +56,7 @@ public class TagController {
         
         try {
             Tag createdTag = tagService.createTag(createTagDto, userId);
-            GetTagDto tag = new GetTagDto(createdTag.getId(), createdTag.getName(), createdTag.getDescription(),userId);
+            GetTagDto tag = new GetTagDto(createdTag.getId(), createdTag.getName(), createdTag.getDescription(),userId, createdTag.getColor());
             return ResponseEntity.ok().body(tag);
         } catch (TransactionException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

@@ -1,0 +1,8 @@
+ALTER TABLE tags
+    ADD color VARCHAR(255) NULL;
+
+UPDATE tags
+SET color = '#8c8c88'
+WHERE color IS NULL;
+ALTER TABLE tags
+    MODIFY color VARCHAR(255) NOT NULL;

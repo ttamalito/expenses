@@ -60,9 +60,10 @@ public class TagControllerIT {
 
         assertEquals("Test Tag", createdTagDto.name());
         assertEquals("Test", createdTagDto.description());
+        assertEquals("#8c8c88", createdTagDto.color());
         assertEquals("f8dffe30-09ed-4794-abc7-98a930c7b938", createdTagDto.userId().toString());
 
-        UpdateTagDto updateTagDto = new UpdateTagDto("Test Tag Updated", "Test Updated");
+        UpdateTagDto updateTagDto = new UpdateTagDto("Test Tag Updated", "Test Updated", "#34eb8c");
         String updateTagDtoAsString = objectMapper.writeValueAsString(updateTagDto);
 
         ResultActions resultOfUpdate = mockMvc.perform(put("/tags/update/" + createdTagDto.id())
@@ -83,6 +84,7 @@ public class TagControllerIT {
         GetTagDto updatedTagDto = objectMapper.readValue(resultOfGet.andReturn().getResponse().getContentAsString(), GetTagDto.class);
         assertEquals("Test Tag Updated", updatedTagDto.name());
         assertEquals("Test Updated", updatedTagDto.description());
+        assertEquals("#34eb8c", updatedTagDto.color());
         assertEquals("f8dffe30-09ed-4794-abc7-98a930c7b938", updatedTagDto.userId().toString());
 
         ResultActions resultOfDelete = mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
@@ -115,6 +117,7 @@ public class TagControllerIT {
 
         assertEquals("Test Tag", createdTagDto.name());
         assertEquals("Test", createdTagDto.description());
+        assertEquals("#8c8c88", createdTagDto.color());
         assertEquals("f8dffe30-09ed-4794-abc7-98a930c7b938", createdTagDto.userId().toString());
 
         // try to create the tag with the same name:
@@ -124,7 +127,7 @@ public class TagControllerIT {
                 .content(tagAsString)
         ).andExpect(status().isBadRequest());
 
-        UpdateTagDto updateTagDto = new UpdateTagDto("Test Tag Updated", "Test Updated");
+        UpdateTagDto updateTagDto = new UpdateTagDto("Test Tag Updated", "Test Updated", "#de1641");
         String updateTagDtoAsString = objectMapper.writeValueAsString(updateTagDto);
 
         ResultActions resultOfUpdate = mockMvc.perform(put("/tags/update/" + createdTagDto.id())
@@ -145,6 +148,7 @@ public class TagControllerIT {
         GetTagDto updatedTagDto = objectMapper.readValue(resultOfGet.andReturn().getResponse().getContentAsString(), GetTagDto.class);
         assertEquals("Test Tag Updated", updatedTagDto.name());
         assertEquals("Test Updated", updatedTagDto.description());
+        assertEquals("#de1641", updatedTagDto.color());
         assertEquals("f8dffe30-09ed-4794-abc7-98a930c7b938", updatedTagDto.userId().toString());
 
         // create a second tag
@@ -162,6 +166,7 @@ public class TagControllerIT {
 
         assertEquals("Test Tag - 2", createdTagDto2.name());
         assertEquals("Test", createdTagDto2.description());
+        assertEquals("#8c8c88", createdTagDto2.color());
         assertEquals("f8dffe30-09ed-4794-abc7-98a930c7b938", createdTagDto2.userId().toString());
 
         // update the second tag so that it has the same name as the first one
@@ -197,7 +202,7 @@ public class TagControllerIT {
         CreateTagDto createTagDto = objectMapper.readValue(tagAsString, CreateTagDto.class);
         List<CreateTagDto> createTagDtoList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            createTagDtoList.add(new CreateTagDto(createTagDto.name() + String.valueOf(i), createTagDto.description()));
+            createTagDtoList.add(new CreateTagDto(createTagDto.name() + String.valueOf(i), createTagDto.description(), createTagDto.color()));
         }
 
         for (CreateTagDto createTagDto1 : createTagDtoList) {

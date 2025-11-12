@@ -1751,6 +1751,9 @@
           },
           "description": {
             "type": "string"
+          },
+          "color": {
+            "type": "string"
           }
         }
       },
@@ -1803,6 +1806,9 @@
           },
           "description": {
             "type": "string"
+          },
+          "color": {
+            "type": "string"
           }
         }
       },
@@ -1822,6 +1828,9 @@
           "userId": {
             "type": "string",
             "format": "uuid"
+          },
+          "color": {
+            "type": "string"
           }
         }
       },

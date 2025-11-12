@@ -2,6 +2,7 @@ package com.api.expenses.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.UUID;
 
@@ -21,6 +22,10 @@ public class Tag {
     @Column
     private String description;
 
+    // @ColumnDefault(value = "'8c8c88'")
+    @Column(nullable = false)
+    private String color;
+
     @JsonIgnore
     @ManyToOne(
             cascade = CascadeType.MERGE,
@@ -39,17 +44,19 @@ public class Tag {
     public Tag() {
     }
 
-    public Tag(int id, String name, String description, User user) {
+    public Tag(int id, String name, String description, User user, String color) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.user = user;
+        this.color = color;
     }
 
-    public Tag(String name, String description,User user) {
+    public Tag(String name, String description, User user, String color) {
         this.name = name;
         this.description = description;
         this.user = user;
+        this.color = color;
     }
 
     public int getId() {
@@ -90,5 +97,13 @@ public class Tag {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

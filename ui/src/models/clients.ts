@@ -2415,6 +2415,7 @@ export class SaveExpenseCategoryClient {
 export class UpdateTagDto implements IUpdateTagDto {
     name?: string;
     description?: string;
+    color?: string;
 
     [key: string]: any;
 
@@ -2435,6 +2436,7 @@ export class UpdateTagDto implements IUpdateTagDto {
             }
             this.name = _data["name"];
             this.description = _data["description"];
+            this.color = _data["color"];
         }
     }
 
@@ -2453,6 +2455,7 @@ export class UpdateTagDto implements IUpdateTagDto {
         }
         data["name"] = this.name;
         data["description"] = this.description;
+        data["color"] = this.color;
         return data;
     }
 }
@@ -2460,6 +2463,7 @@ export class UpdateTagDto implements IUpdateTagDto {
 export interface IUpdateTagDto {
     name?: string;
     description?: string;
+    color?: string;
 
     [key: string]: any;
 }
@@ -2631,6 +2635,7 @@ export interface IUpdateUserDto {
 export class CreateTagDto implements ICreateTagDto {
     name?: string;
     description?: string;
+    color?: string;
 
     [key: string]: any;
 
@@ -2651,6 +2656,7 @@ export class CreateTagDto implements ICreateTagDto {
             }
             this.name = _data["name"];
             this.description = _data["description"];
+            this.color = _data["color"];
         }
     }
 
@@ -2669,6 +2675,7 @@ export class CreateTagDto implements ICreateTagDto {
         }
         data["name"] = this.name;
         data["description"] = this.description;
+        data["color"] = this.color;
         return data;
     }
 }
@@ -2676,6 +2683,7 @@ export class CreateTagDto implements ICreateTagDto {
 export interface ICreateTagDto {
     name?: string;
     description?: string;
+    color?: string;
 
     [key: string]: any;
 }
@@ -2685,6 +2693,7 @@ export class GetTagDto implements IGetTagDto {
     name?: string;
     description?: string;
     userId?: string;
+    color?: string;
 
     [key: string]: any;
 
@@ -2707,6 +2716,7 @@ export class GetTagDto implements IGetTagDto {
             this.name = _data["name"];
             this.description = _data["description"];
             this.userId = _data["userId"];
+            this.color = _data["color"];
         }
     }
 
@@ -2727,6 +2737,7 @@ export class GetTagDto implements IGetTagDto {
         data["name"] = this.name;
         data["description"] = this.description;
         data["userId"] = this.userId;
+        data["color"] = this.color;
         return data;
     }
 }
@@ -2736,6 +2747,7 @@ export interface IGetTagDto {
     name?: string;
     description?: string;
     userId?: string;
+    color?: string;
 
     [key: string]: any;
 }

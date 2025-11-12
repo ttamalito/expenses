@@ -31,7 +31,7 @@ public class TagService {
     public List<GetTagDto> getTagsByUserId(UUID userId) {
         List<Tag> tags = tagRepository.findByUserId(userId);
         return tags.stream()
-                .map(tag -> new GetTagDto(tag.getId(), tag.getName(), tag.getDescription(),tag.getUserId()))
+                .map(tag -> new GetTagDto(tag.getId(), tag.getName(), tag.getDescription(),tag.getUserId(), tag.getColor()))
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +46,7 @@ public class TagService {
             throw new TransactionException(TransactionException.TransactionExceptionType.UNAUTHORIZED);
         }
         
-        return new GetTagDto(tag.getId(), tag.getName(), tag.getDescription(),tag.getUserId());
+        return new GetTagDto(tag.getId(), tag.getName(), tag.getDescription(),tag.getUserId(), tag.getColor());
     }
 
     public Tag createTag(CreateTagDto createTagDto, UUID userId) throws TransactionException {
@@ -59,7 +59,7 @@ public class TagService {
             throw new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND);
         }
         
-        Tag tag = new Tag(createTagDto.name(), createTagDto.description(),userOptional.get());
+        Tag tag = new Tag(createTagDto.name(), createTagDto.description(), userOptional.get(), createTagDto.color());
         Tag savedTag = tagRepository.save(tag);
         return savedTag;
     }
@@ -83,6 +83,7 @@ public class TagService {
         
         tag.setName(updateTagDto.name());
         tag.setDescription(updateTagDto.description());
+        tag.setColor(updateTagDto.color());
         tagRepository.save(tag);
     }
 
