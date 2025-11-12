@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconTag } from '@tabler/icons-react';
 import { IGetIncomeDto } from '@clients';
 import { useDeleteIncome } from '@requests/incomesRequests.ts';
 import { useGetAllIncomeCategories } from '@requests/categoryRequests.ts';
@@ -107,7 +107,12 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
       const tag = userTags.find((tag) => {
         return tag.id === tagId;
       });
-      return tag?.name;
+      return (
+        <Group>
+          <IconTag color={tag?.color} size={14} />
+          <Text size="sm">{tag?.name}</Text>
+        </Group>
+      );
     },
     [userTags],
   );

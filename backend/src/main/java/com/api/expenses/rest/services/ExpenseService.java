@@ -235,7 +235,7 @@ public class ExpenseService {
 
         if (expense.getTagId() != null) {
             GetTagDto tagDto = tagService.getTagById(expense.getTagId(), user.getId());
-            Tag tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user);
+            Tag tag = new Tag(tagDto.id(), tagDto.name(), tagDto.description(), user, tagDto.color());
             expense.setTag(tag);
         }
 

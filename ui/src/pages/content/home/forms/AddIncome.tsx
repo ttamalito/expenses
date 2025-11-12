@@ -10,6 +10,7 @@ import {
   Textarea,
   LoadingOverlay,
   Tooltip,
+  SelectProps,
 } from '@mantine/core';
 import { ICreateIncomeDto, IGetTagDto } from '@clients';
 import { usePostAdd } from '@requests/incomesRequests';
@@ -17,6 +18,7 @@ import { useGetAllIncomeCategories } from '@requests/categoryRequests';
 import { notifications } from '@mantine/notifications';
 import ExpensesDateInputWrapper from '../../../../components/wrappers/ExpensesDateInputWrapper.tsx';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
+import { IconCheck, IconTag } from '@tabler/icons-react';
 
 interface CategoryOption {
   value: string;
@@ -42,6 +44,12 @@ export default function AddIncome({
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [currencyId, setCurrencyId] = useState<number | undefined>(undefined);
   const [tags, setTags] = useState<TagOption[]>([]);
+  const [tagsWithColor, setTagsWithColor] = useState<
+    { value: string; color: string }[]
+  >([]);
+  const [selectedTag, setSelectedTag] = useState<
+    { value: string; color: string } | undefined
+  >(undefined);
 
   const [postAddIncome] = usePostAdd();
   const [getAllCategories] = useGetAllIncomeCategories();
@@ -59,6 +67,19 @@ export default function AddIncome({
     //     return value.trim().length < 1 ? 'Name is required' : null;
     //   },
     // },
+    onValuesChange: (values) => {
+      if (values.tagId === undefined) {
+        setSelectedTag(undefined);
+        return;
+      }
+      const tagIdAsString = String(values.tagId);
+      if (tagIdAsString !== selectedTag?.value) {
+        const tag = tagsWithColor.find((tag) => {
+          return tag.value === tagIdAsString;
+        });
+        setSelectedTag(tag);
+      }
+    },
   });
 
   // Fetch categories
@@ -91,13 +112,20 @@ export default function AddIncome({
 
   useEffect(() => {
     const tagOptions = [];
+    const tagsWithColors: { value: string; color: string }[] = [];
     for (const tag of tagsDto) {
       const option: TagOption = {
         value: tag.id?.toString() ?? '0',
         label: tag.name!,
       };
       tagOptions.push(option);
+      const tagColorOption = {
+        value: tag.id?.toString() ?? '0',
+        color: tag.color!,
+      };
+      tagsWithColors.push(tagColorOption);
     }
+    setTagsWithColor(tagsWithColors);
     setTags(tagOptions);
   }, [tagsDto]);
 
@@ -144,6 +172,38 @@ export default function AddIncome({
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const renderTagsWithColor: SelectProps['renderOption'] = ({
+    option,
+    checked,
+  }) => {
+    const tag = tagsWithColor.find((tag) => {
+      return tag.value === option.value;
+    });
+    const iconProps = {
+      stroke: 1.5,
+      color: tag ? tag.color : 'currentColor',
+      size: 18,
+    };
+    const checkIconProps = {
+      stroke: 1.5,
+      color: 'currentColor',
+      opacity: 0.6,
+      size: 18,
+    };
+    return (
+      <Group flex="1" gap="xs">
+        {<IconTag {...iconProps} />}
+        {option.label}
+        {checked && (
+          <IconCheck
+            style={{ marginInlineStart: 'auto' }}
+            {...checkIconProps}
+          />
+        )}
+      </Group>
+    );
   };
 
   return (
@@ -197,6 +257,12 @@ export default function AddIncome({
           placeholder="Optional Tag"
           data={tags}
           mb="md"
+          clearable
+          searchable
+          renderOption={renderTagsWithColor}
+          leftSection={
+            <IconTag color={selectedTag?.color ?? 'currentColor'} size={18} />
+          }
           key={form.key('tagId')}
           {...form.getInputProps('tagId')}
         />

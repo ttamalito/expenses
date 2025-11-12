@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconTag } from '@tabler/icons-react';
 import { IExpense } from '@clients';
 import { useDeleteExpense } from '@requests/expensesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
@@ -112,7 +112,12 @@ export function ExpensesTable({
       const tag = userTags.find((tag) => {
         return tag.id === tagId;
       });
-      return tag?.name;
+      return (
+        <Group>
+          <IconTag color={tag?.color} size={14} />
+          <Text size="sm">{tag?.name}</Text>
+        </Group>
+      );
     },
     [userTags],
   );

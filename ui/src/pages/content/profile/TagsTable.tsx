@@ -7,8 +7,12 @@ import {
   TextInput,
   Textarea,
   Box,
+  ColorPicker,
+  Grid,
+  Text,
+  Space,
 } from '@mantine/core';
-import { IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit, IconTag } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -27,6 +31,7 @@ export default function TagsTable() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+  const [color, setColor] = useState<string>('#8c8c88');
   const [getTagsForUser] = useGetTagsForUser();
   const [createTag] = usePostCreateTag();
   const [updateTag] = usePutUpdateTag();
@@ -66,6 +71,7 @@ export default function TagsTable() {
 
   const handleCreateTag = async (values: ICreateTagDto) => {
     try {
+      values.color = color;
       await createTag(values);
       form.reset();
       setIsModalOpen(false);
@@ -86,8 +92,11 @@ export default function TagsTable() {
   };
 
   const handleUpdateTag = useCallback(
-    async (tagId: number, values: IUpdateTagDto) => {
+    async (tagId: number, values: IUpdateTagDto, newColor: string) => {
       try {
+        values.color = newColor;
+        console.log('COLOR: ', newColor);
+        console.log('Sending values: ', values);
         await updateTag(tagId, values);
         updateForm.reset();
         setIsEditModalOpen(false);
@@ -162,6 +171,13 @@ export default function TagsTable() {
           { accessor: 'name', title: 'Name', noWrap: true },
           { accessor: 'description', title: 'Description' },
           {
+            accessor: 'color',
+            title: 'Color',
+            render: (tag) => {
+              return <IconTag color={tag.color} size={25} />;
+            },
+          },
+          {
             accessor: 'actions',
             title: 'Actions',
             textAlign: 'right',
@@ -175,6 +191,7 @@ export default function TagsTable() {
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       updateForm.setValues(tag);
+                      setColor(tag.color ?? '#8c8c88');
                       openEditModal(tag.id!);
                     }}
                   >
@@ -221,6 +238,17 @@ export default function TagsTable() {
             {...form.getInputProps('description')}
             mb="md"
           />
+          <Text>Tag Color</Text>
+          <Space h="xs" />
+          <Grid>
+            <Grid.Col span={8}>
+              <ColorPicker value={color} onChange={setColor} />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <IconTag color={color} size={50} />
+            </Grid.Col>
+          </Grid>
+
           <Group justify="flex-end">
             <Button type="submit">Create</Button>
           </Group>
@@ -238,7 +266,7 @@ export default function TagsTable() {
       >
         <form
           onSubmit={updateForm.onSubmit((values) => {
-            handleUpdateTag(selectedTagId!, values);
+            handleUpdateTag(selectedTagId!, values, color);
           })}
         >
           <TextInput
@@ -256,6 +284,16 @@ export default function TagsTable() {
             {...updateForm.getInputProps('description')}
             mb="md"
           />
+          <Text>Tag Color</Text>
+          <Space h="xs" />
+          <Grid>
+            <Grid.Col span={8}>
+              <ColorPicker value={color} onChange={setColor} />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <IconTag color={color} size={50} />
+            </Grid.Col>
+          </Grid>
           <Group justify="flex-end">
             <Button type="submit">Update</Button>
           </Group>
