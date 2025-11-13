@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Tag for expense 1",
+    "description": "Test",
+    "color": "#8c8c88"
+  },
+  {
+    "name": "Tag for expense 2",
+    "description": "Test",
+    "color": "#8c8c88"
+  },
+  {
+    "name": "Tag for expense 3",
+    "description": "Test",
+    "color": "#8c8c88"
+  }
+]

@@ -7,6 +7,7 @@ import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.User;
 import com.api.expenses.rest.models.dtos.CategoryComparisonResponseDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
+import com.api.expenses.rest.models.dtos.GetTotalSpentDto;
 import com.api.expenses.rest.services.ExpenseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -92,6 +93,32 @@ public class ExpensesController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{month}/{year}/tag/{tagId}")
+    public ResponseEntity<List<Expense>> getExpensesOfATagForAMonth(@PathVariable int month, @PathVariable int year, @PathVariable int tagId) {
+        UUID userId = getUserId();
+
+        try {
+            List<Expense> expenses = expenseService.getExpensesForAMonthOfAUserByTag(userId, month, year, tagId);
+            return ResponseEntity.ok(expenses);
+        } catch (TransactionException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/total-spent/{month}/{year}/tag/{tagId}") // Tested
+    public ResponseEntity<GetTotalSpentDto> getTotalSpentOnAMonthForATag(@PathVariable int month,
+                                                                    @PathVariable int year,
+                                                                    @PathVariable int tagId) {
+        UUID userId = getUserId();
+        try {
+            float totalSpent = expenseService.getTotalSpentForAMonthOfAUserByTag(userId, month, year, tagId);
+            GetTotalSpentDto totalSpentDto = new GetTotalSpentDto(totalSpent);
+            return ResponseEntity.ok(totalSpentDto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build(); // TODO: handle exceptions better
         }
     }
 

@@ -126,6 +126,12 @@ public class ExpenseService {
         return expenseRepository.findByUserIdAndMonthAndYearAndCategoryId(userId, month, year, categoryId);
     }
 
+    public List<Expense> getExpensesForAMonthOfAUserByTag(UUID userId, int month, int year, int tagId) throws TransactionException {
+        userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
+
+        return expenseRepository.findByUserIdAndMonthAndYearAndTagId(userId, month, year, tagId);
+    }
+
     public List<Expense> getExpensesForAWeekOfAUser(UUID userId, int week, int year) throws TransactionException {
         userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
 
@@ -192,6 +198,17 @@ public class ExpenseService {
         userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
 
         List<Expense> expenses = expenseRepository.findByUserIdAndMonthAndYearAndCategoryId(userId, month, year, categoryId);
+        float totalSpent = 0;
+        for (Expense expense : expenses) {
+            totalSpent += expense.getAmount();
+        }
+        return totalSpent;
+    }
+
+    public float getTotalSpentForAMonthOfAUserByTag(UUID userId, int month, int year, int tagId) throws TransactionException {
+        userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
+
+        List<Expense> expenses = expenseRepository.findByUserIdAndMonthAndYearAndTagId(userId, month, year, tagId);
         float totalSpent = 0;
         for (Expense expense : expenses) {
             totalSpent += expense.getAmount();

@@ -1,0 +1,30 @@
+[
+  {
+    "categoryId": 7,
+    "amount": 101,
+    "currencyId": 1,
+    "date": "2025-01-31",
+    "description": "Test expense description 2"
+  },
+  {
+    "categoryId": 7,
+    "amount": 104,
+    "currencyId": 1,
+    "date": "2024-06-04",
+    "description": "Test expense description 5"
+  },
+  {
+    "categoryId": 7,
+    "amount": 100.31,
+    "currencyId": 1,
+    "date": "2025-06-04",
+    "description": "100 spent on 2025-04-04"
+  },
+  {
+    "categoryId": 7,
+    "amount": 100.01,
+    "currencyId": 1,
+    "date": "2025-06-04",
+    "description": "100 spent on 2025-06-04"
+  }
+]
