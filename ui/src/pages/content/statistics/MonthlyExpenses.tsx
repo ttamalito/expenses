@@ -11,6 +11,7 @@ import {
   Loader,
   Center,
   Button,
+  SelectProps,
 } from '@mantine/core';
 import { PieChart } from '@mantine/charts';
 import { useForm } from '@mantine/form';
@@ -20,15 +21,19 @@ import ExpensesTable from '../../../components/tables/ExpensesTable';
 import IncomesTable from '../../../components/tables/IncomesTable';
 import {
   useGetMonthly,
+  useGetMonthlyExpensesForATag,
   useGetSingleType,
   useGetTotalSpentMonthly,
   useGetTotalSpentMonthlyCategory,
+  useGetTotalSpentMonthlyForTag,
 } from '@requests/expensesRequests.ts';
 import {
   useGetMonthlyIncomes,
   useGetTotalEarnedMonth,
 } from '@requests/incomesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
+import { IconCheck, IconTag } from '@tabler/icons-react';
 
 interface CategoryOption {
   value: string;
@@ -39,8 +44,18 @@ interface FormValues {
   categoryId: string;
 }
 
+interface TagFormValues {
+  tagId: string;
+}
+
+interface TagOption {
+  value: string;
+  label: string;
+}
+
 const MonthlyExpenses: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { userTags } = useUserDataContext();
   const year = parseInt(
     searchParams.get('year') || new Date().getFullYear().toString(),
   );
@@ -61,11 +76,20 @@ const MonthlyExpenses: React.FC = () => {
   const [pieChartData, setPieChartData] = useState<
     { name: string; value: number; color: string }[]
   >([]);
+  const [tags, setTags] = useState<TagOption[]>([]);
+  const [tagsWithColor, setTagsWithColor] = useState<
+    { value: string; color: string }[]
+  >([]);
+  const [selectedTag, setSelectedTag] = useState<
+    { value: string; color: string } | undefined
+  >(undefined);
 
   const [getMonthlyExpenses] = useGetMonthly();
   const [getSingleTypeExpenses] = useGetSingleType();
+  const [getMonthlyExpensesForTag] = useGetMonthlyExpensesForATag();
   const [getTotalSpentMonthly] = useGetTotalSpentMonthly();
   const [getTotalSpentMonthlyCategory] = useGetTotalSpentMonthlyCategory();
+  const [getTotalSpentMonthlyForTag] = useGetTotalSpentMonthlyForTag();
   const [getAllCategories] = useGetAllExpenseCategories();
   const [getMonthlyIncomes] = useGetMonthlyIncomes();
   const [getTotalEarnedMonth] = useGetTotalEarnedMonth();
@@ -75,6 +99,53 @@ const MonthlyExpenses: React.FC = () => {
       categoryId: '',
     },
   });
+
+  const tagForm = useForm<TagFormValues>({
+    mode: 'uncontrolled',
+    // validate: {
+    //   amount: (value) => {
+    //     return value && value <= 0 ? 'Amount must be greater than 0' : null;
+    //   },
+    //   categoryId: (value) => {
+    //     return value && value <= 0 ? 'Please select a category' : null;
+    //   },
+    //   name: (value) => {
+    //     return value.trim().length < 1 ? 'Name is required' : null;
+    //   },
+    // },
+    onValuesChange: (values) => {
+      if (values.tagId === undefined) {
+        setSelectedTag(undefined);
+        return;
+      }
+      const tagIdAsString = String(values.tagId);
+      if (tagIdAsString !== selectedTag?.value) {
+        const tag = tagsWithColor.find((tag) => {
+          return tag.value === tagIdAsString;
+        });
+        setSelectedTag(tag);
+      }
+    },
+  });
+
+  useEffect(() => {
+    const tagOptions = [];
+    const tagsWithColors: { value: string; color: string }[] = [];
+    for (const tag of userTags) {
+      const tagOption: TagOption = {
+        label: tag.name!,
+        value: tag.id?.toString() ?? '0',
+      };
+      tagOptions.push(tagOption);
+      const tagColorOption = {
+        value: tag.id?.toString() ?? '0',
+        color: tag.color!,
+      };
+      tagsWithColors.push(tagColorOption);
+    }
+    setTagsWithColor(tagsWithColors);
+    setTags(tagOptions);
+  }, [userTags]);
 
   // Fetch all expense categories
   useEffect(() => {
@@ -235,6 +306,50 @@ const MonthlyExpenses: React.FC = () => {
     }
   };
 
+  const handleFilterByTag = async (values: TagFormValues) => {
+    setLoading(true);
+    try {
+      if (values.tagId) {
+        const tagId = parseInt(values.tagId);
+
+        // Fetch expenses for the selected category
+        const expensesResponse = await getMonthlyExpensesForTag(
+          month,
+          year,
+          tagId,
+        );
+        if (expensesResponse?.data) {
+          setExpenses(expensesResponse.data);
+        }
+
+        // Fetch total spent for the selected tag
+        const totalSpentResponse = await getTotalSpentMonthlyForTag(
+          month,
+          year,
+          tagId,
+        );
+        if (totalSpentResponse?.data) {
+          setTotalSpentCategory(totalSpentResponse.data.totalSpent);
+        }
+
+        // Set selected tag name
+        const tag = tags.find((c) => {
+          return c.value === values.tagId;
+        }); // TODO: Use proper setter, so that in the future we can filter by tag and category
+        setSelectedCategoryName(tag?.label || `Tag ${tagId}`);
+      }
+    } catch (error) {
+      console.error('Failed to fetch category data:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to load category data',
+        color: 'red',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleResetCategory = async () => {
     setLoading(true);
     try {
@@ -250,6 +365,7 @@ const MonthlyExpenses: React.FC = () => {
 
       // Reset form
       form.reset();
+      tagForm.reset();
     } catch (error) {
       console.error('Failed to reset data:', error);
       notifications.show({
@@ -296,6 +412,39 @@ const MonthlyExpenses: React.FC = () => {
     );
   }
 
+  // TODO: Extract it to common component
+  const renderTagsWithColor: SelectProps['renderOption'] = ({
+    option,
+    checked,
+  }) => {
+    const tag = tagsWithColor.find((tag) => {
+      return tag.value === option.value;
+    });
+    const iconProps = {
+      stroke: 1.5,
+      color: tag ? tag.color : 'currentColor',
+      size: 18,
+    };
+    const checkIconProps = {
+      stroke: 1.5,
+      color: 'currentColor',
+      opacity: 0.6,
+      size: 18,
+    };
+    return (
+      <Group flex="1" gap="xs">
+        {<IconTag {...iconProps} />}
+        {option.label}
+        {checked && (
+          <IconCheck
+            style={{ marginInlineStart: 'auto' }}
+            {...checkIconProps}
+          />
+        )}
+      </Group>
+    );
+  };
+
   return (
     <Box p="md">
       <Title order={2} mb="lg">
@@ -323,34 +472,68 @@ const MonthlyExpenses: React.FC = () => {
             )}
           </Paper>
 
-          {/* Category Filter */}
-          <Paper shadow="xs" p="md" withBorder>
-            <Title order={4} mb="md">
-              Filter by Expense Category
-            </Title>
-            <form onSubmit={form.onSubmit(handleCategorySubmit)}>
-              <Stack>
-                <Select
-                  label="Select Category"
-                  placeholder="Choose a category"
-                  data={categories}
-                  clearable
-                  key={form.key('categoryId')}
-                  {...form.getInputProps('categoryId')}
-                />
-                <Group>
-                  <Button type="submit">
-                    See expenses of a single category
-                  </Button>
-                  {selectedCategoryName && (
-                    <Button type="button" onClick={handleResetCategory}>
-                      Show all categories
+          {/* Category or Tag Filter */}
+          <Stack gap="md">
+            <Paper shadow="xs" p="md" withBorder>
+              <Title order={4} mb="md">
+                Filter by Expense Category
+              </Title>
+              <form onSubmit={form.onSubmit(handleCategorySubmit)}>
+                <Stack>
+                  <Select
+                    label="Select Category"
+                    placeholder="Choose a category"
+                    data={categories}
+                    clearable
+                    key={form.key('categoryId')}
+                    {...form.getInputProps('categoryId')}
+                  />
+                  <Group>
+                    <Button type="submit">
+                      See expenses of a single category
                     </Button>
-                  )}
-                </Group>
-              </Stack>
-            </form>
-          </Paper>
+                    {selectedCategoryName && (
+                      <Button type="button" onClick={handleResetCategory}>
+                        Show all categories
+                      </Button>
+                    )}
+                  </Group>
+                </Stack>
+              </form>
+            </Paper>
+            <Paper shadow="xs" p="md" withBorder>
+              <Title order={4} mb="md">
+                Filter Expenses by Tag
+              </Title>
+              <form onSubmit={tagForm.onSubmit(handleFilterByTag)}>
+                <Stack>
+                  <Select
+                    label="Select Tag"
+                    placeholder="Choose a tag"
+                    data={tags}
+                    clearable
+                    renderOption={renderTagsWithColor}
+                    leftSection={
+                      <IconTag
+                        color={selectedTag?.color ?? 'currentColor'}
+                        size={18}
+                      />
+                    }
+                    key={tagForm.key('tagId')}
+                    {...tagForm.getInputProps('tagId')}
+                  />
+                  <Group>
+                    <Button type="submit">See expenses of a single tag</Button>
+                    {selectedCategoryName && (
+                      <Button type="button" onClick={handleResetCategory}>
+                        Show all expenses
+                      </Button>
+                    )}
+                  </Group>
+                </Stack>
+              </form>
+            </Paper>
+          </Stack>
         </Group>
 
         {/* Total Spent */}

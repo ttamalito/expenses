@@ -175,6 +175,7 @@ export default function AddExpense({
     }
   };
 
+  // TODO: Extract it to common functionality, used in 4 files
   const renderTagsWithColor: SelectProps['renderOption'] = ({
     option,
     checked,

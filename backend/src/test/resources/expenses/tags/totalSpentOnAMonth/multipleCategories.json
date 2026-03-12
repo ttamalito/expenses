@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Category 1",
+    "description": "Category 1",
+    "budget": "1500.25"
+  },
+  {
+    "name": "Category 2",
+    "description": "Category 2",
+    "budget": "1500.25"
+  },
+  {
+    "name": "Category 3",
+    "description": "Category 3",
+    "budget": "1500.25"
+  }
+]

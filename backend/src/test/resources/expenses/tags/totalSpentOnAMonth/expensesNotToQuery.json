@@ -1,0 +1,44 @@
+[
+  {
+    "categoryId": 6,
+    "amount": 100,
+    "currencyId": 1,
+    "date": "2025-01-01",
+    "description": "Test expense description 1"
+  },
+  {
+    "categoryId": 6,
+    "amount": 103,
+    "currencyId": 1,
+    "date": "2025-01-22",
+    "description": "Test expense description 4"
+  },
+  {
+    "categoryId": 8,
+    "amount": 105,
+    "currencyId": 1,
+    "date": "2025-02-04",
+    "description": "Test expense description 6"
+  },
+  {
+    "categoryId": 8,
+    "amount": 106,
+    "currencyId": 1,
+    "date": "2025-01-04",
+    "description": "Test expense description 7"
+  },
+  {
+    "categoryId": 6,
+    "amount": 101,
+    "currencyId": 1,
+    "date": "2025-06-04",
+    "description": "100 spent on 2025-01-04"
+  },
+  {
+    "categoryId": 8,
+    "amount": 108.49,
+    "currencyId": 1,
+    "date": "2025-06-04",
+    "description": "100 spent on 2025-11-04"
+  }
+]

@@ -56,7 +56,7 @@ public class JwtService {
                 .verifyWith(getSignKey())
                 .build()
                 .parseSignedClaims(token).getPayload().get("userId");
-       LOG.info("Extracted userId for authentication: {}", userIdA);
+       LOG.debug("Extracted userId for authentication: {}", userIdA);
 
         return UUID.fromString(userIdA);
     }
