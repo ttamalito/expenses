@@ -45,7 +45,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        LOG.info("Processing authentication for '{}'", request.getRequestURL());
+        LOG.debug("Processing authentication for '{}'", request.getRequestURL());
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -60,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     } else {
-                        LOG.info("User sent a valid token but the user was not found in the database");
+                        LOG.debug("User sent a valid token but the user was not found in the database");
                         filterChain.doFilter(request, response);
                     }
 
