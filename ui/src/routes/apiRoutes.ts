@@ -55,6 +55,7 @@ export const constants = {
 
   // Tags
   tags: 'tags',
+  tag: 'tag',
 };
 
 export const routes = {
@@ -119,6 +120,9 @@ export const routes = {
     singleType: (month: number, year: number) => {
       return `/${constants.expenses}/${constants.singleType}/${month}/${year}`;
     },
+    monthlyExpensesForTagId: (month: number, year: number, tagId: number) => {
+      return `/${constants.expenses}/${month}/${year}/${constants.tag}/${tagId}`;
+    },
     yearly: (year: number) => {
       return `/${constants.expenses}/${constants.yearly}/${year}`;
     },
@@ -127,6 +131,9 @@ export const routes = {
     modify: `/${constants.expenses}/${constants.modify}`,
     totalSpentMonthly: `/${constants.expenses}/${constants.totalSpent}/${constants.monthly}`,
     totalSpentMonthlyCategory: `/${constants.expenses}/${constants.totalSpent}/${constants.monthly}/${constants.category}`,
+    totalSpentMonthlyForTag: (month: number, year: number, tagId: number) => {
+      return `/${constants.expenses}/${constants.totalSpent}/${month}/${year}/${constants.tag}/${tagId}`;
+    },
     delete: `/${constants.expenses}/${constants.delete}`,
     compare: `/${constants.expenses}/${constants.compare}`,
   },

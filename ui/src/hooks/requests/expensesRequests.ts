@@ -62,6 +62,23 @@ export const useGetSingleType = (): [
   return [callback];
 };
 
+export const useGetMonthlyExpensesForATag = (): [
+  (
+    month: number,
+    year: number,
+    tagId: number,
+  ) => Promise<AxiosResponse | undefined>,
+] => {
+  const { get } = useApi();
+  const callback = useCallback(
+    (month: number, year: number, tagId: number) => {
+      return get(routes.expenses.monthlyExpensesForTagId(month, year, tagId));
+    },
+    [get],
+  );
+  return [callback];
+};
+
 export const useGetYearly = (): [
   (year: number) => Promise<AxiosResponse | undefined>,
 ] => {
@@ -150,6 +167,23 @@ export const useGetTotalSpentMonthlyCategory = (): [
       params.append('year', year.toString());
       params.append('category', category.toString());
       return get(routes.expenses.totalSpentMonthlyCategory, params);
+    },
+    [get],
+  );
+  return [callback];
+};
+
+export const useGetTotalSpentMonthlyForTag = (): [
+  (
+    month: number,
+    year: number,
+    tagId: number,
+  ) => Promise<AxiosResponse | undefined>,
+] => {
+  const { get } = useApi();
+  const callback = useCallback(
+    (month: number, year: number, tagId: number) => {
+      return get(routes.expenses.totalSpentMonthlyForTag(month, year, tagId));
     },
     [get],
   );
