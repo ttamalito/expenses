@@ -23,15 +23,29 @@ export default defineConfig({
     },
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            const chunks = id.split('node_modules/');
-            return chunks[chunks.length - 1].split('/')[0];
-          }
-          return;
+        codeSplitting: {
+          groups: [
+            {
+              name(moduleId) {
+                if (moduleId.includes('node_modules')) {
+                  const chunks = moduleId.split('node_modules/');
+                  const packageName = chunks[chunks.length - 1].split('/')[0];
+                  return packageName;
+                }
+                return null;
+              },
+            },
+          ],
         },
+        // manualChunks: (id) => {
+        //   if (id.includes('node_modules')) {
+        //     const chunks = id.split('node_modules/');
+        //     return chunks[chunks.length - 1].split('/')[0];
+        //   }
+        //   return;
+        // },
       },
     },
   },
