@@ -1,8 +1,8 @@
-import { Group, Box, Image, Grid, useMantineTheme, Text } from '@mantine/core';
+import { Group, Box, Image, useMantineTheme, Text, Flex } from '@mantine/core';
 import { Outlet, useNavigate } from 'react-router';
 import { routes } from '@routes';
 import { useGetUserData } from '@requests/userRequests.ts';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { IGetUserDto } from '@clients';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import useErrorHandling from '@hooks/useErrorHandling.tsx';
@@ -46,6 +46,10 @@ export default function ExpensesLayout() {
           color: 'red',
         });
       });
+  }, []);
+
+  const currentYear = useMemo(() => {
+    return new Date().getFullYear();
   }, []);
 
   return (
@@ -99,35 +103,31 @@ export default function ExpensesLayout() {
             marginLeft: '-15', // DOnt know if they are necessary
           }}
         >
-          <Grid
-            //bg={'blue'}
-            // overflow={'hidden'}
-            //justify={'flex-end'}
-            // gutter={{ base: 10, xs: 'md', md: 'xl', xl: 50 }}
+          <Flex
             //visibleFrom={'md'}
-            gutter={0}
+            gap={{ base: 'md', lg: 'lg' }}
             style={{
-              //float: 'left',
               paddingRight: '15',
               paddingLeft: '15',
               //maxWidth: '100%',
             }}
-            columns={50}
-            // grow
           >
-            <Grid.Col span={'content'}>
+            <Box style={{ minWidth: '250px' }} w={'15%'}>
               <SideBar />
-            </Grid.Col>
-            <Grid.Col
-              span={40} // TODO: Find a solution to not loose those 15-20 px
-              //bg={'violet'}
+            </Box>
+            <Box
+              style={{
+                flexGrow: 5,
+                minWidth: 0,
+              }}
+              w={'82%'}
             >
               <Outlet />
-            </Grid.Col>
-          </Grid>
+            </Box>
+          </Flex>
         </Box>
         <Group id={'footer'}>
-          <Text>© 2025 Expenses Manager All rights reserved.</Text>
+          <Text>© {currentYear} Expenses Manager. All rights reserved.</Text>
         </Group>
       </Box>
     </Box>
