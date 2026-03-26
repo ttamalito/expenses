@@ -46,7 +46,7 @@ export default function SideBar({
     <Box
       style={{
         height: '100%',
-        width: 250,
+        width: '100%',
         backgroundColor: 'white',
         padding: '1rem',
         borderRight: `1px solid ${theme.colors.gray[3]}`,
