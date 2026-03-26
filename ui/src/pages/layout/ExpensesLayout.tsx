@@ -2,7 +2,7 @@ import { Group, Box, Image, Grid, useMantineTheme, Text } from '@mantine/core';
 import { Outlet, useNavigate } from 'react-router';
 import { routes } from '@routes';
 import { useGetUserData } from '@requests/userRequests.ts';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { IGetUserDto } from '@clients';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import useErrorHandling from '@hooks/useErrorHandling.tsx';
@@ -46,6 +46,10 @@ export default function ExpensesLayout() {
           color: 'red',
         });
       });
+  }, []);
+
+  const currentYear = useMemo(() => {
+    return new Date().getFullYear();
   }, []);
 
   return (
@@ -127,7 +131,7 @@ export default function ExpensesLayout() {
           </Grid>
         </Box>
         <Group id={'footer'}>
-          <Text>© 2025 Expenses Manager All rights reserved.</Text>
+          <Text>© {currentYear} Expenses Manager. All rights reserved.</Text>
         </Group>
       </Box>
     </Box>
