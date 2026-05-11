@@ -13,7 +13,7 @@ import {
 import CategoryComparisonChart from './CategoryComparisonChart';
 import CashFlowChart from './CashFlowChart';
 import BudgetBurndownChart from './BudgetBurndownChart';
-import SankeyDiagram from './SankeyDiagram';
+// import SankeyDiagram from './SankeyDiagram';
 import StatisticalSummaries from './StatisticalSummaries';
 import CategorySpendingTimelineChart from './CategorySpendingTimelineChart';
 
@@ -124,7 +124,7 @@ const Statistics: React.FC = () => {
 
         <StatisticalSummaries />
 
-        <SankeyDiagram />
+        {/*<SankeyDiagram />*/}
       </Stack>
     </Box>
   );

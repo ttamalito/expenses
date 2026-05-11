@@ -59,13 +59,13 @@ public class User implements UserDetails {
     )
     private Set<Income> incomes = new HashSet<>();
 
-    @JsonIgnore
+    // @JsonIgnore
     //@JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
     //@JsonIgnore
     // @JsonIdentityReference(alwaysAsId = true) // this is used to return the id only in foreign key relationships... iguess
     @ManyToOne( // many to one means that this entity will have the foreign key column
             cascade = CascadeType.PERSIST, // when the user is deleted, the currency will not be deleted
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     @JoinColumn(
             name = "currency_id",

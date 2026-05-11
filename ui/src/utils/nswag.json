@@ -935,6 +935,58 @@
         }
       }
     },
+    "/expenses/{month}/{year}/tag/{tagId}": {
+      "get": {
+        "tags": [
+          "expenses-controller"
+        ],
+        "operationId": "getExpensesOfATagForAMonth",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Expense"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/expenses/yearly/{year}": {
       "get": {
         "tags": [
@@ -990,6 +1042,55 @@
               "application/json": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expenses/total-spent/{month}/{year}/tag/{tagId}": {
+      "get": {
+        "tags": [
+          "expenses-controller"
+        ],
+        "operationId": "getTotalSpentOnAMonthForATag",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTotalSpentDto"
                 }
               }
             }
@@ -1969,7 +2070,7 @@
           "symbol": {
             "type": "string"
           },
-          "description": {
+          "code": {
             "type": "string"
           }
         }
@@ -2054,6 +2155,9 @@
           "currencyId": {
             "type": "integer",
             "format": "int32"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/GetCurrencyDto"
           }
         }
       },
@@ -2226,6 +2330,15 @@
           "tagId": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "GetTotalSpentDto": {
+        "type": "object",
+        "properties": {
+          "totalSpent": {
+            "type": "number",
+            "format": "float"
           }
         }
       },

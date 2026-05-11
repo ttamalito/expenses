@@ -6,5 +6,6 @@ import java.sql.Date;
 import java.util.UUID;
 
 public record GetUserDto(UUID id, String username, String email,
-                         String profilePicture, Date creationDate, String firstName, String lastName, Role role, int currencyId) {
+                         String profilePicture, Date creationDate, String firstName, String lastName, Role role, int currencyId,
+                         GetCurrencyDto currency) {
 }

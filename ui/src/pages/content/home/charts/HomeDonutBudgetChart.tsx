@@ -3,6 +3,7 @@ import { DonutChart } from '@mantine/charts';
 import { Paper, Title, Text, Box, Loader, Center, Group } from '@mantine/core';
 import { useGetTotalSpentMonthly } from '@requests/expensesRequests';
 import { useGetBudget } from '@requests/budgetRequests';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface ChartData {
   name: string;
@@ -25,6 +26,8 @@ export default function HomeDonutBudgetChart({
 
   const [getTotalSpentMonthly] = useGetTotalSpentMonthly();
   const [getBudget] = useGetBudget();
+
+  const { userData } = useUserDataContext();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -138,8 +141,12 @@ export default function HomeDonutBudgetChart({
         Monthly Budget
       </Title>
       <Group justify="space-between" mb="md">
-        <Text>Spent: ${totalSpent.toFixed(2)}</Text>
-        <Text>Budget: ${budget.toFixed(2)}</Text>
+        <Text>
+          Spent: {userData?.currency?.symbol} {totalSpent.toFixed(2)}
+        </Text>
+        <Text>
+          Budget: {userData?.currency?.symbol} {budget.toFixed(2)}
+        </Text>
         <Text c={isOverBudget ? 'red' : 'green'}>
           {isOverBudget ? 'Over budget: ' : 'Remaining: '}
           {Math.abs(budget - totalSpent).toFixed(2)} ({percentSpent}%)
