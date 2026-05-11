@@ -4,6 +4,7 @@ import com.api.expenses.rest.controllers.utils.ControllersHelper;
 import com.api.expenses.rest.models.Currency;
 import com.api.expenses.rest.models.User;
 import com.api.expenses.rest.models.dtos.CreateUserDto;
+import com.api.expenses.rest.models.dtos.GetCurrencyDto;
 import com.api.expenses.rest.models.dtos.GetUserDto;
 import com.api.expenses.rest.models.dtos.UpdateUserDto;
 import com.api.expenses.rest.models.requestsModels.UserSignupRequest;
@@ -72,6 +73,11 @@ public class UserController implements Serializable {
             return ResponseEntity.badRequest().build();
         }
 
+        GetCurrencyDto getCurrencyDto = new GetCurrencyDto(user.getCurrencyId(),
+                user.getCurrency().getName(),
+                user.getCurrency().getSymbol(),
+                user.getCurrency().getCode());
+
         GetUserDto getUserDto = new GetUserDto(
             user.getId(),
             user.getUsername(),
@@ -81,7 +87,8 @@ public class UserController implements Serializable {
             user.getFirstName(),
             user.getLastName(),
             user.getRole(),
-            user.getCurrencyId()
+            user.getCurrencyId(),
+                getCurrencyDto
         );
 
         return ResponseEntity.ok(getUserDto);
@@ -94,6 +101,11 @@ public class UserController implements Serializable {
 
         //Currency currency = userMakingRequest.getCurrency();
 
+        GetCurrencyDto getCurrencyDto = new GetCurrencyDto(userMakingRequest.getCurrencyId(),
+                userMakingRequest.getCurrency().getName(),
+                userMakingRequest.getCurrency().getSymbol(),
+                userMakingRequest.getCurrency().getCode());
+
         GetUserDto getUserDto = new GetUserDto(
                 userMakingRequest.getId(),
                 userMakingRequest.getUsername(),
@@ -103,7 +115,8 @@ public class UserController implements Serializable {
                 userMakingRequest.getFirstName(),
                 userMakingRequest.getLastName(),
                 userMakingRequest.getRole(),
-                userMakingRequest.getCurrencyId()
+                userMakingRequest.getCurrencyId(),
+                getCurrencyDto
         );
 
         return ResponseEntity.ok(getUserDto);

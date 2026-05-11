@@ -16,6 +16,7 @@ import { DataTable } from 'mantine-datatable';
 import { IUpdateBudgetDto } from '@clients';
 import { useGetBudget, usePostModify } from '@requests/budgetRequests.ts';
 import BudgetBurndownChart from '../statistics/BudgetBurndownChart.tsx';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface BudgetItem {
   id: number;
@@ -36,6 +37,8 @@ export default function Budget() {
   const [debouncedBudgets] = useDebouncedValue(budgetsThatAreBeingChanged, 200);
   const [getBudget] = useGetBudget();
   const [modifyBudget] = usePostModify();
+
+  const { userData } = useUserDataContext();
 
   // Initialize form with uncontrolled mode as specified in requirements
   const form = useForm<{ budgets: IUpdateBudgetDto[] }>({
@@ -130,7 +133,7 @@ export default function Budget() {
           <Text size="lg" fw={500}>
             Monthly Budget Total:{' '}
             <Text span fw={700} c="blue">
-              ${totalMonthlyBudget.toFixed(2)}
+              {userData?.currency?.symbol} {totalMonthlyBudget.toFixed(2)}
             </Text>
           </Text>
         </Box>

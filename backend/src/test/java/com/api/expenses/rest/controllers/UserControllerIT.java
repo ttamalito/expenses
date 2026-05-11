@@ -58,6 +58,9 @@ public class UserControllerIT {
         assertEquals("test@test.com", testUser.email());
         assertEquals(Role.USER, testUser.role());
         assertEquals(1, testUser.currencyId());
+        assertEquals("EUROS", testUser.currency().name());
+        assertEquals("EUR", testUser.currency().code());
+        assertEquals(1, testUser.currency().id());
         UpdateUserDto updateUserDto = new UpdateUserDto("Testing", "Testing", 2);
         String updateUserDtoJson = new ObjectMapper().writeValueAsString(updateUserDto);
 
@@ -77,6 +80,9 @@ public class UserControllerIT {
         assertEquals("test@test.com", testUser2.email());
         assertEquals(Role.USER, testUser2.role());
         assertEquals(1, testUser2.currencyId()); // TODO: Currency cannot be updated yet, handle it later
+        assertEquals("EUROS", testUser2.currency().name());
+        assertEquals("EUR", testUser2.currency().code());
+        assertEquals(1, testUser2.currency().id());
         assertEquals("Testing", testUser2.firstName());
         assertEquals("Testing", testUser2.lastName());
 
@@ -111,6 +117,9 @@ public class UserControllerIT {
         assertEquals("test@test.com", userData.email());
         assertEquals(Role.USER, userData.role());
         assertEquals(1, userData.currencyId());
+        assertEquals("EUROS", userData.currency().name());
+        assertEquals("EUR", userData.currency().code());
+        assertEquals(1, userData.currency().id());
 
         // Clean up - delete the test user
         mockMvc.perform(MockMvcRequestBuilders.delete("/user/delete/test")

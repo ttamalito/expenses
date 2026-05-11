@@ -28,6 +28,7 @@ import {
   CategoryBurndownData,
 } from '@requests/budgetRequests.ts';
 import { notifications } from '@mantine/notifications';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface ChartDataPoint {
   day: number;
@@ -47,6 +48,8 @@ const BudgetBurndownChart: React.FC = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   const [getBudgetBurndown] = useGetBudgetBurndown();
+
+  const { userData } = useUserDataContext();
 
   const fetchData = async () => {
     setLoading(true);
@@ -235,7 +238,7 @@ const BudgetBurndownChart: React.FC = () => {
               })
               .map((category) => {
                 return {
-                  value: category.categoryId.toString(),
+                  value: category.categoryId.toString(), // TODO: label produces NaN when there are no categories
                   label: `${category.categoryName} (${((category.totalSpent / category.budget) * 100).toFixed(1)}% used)`,
                 };
               })}
@@ -264,14 +267,17 @@ const BudgetBurndownChart: React.FC = () => {
               />
               <YAxis
                 label={{
-                  value: 'Amount ($)',
+                  value: `Amount (${userData?.currency?.symbol})`,
                   angle: -90,
                   position: 'insideLeft',
                 }}
               />
               <Tooltip
                 formatter={(value, name) => {
-                  return [`$${Number(value).toFixed(2)}`, name];
+                  return [
+                    `${userData?.currency?.symbol}${Number(value).toFixed(2)}`,
+                    name,
+                  ];
                 }}
                 labelFormatter={(label) => {
                   return `Day ${label}`;
