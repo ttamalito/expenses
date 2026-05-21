@@ -244,4 +244,132 @@ public class TagControllerIT {
         List<GetTagDto> responseNoTagsList = objectMapper.readValue(responseNoTags, objectMapper.getTypeFactory().constructCollectionType(List.class, GetTagDto.class));
         assertEquals(0, responseNoTagsList.size());
     }
+
+    @Test
+    @DisplayName("Test tag deletion with linked expenses and incomes")
+    public void testTagDeletionWithLinkedExpensesAndIncomes() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        // Create an expense category
+        String expenseCategoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/expense/validCategory.json")));
+        ResultActions resultOfExpenseCategoryCreation = mockMvc.perform(put("/category/expense/create")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(expenseCategoryAsString)
+        ).andExpect(status().isOk());
+
+        String expenseCategoryId = resultOfExpenseCategoryCreation.andReturn().getResponse().getContentAsString();
+
+        // Create an income category
+        String incomeCategoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/income/validCategory.json")));
+        ResultActions resultOfIncomeCategoryCreation = mockMvc.perform(put("/category/income/create")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(incomeCategoryAsString)
+        ).andExpect(status().isOk());
+
+        String incomeCategoryId = resultOfIncomeCategoryCreation.andReturn().getResponse().getContentAsString();
+
+        // Create a tag
+        String tagAsString = new String(Files.readAllBytes(Path.of("src/test/resources/tags/tag.json")));
+        ResultActions resultOfTagCreation = mockMvc.perform(post("/tags/create")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tagAsString)
+        ).andExpect(status().isOk());
+
+        String createdTag = resultOfTagCreation.andReturn().getResponse().getContentAsString();
+        GetTagDto createdTagDto = objectMapper.readValue(createdTag, GetTagDto.class);
+
+        // Create an expense with the tag
+        String expenseWithTagJson = String.format("""
+            {
+              "categoryId": %s,
+              "amount": 100,
+              "currencyId": 1,
+              "date": "2025-01-05",
+              "description": "Test expense with tag",
+              "tagId": %d
+            }
+            """, expenseCategoryId, createdTagDto.id());
+
+        ResultActions resultOfExpenseCreation = mockMvc.perform(post("/expenses/add")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(expenseWithTagJson)
+        ).andExpect(status().isOk());
+
+        String expenseId = resultOfExpenseCreation.andReturn().getResponse().getContentAsString();
+
+        // Create an income with the tag
+        String incomeWithTagJson = String.format("""
+            {
+              "categoryId": %s,
+              "amount": 1000.32,
+              "currencyId": 1,
+              "date": "2025-01-05",
+              "description": "Test income with tag",
+              "tagId": %d
+            }
+            """, incomeCategoryId, createdTagDto.id());
+
+        ResultActions resultOfIncomeCreation = mockMvc.perform(post("/incomes/add")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(incomeWithTagJson)
+        ).andExpect(status().isOk());
+
+        String incomeId = resultOfIncomeCreation.andReturn().getResponse().getContentAsString().split(":")[1].replace("\"", "").replace("}", "");
+
+
+        // Try to delete the tag - should fail with TAG_HAS_LINKED_EXPENSES
+        ResultActions firstDeleteAttempt = mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
+
+        String firstDeleteResponse = firstDeleteAttempt.andReturn().getResponse().getContentAsString();
+        assertEquals("Cannot delete tag because it has linked expenses", firstDeleteResponse);
+
+        // Delete the expense
+        mockMvc.perform(delete("/expenses/delete?expenseId=" + expenseId)
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
+
+        // delete the expense category
+        mockMvc.perform(delete("/category/expense/delete/" + expenseCategoryId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+
+        // Try to delete the tag again - should fail with TAG_HAS_LINKED_INCOMES
+        ResultActions secondDeleteAttempt = mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
+
+        String secondDeleteResponse = secondDeleteAttempt.andReturn().getResponse().getContentAsString();
+        assertEquals("Cannot delete tag because it has linked incomes", secondDeleteResponse);
+
+        // Delete the income
+        mockMvc.perform(delete("/incomes/delete/" + incomeId)
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
+
+        // delete the income category
+        mockMvc.perform(delete("/category/income/delete/" + incomeCategoryId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+
+        // Now the tag should be successfully deleted
+        mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
+    }
 }

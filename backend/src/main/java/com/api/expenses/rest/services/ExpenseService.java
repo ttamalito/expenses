@@ -279,6 +279,10 @@ public class ExpenseService {
         return expenseRepository.countByCategoryId(categoryId) > 0;
     }
 
+    public boolean hasExpensesLinkedToTag(int tagId) {
+        return expenseRepository.countByTagId(tagId) > 0;
+    }
+
     /**
      * Gets all expenses from the database
      * @return a list of all expenses
