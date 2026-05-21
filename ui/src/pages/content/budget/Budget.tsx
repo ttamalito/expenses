@@ -155,7 +155,7 @@ export default function Budget() {
                 title: 'Current Budget',
                 width: 150,
                 render: (item) => {
-                  return `$${item.budget.toFixed(2)}`;
+                  return `${userData?.currency?.symbol} ${item.budget.toFixed(2)}`;
                 },
               },
               {
