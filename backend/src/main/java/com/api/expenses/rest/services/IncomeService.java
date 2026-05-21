@@ -158,6 +158,10 @@ public class IncomeService {
         return incomeRepository.countByCategoryId(categoryId) > 0;
     }
 
+    public boolean hasIncomesLinkedToTag(int tagId) {
+        return incomeRepository.countByTagId(tagId) > 0;
+    }
+
     /**
      * Gets all incomes from the database
      * @return a list of all incomes

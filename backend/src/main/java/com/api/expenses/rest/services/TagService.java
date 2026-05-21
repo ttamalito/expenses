@@ -6,6 +6,8 @@ import com.api.expenses.rest.models.User;
 import com.api.expenses.rest.models.dtos.CreateTagDto;
 import com.api.expenses.rest.models.dtos.GetTagDto;
 import com.api.expenses.rest.models.dtos.UpdateTagDto;
+import com.api.expenses.rest.repositories.ExpenseRepository;
+import com.api.expenses.rest.repositories.IncomeRepository;
 import com.api.expenses.rest.repositories.TagRepository;
 import com.api.expenses.rest.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,30 @@ public class TagService {
 
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    // private ExpenseService expenseService;
+    private final ExpenseRepository expenseRepository;
+    private final IncomeRepository incomeRepository;
+    // private IncomeService incomeService;
 
     @Autowired
-    public TagService(TagRepository tagRepository, UserRepository userRepository) {
+    public TagService(TagRepository tagRepository, UserRepository userRepository,
+                      ExpenseRepository expenseRepository,
+                      IncomeRepository incomeRepository) {
         this.tagRepository = tagRepository;
         this.userRepository = userRepository;
+        this.expenseRepository = expenseRepository;
+        this.incomeRepository = incomeRepository;
     }
+
+//    @Autowired
+//    public void setExpenseService(ExpenseService expenseService) {
+//        this.expenseService = expenseService;
+//    }
+
+//    @Autowired
+//    public void setIncomeService(IncomeService incomeService) {
+//        this.incomeService = incomeService;
+//    }
 
     public List<GetTagDto> getTagsByUserId(UUID userId) {
         List<Tag> tags = tagRepository.findByUserId(userId);
@@ -97,6 +117,16 @@ public class TagService {
         if (!tag.getUserId().equals(userId)) {
             throw new TransactionException(TransactionException.TransactionExceptionType.UNAUTHORIZED);
         }
+
+        if (expenseRepository.countByTagId(tagId) > 0) {
+            throw new TransactionException(TransactionException.TransactionExceptionType.TAG_HAS_LINKED_EXPENSES);
+        }
+
+        if (incomeRepository.countByTagId(tagId) > 0) {
+            throw new TransactionException(TransactionException.TransactionExceptionType.TAG_HAS_LINKED_INCOMES);
+        }
+
+
         
         tagRepository.delete(tag);
     }

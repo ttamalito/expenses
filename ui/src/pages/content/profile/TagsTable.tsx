@@ -133,7 +133,7 @@ export default function TagsTable() {
         console.error('Error deleting Tag:', error);
         notifications.show({
           title: 'Error',
-          message: 'Failed to deleteTag: ' + error.response.data,
+          message: 'Failed to delete Tag: ' + error.response.data,
           color: 'red',
         });
       }

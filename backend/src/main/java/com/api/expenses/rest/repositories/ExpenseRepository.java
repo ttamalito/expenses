@@ -1,6 +1,7 @@
 package com.api.expenses.rest.repositories;
 
 import com.api.expenses.rest.models.Expense;
+import com.api.expenses.rest.models.Tag;
 import org.hibernate.annotations.NamedNativeQuery;
 import org.hibernate.annotations.NamedQuery;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
     public List<Expense> findByUserIdAndYear(UUID userId, int year);
 
     public long countByCategoryId(int categoryId);
+
+    public long countByTagId(int tagId);
 
     @Query(value = "SELECT * FROM expenses WHERE user_id = ?1 AND month = ?2 AND year = ?3 AND category_id = ?4", nativeQuery = true)
     public List<Expense> findByUserIdAndMonthAndYearAndCategoryId(UUID userId, int month, int year, int categoryId);
