@@ -28,6 +28,7 @@ import {
   useGetTotalEarnedYear,
 } from '@requests/incomesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CategoryOption {
   value: string;
@@ -64,6 +65,8 @@ const YearlyExpenses: React.FC = () => {
   const [getAllCategories] = useGetAllExpenseCategories();
   const [getYearlyIncomes] = useGetYearlyIncomes();
   const [getTotalEarnedYear] = useGetTotalEarnedYear();
+
+  const { userData } = useUserDataContext();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -367,11 +370,13 @@ const YearlyExpenses: React.FC = () => {
         <Paper shadow="xs" p="md" withBorder>
           <Group justify="space-between">
             <Text size="xl" fw={700}>
-              Total spent this year: ${totalSpent.toFixed(2)}
+              Total spent this year: {userData?.currency?.symbol}
+              {totalSpent.toFixed(2)}
             </Text>
             {totalSpentCategory !== null && selectedCategoryName && (
               <Text size="xl" fw={700}>
-                Total spent on {selectedCategoryName}: $
+                Total spent on {selectedCategoryName}:{' '}
+                {userData?.currency?.symbol}
                 {totalSpentCategory.toFixed(2)}
               </Text>
             )}
@@ -392,7 +397,8 @@ const YearlyExpenses: React.FC = () => {
         {/* Total Earned */}
         <Paper shadow="xs" p="md" withBorder>
           <Text size="xl" fw={700}>
-            Total earned this year: ${totalEarned.toFixed(2)}
+            Total earned this year: {userData?.currency?.symbol}
+            {totalEarned.toFixed(2)}
           </Text>
         </Paper>
 

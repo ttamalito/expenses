@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import {
   Box,
-  Title,
-  Paper,
-  Text,
-  Select,
-  Group,
-  Stack,
-  Loader,
-  Center,
   Button,
+  Center,
+  Group,
+  Loader,
+  Paper,
+  Select,
   SelectProps,
+  Stack,
+  Text,
+  Title,
 } from '@mantine/core';
 import { PieChart } from '@mantine/charts';
 import { useForm } from '@mantine/form';
@@ -55,7 +55,7 @@ interface TagOption {
 
 const MonthlyExpenses: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { userTags } = useUserDataContext();
+  const { userTags, userData } = useUserDataContext();
   const year = parseInt(
     searchParams.get('year') || new Date().getFullYear().toString(),
   );
@@ -540,11 +540,13 @@ const MonthlyExpenses: React.FC = () => {
         <Paper shadow="xs" p="md" withBorder>
           <Group justify="space-between">
             <Text size="xl" fw={700}>
-              Total spent this month: ${totalSpent.toFixed(2)}
+              Total spent this month: {userData?.currency?.symbol}
+              {totalSpent.toFixed(2)}
             </Text>
             {totalSpentCategory !== null && selectedCategoryName && (
               <Text size="xl" fw={700}>
-                Total spent on {selectedCategoryName}: $
+                Total spent on {selectedCategoryName}:{' '}
+                {userData?.currency?.symbol}
                 {totalSpentCategory.toFixed(2)}
               </Text>
             )}
@@ -565,7 +567,8 @@ const MonthlyExpenses: React.FC = () => {
         {/* Total Earned */}
         <Paper shadow="xs" p="md" withBorder>
           <Text size="xl" fw={700}>
-            Total earned this month: ${totalEarned.toFixed(2)}
+            Total earned this month: {userData?.currency?.symbol}
+            {totalEarned.toFixed(2)}
           </Text>
         </Paper>
 
