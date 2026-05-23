@@ -27,6 +27,7 @@ import {
   useGetEarnedYearMonthly,
 } from '@requests/incomesRequests.ts';
 import { notifications } from '@mantine/notifications';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CashFlowData {
   month: string;
@@ -58,6 +59,8 @@ const CashFlowChart: React.FC = () => {
   const [getTotalSpentMonthly] = useGetTotalSpentMonthly();
   const [getTotalEarnedMonth] = useGetTotalEarnedMonth();
   const [getEarnedYearMonthly] = useGetEarnedYearMonthly();
+
+  const { userData } = useUserDataContext();
 
   const fetchData = async () => {
     setLoading(true);
@@ -171,7 +174,10 @@ const CashFlowChart: React.FC = () => {
               <YAxis />
               <Tooltip
                 formatter={(value, name) => {
-                  return [`$${Number(value).toFixed(2)}`, name];
+                  return [
+                    `${userData?.currency?.symbol}${Number(value).toFixed(2)}`,
+                    name,
+                  ];
                 }}
               />
               <Legend />

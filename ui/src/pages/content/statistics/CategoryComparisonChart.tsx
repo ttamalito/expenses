@@ -14,6 +14,7 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useCompareCategories } from '@requests/expensesRequests.ts';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface FormValues {
   currentPeriodType: string;
@@ -52,6 +53,8 @@ const CategoryComparisonChart: React.FC = () => {
   >([]);
 
   const [compareCategories] = useCompareCategories();
+
+  const { userData } = useUserDataContext();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -309,7 +312,8 @@ const CategoryComparisonChart: React.FC = () => {
                 Total for {comparisonData.currentPeriodLabel}
               </Text>
               <Text size="xl" fw={700}>
-                ${comparisonData.totalCurrentPeriod.toFixed(2)}
+                {userData?.currency?.symbol}
+                {comparisonData.totalCurrentPeriod.toFixed(2)}
               </Text>
             </Stack>
 
@@ -318,7 +322,8 @@ const CategoryComparisonChart: React.FC = () => {
                 Total for {comparisonData.previousPeriodLabel}
               </Text>
               <Text size="xl" fw={700}>
-                ${comparisonData.totalPreviousPeriod.toFixed(2)}
+                {userData?.currency?.symbol}
+                {comparisonData.totalPreviousPeriod.toFixed(2)}
               </Text>
             </Stack>
 
@@ -329,7 +334,8 @@ const CategoryComparisonChart: React.FC = () => {
                 fw={700}
                 c={comparisonData.totalDifference >= 0 ? 'red' : 'green'}
               >
-                ${comparisonData.totalDifference.toFixed(2)}(
+                {userData?.currency?.symbol}
+                {comparisonData.totalDifference.toFixed(2)}(
                 {comparisonData.totalPercentageChange >= 0 ? '+' : ''}
                 {comparisonData.totalPercentageChange.toFixed(2)}%)
               </Text>

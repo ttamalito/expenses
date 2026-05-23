@@ -23,6 +23,7 @@ import {
   IconCoin,
   IconTrendingUp,
 } from '@tabler/icons-react';
+import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 const StatisticalSummaries: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,6 +32,8 @@ const StatisticalSummaries: React.FC = () => {
   );
 
   const [getStatisticalSummary] = useGetStatisticalSummary();
+
+  const { userData } = useUserDataContext();
 
   const fetchData = async () => {
     setLoading(true);
@@ -57,10 +60,7 @@ const StatisticalSummaries: React.FC = () => {
 
   // Format currency values
   const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(value);
+    return `${userData?.currency?.symbol} ${value.toFixed(2)}`;
   };
 
   // Format percentage values

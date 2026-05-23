@@ -228,7 +228,7 @@ export default function AddExpense({
 
         <NumberInput
           label="Amount"
-          placeholder="0.00"
+          placeholder={`${userData?.currency?.symbol} 0.00`}
           required
           min={0.01}
           step={0.01}
