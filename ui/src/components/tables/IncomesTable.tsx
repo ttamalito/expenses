@@ -160,7 +160,7 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
             sortable: true,
             width: '10%',
             render: ({ date }) => {
-              return date ? new Date(date).toLocaleDateString() : '';
+              return date ? new Date(date).toLocaleDateString('es-ES') : '';
             },
           },
           {
