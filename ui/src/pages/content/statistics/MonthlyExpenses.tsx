@@ -222,7 +222,8 @@ const MonthlyExpenses: React.FC = () => {
           // add a random color to each category:
           const dataWithColors = chartData.map((entry, index) => {
             return {
-              ...entry,
+              name: entry.name,
+              value: Math.round(entry.value * 1e2) / 1e2,
               color: colors[index],
             };
           });
