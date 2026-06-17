@@ -100,7 +100,7 @@ const StatisticalSummaries: React.FC = () => {
       'November',
       'December',
     ];
-    return months[month - 1] || 'Unknown';
+    return months[month - 1] + ' ' || 'Unknown ';
   };
 
   if (loading) {
@@ -159,7 +159,7 @@ const StatisticalSummaries: React.FC = () => {
                       {formatDate(
                         highestSpending?.highestSpendingDay?.date ?? '01-01-00',
                       )}
-                      :
+                      {': '}
                       {formatCurrency(
                         highestSpending?.highestSpendingDay?.amount ?? 0,
                       )}
@@ -178,6 +178,7 @@ const StatisticalSummaries: React.FC = () => {
                         highestSpending?.highestSpendingMonth?.month ?? 0,
                       )}
                       {highestSpending?.highestSpendingMonth?.year ?? 0}
+                      {': '}
                       {formatCurrency(
                         highestSpending?.highestSpendingMonth?.amount ?? 0,
                       )}
@@ -192,7 +193,8 @@ const StatisticalSummaries: React.FC = () => {
                   <div>
                     <Text fw={500}>Highest Spending Category</Text>
                     <Text size="sm">
-                      {highestSpending?.highestSpendingCategory?.categoryName}:
+                      {highestSpending?.highestSpendingCategory?.categoryName}
+                      {': '}
                       {formatCurrency(
                         highestSpending?.highestSpendingCategory?.amount ?? 0,
                       )}

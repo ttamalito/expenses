@@ -215,7 +215,9 @@ public class StatisticsService {
      */
     private SavingsDto calculateSavings(UUID userId) throws TransactionException {
         // Get current year and previous year
-        int currentYear = LocalDate.now().getYear();
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+        int currentMonth = now.getMonthValue();
         int previousYear = currentYear - 1;
         
         // Calculate monthly savings percentages for the last 24 months
@@ -227,10 +229,13 @@ public class StatisticsService {
         for (int year : new int[]{currentYear, previousYear}) {
             for (int month = 1; month <= 12; month++) {
                 try {
+                    if (year == currentYear && month == currentMonth) {
+                        continue; // Exclude the current month from the analytics
+                    }
                     float income = incomeService.getTotalEarnedForAMonthForAUser(userId, month, year);
                     float expenses = expenseService.getTotalSpentForAMonthOfAUser(userId, month, year);
                     
-                    // Skip months with no income
+                    // Skip months with no income, mainly to avoid adding months in the future, TODO: Fix this and use the actual last 24 months
                     if (income <= 0) {
                         continue;
                     }
