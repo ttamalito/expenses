@@ -1,19 +1,21 @@
-import { Grid, Container, Title } from '@mantine/core';
+import { Grid, Container, Title, Text } from '@mantine/core';
 import HomeLineChart from './charts/HomeLineChart';
 import HomeDonutBudgetChart from './charts/HomeDonutBudgetChart';
 import AddExpense from './forms/AddExpense';
 import AddIncome from './forms/AddIncome';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import { useState } from 'react';
+import getCurrentMonthAndYear from '../../../utils/getCurrentMonthAndYear.ts';
 
 export default function Home() {
   const { userTags } = useUserDataContext();
   const [updateCharts, setUpdateCharts] = useState<boolean>(false);
   return (
     <Container fluid>
-      <Title order={1} mb="xl">
-        Dashboard
-      </Title>
+      <Title order={1}>Dashboard</Title>
+      <Text size="lg" c="dimmed" mb="lg">
+        {getCurrentMonthAndYear()}
+      </Text>
 
       {/* Charts Row */}
       <Grid mb="xl">
