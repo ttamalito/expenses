@@ -53,6 +53,26 @@ export default function SideBar({
       }}
     >
       <Stack gap="md">
+        <Group
+          style={{
+            borderBottom: `1px solid #EEE`, // Media query : minwidth: 992px
+            width: '100%',
+          }}
+        >
+          <Image
+            alt="logo"
+            src={'/money_svg.svg'}
+            width={121}
+            height={54}
+            style={{
+              position: 'relative',
+            }}
+            onClick={() => {
+              navigate(routes.content.home);
+            }}
+          />
+          <Text fw={500}>Expenses Manager</Text>
+        </Group>
         {/* Profile Picture */}
         <Group justify="center">
           <Image

@@ -1,6 +1,5 @@
-import { Group, Box, Image, useMantineTheme, Text, Flex } from '@mantine/core';
-import { Outlet, useNavigate } from 'react-router';
-import { routes } from '@routes';
+import { Group, Box, useMantineTheme, Text, Flex } from '@mantine/core';
+import { Outlet } from 'react-router';
 import { useGetUserData } from '@requests/userRequests.ts';
 import { useEffect, useMemo } from 'react';
 import { IGetUserDto } from '@clients';
@@ -12,7 +11,6 @@ import { useGetTagsForUser } from '@requests/tagRequests.ts';
 
 export default function ExpensesLayout() {
   const theme = useMantineTheme();
-  const navigate = useNavigate();
   const [getTagsForUser] = useGetTagsForUser();
   const { setUserData, setUserTags } = useUserDataContext();
   const [getUser] = useGetUserData();
@@ -59,35 +57,11 @@ export default function ExpensesLayout() {
         minHeight: '100vh',
       }}
     >
-      <Group
-        bg={'white'}
-        h={75}
-        //className={classes.index}
-        style={{
-          borderBottom: `1px solid #EEE`, // Media query : minwidth: 992px
-          position: 'fixed',
-          top: 0,
-          width: '100%',
-        }}
-      >
-        <Image
-          alt="logo"
-          src={'/money_svg.svg'}
-          width={171}
-          height={74}
-          style={{
-            position: 'relative',
-          }}
-          onClick={() => {
-            navigate(routes.content.home);
-          }}
-        />
-      </Group>
       <Box
         style={{
           //minHeight: '100vh',
           padding: '1.25rem 1.25rem 0 1.25rem',
-          marginTop: 75, // position: relative - makes the z-index higher than the header
+          // marginTop: 75, // position: relative - makes the z-index higher than the header
           // position: 'relative',
           // 'z-index': 0,
           // backgroundColor: theme.colors.violet[0],
