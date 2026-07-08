@@ -22,11 +22,4 @@ public class ControllersHelper {
     public static UUID getUserIdFromSecurityContextHolder() {
         return getUserFromSecurityContextHolder().map(User::getId).orElse(null);
     }
-
-    public static ResponseEntity<String> handleException(Exception e) {
-        if (e instanceof TransactionException) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        return ResponseEntity.internalServerError().body(e.getMessage());
-    }
 }

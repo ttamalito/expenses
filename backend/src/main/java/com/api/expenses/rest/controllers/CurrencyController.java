@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/currency", produces = { MediaType.APPLICATION_JSON_VALUE })
+@RequestMapping(value = "/currency", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class CurrencyController {
 
     private final CurrencyService currencyService;
@@ -28,66 +28,50 @@ public class CurrencyController {
 
     @GetMapping("/all")
     public ResponseEntity<List<GetCurrencyDto>> getAllCurrencies() {
-        try {
-            List<Currency> currencies = currencyService.getAllCurrencies();
-            List<GetCurrencyDto> currencyDtos = currencies.stream()
-                    .map(currency -> new GetCurrencyDto(
-                            currency.getId(),
-                            currency.getName(),
-                            currency.getSymbol(),
-                            currency.getCode()))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok().body(currencyDtos);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
+        List<Currency> currencies = currencyService.getAllCurrencies();
+        List<GetCurrencyDto> currencyDtos = currencies.stream()
+                .map(currency -> new GetCurrencyDto(
+                        currency.getId(),
+                        currency.getName(),
+                        currency.getSymbol(),
+                        currency.getCode()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(currencyDtos);
+
     }
 
     @GetMapping("/{currencyId}")
     public ResponseEntity<GetCurrencyDto> getCurrency(@PathVariable int currencyId) {
-        try {
-            Optional<Currency> optionalCurrency = currencyService.getCurrencyById(currencyId);
-            if (optionalCurrency.isPresent()) {
-                Currency currency = optionalCurrency.get();
-                GetCurrencyDto currencyDto = new GetCurrencyDto(
-                        currency.getId(),
-                        currency.getName(),
-                        currency.getSymbol(),
-                        currency.getCode());
-                return ResponseEntity.ok().body(currencyDto);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<GetCurrencyDto> createCurrency(@RequestBody CreateCurrencyDto createCurrencyDto) {
-        try {
-            Currency currency = currencyService.createCurrency(createCurrencyDto);
+        Optional<Currency> optionalCurrency = currencyService.getCurrencyById(currencyId);
+        if (optionalCurrency.isPresent()) {
+            Currency currency = optionalCurrency.get();
             GetCurrencyDto currencyDto = new GetCurrencyDto(
                     currency.getId(),
                     currency.getName(),
                     currency.getSymbol(),
                     currency.getCode());
             return ResponseEntity.ok().body(currencyDto);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return ResponseEntity.badRequest().build();
         }
+        return ResponseEntity.notFound().build();
+
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<GetCurrencyDto> createCurrency(@RequestBody CreateCurrencyDto createCurrencyDto) {
+
+        Currency currency = currencyService.createCurrency(createCurrencyDto);
+        GetCurrencyDto currencyDto = new GetCurrencyDto(
+                currency.getId(),
+                currency.getName(),
+                currency.getSymbol(),
+                currency.getCode());
+        return ResponseEntity.ok().body(currencyDto);
+
     }
 
     @DeleteMapping("/delete/{currencyId}")
     public ResponseEntity<Void> deleteCurrency(@PathVariable int currencyId) {
-        try {
-            currencyService.deleteCurrency(currencyId);
-            return ResponseEntity.noContent().build();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
+        currencyService.deleteCurrency(currencyId);
+        return ResponseEntity.noContent().build();
     }
 }

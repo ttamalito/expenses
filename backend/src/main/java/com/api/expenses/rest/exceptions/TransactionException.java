@@ -1,7 +1,7 @@
 package com.api.expenses.rest.exceptions;
 
 public class TransactionException extends Exception {
-    public enum TransactionExceptionType {
+    public enum TransactionExceptionType { // TODO: Exceptions should be more specific #84
         USER_NOT_FOUND("User not found in the database for the transaction"),
         CATEGORY_NOT_FOUND("Category not found in the database for the transaction"),
         CURRENCY_NOT_FOUND("Currency not found in the database for the transaction"),

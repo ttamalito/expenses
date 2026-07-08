@@ -30,22 +30,14 @@ public class StatisticsController {
 
     /**
      * Get statistical summaries for the current user.
-     * 
+     *
      * @return a StatisticalSummaryDto containing various financial statistics
      */
     @GetMapping("/summary")
-    public ResponseEntity<StatisticalSummaryDto> getStatisticalSummary() {
+    public ResponseEntity<StatisticalSummaryDto> getStatisticalSummary() throws TransactionException, UserException {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
-        
-        try {
-            StatisticalSummaryDto summary = statisticsService.getStatisticalSummary(userId);
-            return ResponseEntity.ok(summary);
-        } catch (UserException e) {
-            return ResponseEntity.notFound().build();
-        } catch (TransactionException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+
+        StatisticalSummaryDto summary = statisticsService.getStatisticalSummary(userId);
+        return ResponseEntity.ok(summary);
     }
 }

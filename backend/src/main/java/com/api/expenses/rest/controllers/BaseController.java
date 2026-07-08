@@ -12,6 +12,7 @@ import com.api.expenses.rest.services.ExpenseService;
 import com.api.expenses.rest.services.IncomeCategoryService;
 import com.api.expenses.rest.services.IncomeService;
 import com.api.expenses.rest.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,37 +66,34 @@ public class BaseController {
     }
 
     @GetMapping("/export")
-    public ResponseEntity<String> exportAllData() {
-        try {
-            // Fetch all data from services
-            List<User> users = userService.getAllUsers();
-            List<Expense> expenses = expenseService.getAllExpenses();
-            List<Income> incomes = incomeService.getAllIncomes();
-            List<ExpenseCategory> expenseCategories = expenseCategoryService.getAllCategories();
-            List<IncomeCategory> incomeCategories = incomeCategoryService.getAllCategories();
-            List<Currency> currencies = currencyService.getAllCurrencies();
+    public ResponseEntity<String> exportAllData() throws JsonProcessingException {
+        // Fetch all data from services
+        List<User> users = userService.getAllUsers();
+        List<Expense> expenses = expenseService.getAllExpenses();
+        List<Income> incomes = incomeService.getAllIncomes();
+        List<ExpenseCategory> expenseCategories = expenseCategoryService.getAllCategories();
+        List<IncomeCategory> incomeCategories = incomeCategoryService.getAllCategories();
+        List<Currency> currencies = currencyService.getAllCurrencies();
 
-            // Create JSON object with all data
-            ObjectNode rootNode = objectMapper.createObjectNode();
-            rootNode.set("users", objectMapper.valueToTree(users));
-            rootNode.set("expenses", objectMapper.valueToTree(expenses));
-            rootNode.set("incomes", objectMapper.valueToTree(incomes));
-            rootNode.set("expenseCategories", objectMapper.valueToTree(expenseCategories));
-            rootNode.set("incomeCategories", objectMapper.valueToTree(incomeCategories));
-            rootNode.set("currencies", objectMapper.valueToTree(currencies));
+        // Create JSON object with all data
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        rootNode.set("users", objectMapper.valueToTree(users));
+        rootNode.set("expenses", objectMapper.valueToTree(expenses));
+        rootNode.set("incomes", objectMapper.valueToTree(incomes));
+        rootNode.set("expenseCategories", objectMapper.valueToTree(expenseCategories));
+        rootNode.set("incomeCategories", objectMapper.valueToTree(incomeCategories));
+        rootNode.set("currencies", objectMapper.valueToTree(currencies));
 
-            String jsonData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
+        String jsonData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
 
-            // Set headers for file download
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setContentDispositionFormData("attachment", "expenses_data_export.json");
+        // Set headers for file download
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentDispositionFormData("attachment", "expenses_data_export.json");
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(jsonData);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error exporting data: " + e.getMessage());
-        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(jsonData);
+
     }
 }
