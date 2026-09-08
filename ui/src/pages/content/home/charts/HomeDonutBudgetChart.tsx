@@ -72,24 +72,24 @@ export default function HomeDonutBudgetChart({
         newChartData.push({
           name: 'Spent',
           value: spent,
-          color: 'blue',
+          color: 'blue.6',
         });
         newChartData.push({
           name: 'Remaining',
           value: remaining,
-          color: 'teal',
+          color: 'teal.6',
         });
       } else {
         // If over budget
         newChartData.push({
           name: 'Budget',
           value: budgetAmount,
-          color: 'red',
+          color: 'red.6',
         });
         newChartData.push({
           name: 'Overspent',
           value: overspent,
-          color: 'orange',
+          color: 'amber.6',
         });
       }
 

@@ -1,0 +1,31 @@
+.navItem {
+  color: var(--app-text-secondary);
+  font-weight: 400;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.navItem:hover {
+  background-color: var(--app-surface-secondary);
+  color: var(--app-text-primary);
+}
+
+.navItemActive {
+  background-color: var(--app-surface-secondary);
+  color: var(--app-text-primary);
+  font-weight: 500;
+}
+
+/* Keep the active item's background stable on hover instead of flashing
+   back to the plain hover shade. */
+.navItemActive:hover {
+  background-color: var(--app-surface-secondary);
+}
+
+.logoRow {
+  border-radius: var(--mantine-radius-md);
+  transition: background-color 100ms ease;
+}
+
+.logoRow:hover {
+  background-color: var(--app-surface-secondary);
+}

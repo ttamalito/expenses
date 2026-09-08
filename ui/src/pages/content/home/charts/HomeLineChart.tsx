@@ -125,8 +125,8 @@ export default function HomeLineChart({ updateChart }: HomeLineChartProps) {
           data={chartData}
           dataKey="month"
           series={[
-            { name: 'spent', color: 'red' },
-            { name: 'earned', color: 'green' },
+            { name: 'spent', color: 'red.6' },
+            { name: 'earned', color: 'teal.6' },
           ]}
           curveType="linear"
           withLegend

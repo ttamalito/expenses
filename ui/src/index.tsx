@@ -13,7 +13,7 @@ import { BrowserRouter } from 'react-router';
 import { Notifications } from '@mantine/notifications';
 
 createRoot(document.getElementById('root')!).render(
-  <MantineProvider theme={theme}>
+  <MantineProvider theme={theme} defaultColorScheme="dark">
     <StrictMode>
       <BrowserRouter>
         <Suspense fallback={<Loader color={'green'} />}>

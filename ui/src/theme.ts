@@ -8,106 +8,125 @@ import {
   ActionIcon,
   Tabs,
   Anchor,
+  TextInput,
+  NumberInput,
+  Select,
+  Textarea,
 } from '@mantine/core';
 
-// Define color palette based on requirements
-const colors = {
-  // Primary Colors
-  darkGreen: '#1A4F37',
-  emeraldGreen: '#28C76F',
-  deepNavy: '#1E2A38',
-  teal: '#00B8A9',
-
-  // Accent Colors
-  softGold: '#F6C453',
-  skyBlue: '#4AA8D8',
-
-  // Background / Neutral
-  offWhite: '#F7F9FB',
-  mediumGray: '#D3D8DE',
-  charcoal: '#2C2E33',
-
-  // Additional colors
-  positive: '#28C76F', // Same as emeraldGreen for consistency
-  negative: '#FF5C5C', // Red for negative values
-  warning: '#F6C453', // Same as softGold for consistency
-};
+// ---------------------------------------------------------------------------
+// Structural colors (backgrounds/text/borders) live as CSS custom properties
+// in index.css — `:root` for light mode, `[data-mantine-color-scheme='dark']`
+// for dark mode. Every component override below references those variables,
+// so it automatically follows whichever scheme is active instead of being
+// locked to one look. Mantine sets the `data-mantine-color-scheme` attribute
+// on <html> itself whenever `useMantineColorScheme().toggleColorScheme()` (or
+// setColorScheme) is called, so no extra plumbing is needed for this to react.
+//
+// Accent colors (teal/red/amber/blue/green) come straight from
+// expense-tracker-colors.md and are the SAME in both schemes — those stay as
+// a normal Mantine color palette.
+// ---------------------------------------------------------------------------
 
 const theme = createTheme({
-  // Set primary and default colors
   primaryColor: 'teal',
+  primaryShade: 6,
 
-  // Define custom colors
   colors: {
-    // Add custom teal color
     teal: [
-      '#E6F7F6', // 0
-      '#CCF0ED', // 1
-      '#99E0DB', // 2
-      '#66D1C9', // 3
-      '#33C2B7', // 4
-      '#00B8A9', // 5 - Main teal color
-      '#009A8E', // 6
-      '#007C72', // 7
-      '#005E57', // 8
-      '#00403B', // 9
+      '#E1F5EE',
+      '#CDEEE1',
+      '#9FE1CB',
+      '#7DD4B7',
+      '#5DCAA5',
+      '#3BB98D',
+      '#1D9E75',
+      '#167A5B',
+      '#0F5C44',
+      '#085041',
     ],
-    // Add custom dark green color
-    darkGreen: [
-      '#E8EEE9', // 0
-      '#D1DDD3', // 1
-      '#A3BBA7', // 2
-      '#75997B', // 3
-      '#47774F', // 4
-      '#1A4F37', // 5 - Main dark green color
-      '#16422E', // 6
-      '#123524', // 7
-      '#0D281B', // 8
-      '#091A12', // 9
+    red: [
+      '#FCEBEB',
+      '#F7D2D2',
+      '#F0AFAE',
+      '#EA8C8B',
+      '#E56968',
+      '#E45D5C',
+      '#E24B4A',
+      '#C93F3E',
+      '#A83433',
+      '#791F1F',
     ],
-    // Add custom emerald color
-    emerald: [
-      '#E9F9F1', // 0
-      '#D3F3E3', // 1
-      '#A7E7C7', // 2
-      '#7BDBAB', // 3
-      '#4FCF8F', // 4
-      '#28C76F', // 5 - Main emerald color
-      '#21A65D', // 6
-      '#1A854A', // 7
-      '#146438', // 8
-      '#0D4325', // 9
+    amber: [
+      '#FAEEDA',
+      '#F5DDB5',
+      '#F0CC90',
+      '#ECBC6E',
+      '#F1B542',
+      '#F0A62E',
+      '#EF9F27',
+      '#D68A1D',
+      '#B27314',
+      '#633806',
     ],
-    // Add custom navy color
-    navy: [
-      '#E8EAED', // 0
-      '#D1D5DB', // 1
-      '#A3ABB7', // 2
-      '#7581A3', // 3
-      '#47576F', // 4
-      '#1E2A38', // 5 - Main navy color
-      '#19232F', // 6
-      '#141C25', // 7
-      '#0F151C', // 8
-      '#0A0E12', // 9
+    blue: [
+      '#E6F1FB',
+      '#CDE3F7',
+      '#9BC7EF',
+      '#85B7EB',
+      '#6BA6E6',
+      '#5199E1',
+      '#378ADD',
+      '#2C71B4',
+      '#22588C',
+      '#0C447C',
+    ],
+    green: [
+      '#EAF3DE',
+      '#D4E7BD',
+      '#BEDB9C',
+      '#A8CE7B',
+      '#93C25A',
+      '#7DB63A',
+      '#639A2A',
+      '#4C7E1D',
+      '#376212',
+      '#27500A',
+    ],
+    // Only used by un-styled Mantine defaults (Modal, Menu, Tooltip, etc.)
+    // when colorScheme is 'dark'. The components we style explicitly below
+    // use the CSS variables instead, so they respond to the toggle; this
+    // array stays dark-only since it's never consulted in light mode.
+    dark: [
+      '#F2F1EC',
+      '#D8D6CF',
+      '#9A9890',
+      '#4A4944',
+      '#3A3934',
+      '#2A2A27',
+      '#1E1E1C',
+      '#141413',
+      '#0C0C0B',
+      '#000000',
     ],
   },
 
-  // Set global styles
   fontFamily:
     'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
 
-  // Set default radius for components
   defaultRadius: 'md',
 
-  // Set color scheme
-  // colorScheme: 'light',
+  white: '#ffffff',
+  black: '#1a1a18',
 
-  // Set white and black colors
-  white: colors.offWhite,
-  black: colors.charcoal,
+  other: {
+    mainBackground: 'var(--app-page-background)',
+    sideBarBackground: 'var(--app-surface-primary)',
+    textColor: 'var(--app-text-primary)',
+    textSecondary: 'var(--app-text-secondary)',
+    borderColor: 'var(--app-border)',
+  },
 
-  // Component specific styles
   components: {
     Button: Button.extend({
       defaultProps: {
@@ -115,11 +134,7 @@ const theme = createTheme({
         radius: 'md',
       },
       styles: () => {
-        return {
-          root: {
-            fontWeight: 600,
-          },
-        };
+        return { root: { fontWeight: 600 } };
       },
     }),
 
@@ -128,16 +143,14 @@ const theme = createTheme({
         size: 'lg',
         color: 'teal',
         styles: {
-          trackLabel: {
-            fontSize: 12,
-          },
+          trackLabel: { fontSize: 12 },
         },
       },
     }),
 
     Text: Text.extend({
       defaultProps: {
-        color: colors.charcoal,
+        color: 'var(--app-text-primary)',
       },
     }),
 
@@ -151,7 +164,8 @@ const theme = createTheme({
       styles: () => {
         return {
           root: {
-            backgroundColor: colors.offWhite,
+            backgroundColor: 'var(--app-surface-primary)',
+            borderColor: 'var(--app-border)',
           },
         };
       },
@@ -167,7 +181,8 @@ const theme = createTheme({
       styles: () => {
         return {
           root: {
-            backgroundColor: colors.offWhite,
+            backgroundColor: 'var(--app-surface-primary)',
+            borderColor: 'var(--app-border)',
           },
         };
       },
@@ -189,6 +204,51 @@ const theme = createTheme({
     Anchor: Anchor.extend({
       defaultProps: {
         color: 'teal',
+      },
+    }),
+
+    TextInput: TextInput.extend({
+      styles: () => {
+        return {
+          input: {
+            backgroundColor: 'var(--app-surface-secondary)',
+            borderColor: 'var(--app-border)',
+            color: 'var(--app-text-primary)',
+          },
+        };
+      },
+    }),
+    NumberInput: NumberInput.extend({
+      styles: () => {
+        return {
+          input: {
+            backgroundColor: 'var(--app-surface-secondary)',
+            borderColor: 'var(--app-border)',
+            color: 'var(--app-text-primary)',
+          },
+        };
+      },
+    }),
+    Select: Select.extend({
+      styles: () => {
+        return {
+          input: {
+            backgroundColor: 'var(--app-surface-secondary)',
+            borderColor: 'var(--app-border)',
+            color: 'var(--app-text-primary)',
+          },
+        };
+      },
+    }),
+    Textarea: Textarea.extend({
+      styles: () => {
+        return {
+          input: {
+            backgroundColor: 'var(--app-surface-secondary)',
+            borderColor: 'var(--app-border)',
+            color: 'var(--app-text-primary)',
+          },
+        };
       },
     }),
   },
