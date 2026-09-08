@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, enhancements ]
   pull_request:
     branches: [ main ]
 
@@ -72,16 +72,16 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ui/package-lock.json
 
-#      - name: Install UI Dependencies
-#        run: |
-#          cd ui
-#          npm install
-#
-#      - name: Build UI
-#        run: |
-#          cd ui
-#          npm run build
-#
+      - name: Install UI Dependencies
+        run: |
+          cd ui
+          npm ci
+
+      - name: Build UI
+        run: |
+          cd ui
+          npm run build
+
 #      - name: Run UI Tests
 #        run: |
 #          cd ui
