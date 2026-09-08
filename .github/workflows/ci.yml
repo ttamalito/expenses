@@ -18,7 +18,7 @@ jobs:
           MYSQL_DATABASE: test_expensesdb
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
       - uses: actions/checkout@v5
@@ -30,40 +30,27 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Verify MySQL Connection
-        env:
-          DB_HOST: 127.0.0.1 # maybe use localhost
-          DB_CONNECTION: mysql
-          DB_NAME: test_expensesdb
-          DB_USER: root
-          DB_PASSWORD: test_db
-          DB_PORT: 3306
-        run: |
-          mysql -h 127.0.0.1 -P 3306 -uroot -ptest_db
-          mysql -h 127.0.0.1 -P 3306 -e 'CREATE DATABASE IF NOT EXISTS test_expensesdb;' -uroot -ptest_db
-
-      - name: Initialize Database Schema
+      - name: Apply Flyway migrations
         run: |
           cd backend
-          mvn spring-boot:run -Dspring-boot.run.arguments="--spring.jpa.hibernate.ddl-auto=create" -Dspring-boot.run.jvmArguments="-Dspring.config.location=classpath:/test-application.properties" &
-          # Wait for application to start and initialize schema
-          sleep 30
-          # Kill the application
-          pkill -f "spring-boot:run" || true
-# The .properties files in /test need to be renamed to application.properties, otherwise this will not work
-#      - name: Insert Test Data
-#        run: |
-#          mysql -h 127.0.0.1 -P 3306 -u root -ptest_db test_expensesdb -e "
-#          INSERT INTO test_expensesdb.currencies (code, name, symbol) VALUES ('GTQ', 'Quetzales', 'Q');
-#          INSERT INTO test_expensesdb.currencies (code, name, symbol) VALUES ('USD', 'Dolares', '$');
-#          INSERT INTO test_expensesdb.users (id, creation_date, currency_id, email, first_name, last_name, password, profile_picture, username, role)
-#          VALUES (0xF8DFFE3009ED4794ABC798A930C7B938, '2025-07-01', 1, 'coding.tamalito@gmail.com', null, null, '$2a$10$FKYfPVP3XGCZswCBCKXKTeJqn8.cYJgU2T1YgWG0Tz3Z0tKn1r.ga', 'profilePicture', 'tamalito', 0);
-#          "
+          mvn flyway:migrate \
+            -Dflyway.url=jdbc:mysql://127.0.0.1:3306/test_expensesdb \
+            -Dflyway.user=root \
+            -Dflyway.password=test_db
 
-#      - name: Run Backend Integration Tests
-#        run: |
-#          cd backend
-#          mvn clean install -Pexecute-integration-tests -Dspring.profiles.active=test
+      - name: Insert Test Data
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -uroot -ptest_db test_expensesdb -e "
+          INSERT INTO currencies (id, code, name, symbol) VALUES (2, 'GTQ', 'Quetzales', 'Q');
+          INSERT INTO currencies (id, code, name, symbol) VALUES (3, 'USD', 'Dolares', '\$');
+          INSERT INTO users (id, creation_date, currency_id, email, first_name, last_name, password, profile_picture, username, role)
+          VALUES (0xF8DFFE3009ED4794ABC798A930C7B938, '2025-07-01', 1, 'coding.tamalito@gmail.com', null, null, '\$2a\$10\$FKYfPVP3XGCZswCBCKXKTeJqn8.cYJgU2T1YgWG0Tz3Z0tKn1r.ga', 'profilePicture', 'tamalito', 0);
+          "
+
+      - name: Run Backend Integration Tests
+        run: |
+          cd backend
+          mvn verify -Pexecute-integration-tests
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
@@ -80,8 +67,3 @@ jobs:
         run: |
           cd ui
           npm run build
-
-#      - name: Run UI Tests
-#        run: |
-#          cd ui
-#          npm test
