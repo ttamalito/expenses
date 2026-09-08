@@ -1,8 +1,7 @@
 import { Grid, Container, Title, Text } from '@mantine/core';
 import HomeLineChart from './charts/HomeLineChart';
 import HomeDonutBudgetChart from './charts/HomeDonutBudgetChart';
-import AddExpense from './forms/AddExpense';
-import AddIncome from './forms/AddIncome';
+import AddTransaction from './forms/AddTransaction';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import { useState } from 'react';
 import getCurrentMonthAndYear from '../../../utils/getCurrentMonthAndYear.ts';
@@ -29,11 +28,11 @@ export default function Home() {
 
       {/* Forms Row */}
       <Grid>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <AddExpense tagsDto={userTags} setUpdateCharts={setUpdateCharts} />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <AddIncome tagsDto={userTags} setUpdateCharts={setUpdateCharts} />
+        <Grid.Col span={12}>
+          <AddTransaction
+            tagsDto={userTags}
+            setUpdateCharts={setUpdateCharts}
+          />
         </Grid.Col>
       </Grid>
     </Container>
