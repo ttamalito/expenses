@@ -6,6 +6,7 @@ import com.api.expenses.rest.models.dtos.BudgetBurndownDto;
 import com.api.expenses.rest.models.dtos.UpdateBudgetDto;
 import com.api.expenses.rest.services.BudgetService;
 import com.api.expenses.rest.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,44 +34,38 @@ public class BudgetController {
     }
 
     @GetMapping()
-    public ResponseEntity<String> getBudget() {
+    public ResponseEntity<String> getBudget() throws JsonProcessingException {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
 
-        try {
-            String categoriesAsJson = budgetService.getBudgetForUserAsJsonString(userId);
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(categoriesAsJson);
-        } catch (Exception e) {
-            return ControllersHelper.handleException(e);
-        }
+        String categoriesAsJson = budgetService.getBudgetForUserAsJsonString(userId);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(categoriesAsJson);
+
 
     }
 
 
     /**
      * route to create or modify the existing budget - It modifies multiple expense categories
+     *
      * @param budgets - A Serialized array of budgets, each having a category id and a new budget
      * @return
      */
     @PostMapping("/modify")
     public ResponseEntity<String> modifySetUp(@RequestBody List<UpdateBudgetDto> budgets) {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
-        try {
 //            List<ExpenseCategory> categoriesSentFromClient = objectMapper.readValue(listOfCategoriesIds,
 //                    objectMapper.getTypeFactory().constructCollectionType(List.class, ExpenseCategory.class));
 
-            List<ExpenseCategory> categoriesFromDb = userService.getUserExpenseCategories(userId);
-            for (UpdateBudgetDto budget : budgets) {
-                for (ExpenseCategory dbCategory : categoriesFromDb) {
-                    if (budget.categoryId() == dbCategory.getId()) {
-                        dbCategory.setBudget(budget.newBudget());
-                    }
+        List<ExpenseCategory> categoriesFromDb = userService.getUserExpenseCategories(userId);
+        for (UpdateBudgetDto budget : budgets) {
+            for (ExpenseCategory dbCategory : categoriesFromDb) {
+                if (budget.categoryId() == dbCategory.getId()) {
+                    dbCategory.setBudget(budget.newBudget());
                 }
             }
-            userService.saveExpenseCategories(categoriesFromDb);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ControllersHelper.handleException(e);
         }
+        userService.saveExpenseCategories(categoriesFromDb);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -78,7 +73,7 @@ public class BudgetController {
      * This data shows how the budget is being used throughout the month.
      *
      * @param month the month (1-12), defaults to current month if not provided
-     * @param year the year, defaults to current year if not provided
+     * @param year  the year, defaults to current year if not provided
      * @return budget burn-down data for each category with a budget
      */
     @GetMapping("/burndown")

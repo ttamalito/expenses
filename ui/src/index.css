@@ -1,5 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap");
 
+:root {
+    /* Light mode structural colors — see expense-tracker-colors.md */
+    --app-page-background: #eceae3;
+    --app-surface-primary: #ffffff;
+    --app-surface-secondary: #f5f4ef;
+    --app-text-primary: #1a1a18;
+    --app-text-secondary: #6b6a65;
+    --app-text-success: #3b6d11;
+    --app-text-danger: #a32d2d;
+    --app-border: #e0ddd4;
+    --app-border-strong: #c8c6bc;
+}
+
+[data-mantine-color-scheme='dark'] {
+    --app-page-background: #141413;
+    --app-surface-primary: #1e1e1c;
+    --app-surface-secondary: #2a2a27;
+    --app-text-primary: #f2f1ec;
+    --app-text-secondary: #9a9890;
+    --app-text-success: #1d9e75;
+    --app-text-danger: #e24b4a;
+    --app-border: #3a3934;
+    --app-border-strong: #4a4944;
+}
+
 html,
 body,
 #root,
@@ -15,21 +40,26 @@ body,
     position: relative;
 }
 
+body {
+    background-color: var(--app-page-background);
+    color: var(--app-text-primary);
+}
+
 ::-webkit-scrollbar {
     width: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #e0e0e0;
+    background: var(--app-surface-secondary);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #888;
+    background: var(--app-border-strong);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: var(--app-text-secondary);
 }

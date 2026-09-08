@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/tags", produces = { MediaType.APPLICATION_JSON_VALUE })
+@RequestMapping(value = "/tags", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class TagController {
 
     private final TagService tagService;
@@ -32,15 +32,11 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTagById(@PathVariable int id) {
+    public ResponseEntity<?> getTagById(@PathVariable int id) throws TransactionException {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
-        
-        try {
-            GetTagDto tag = tagService.getTagById(id, userId);
-            return ResponseEntity.ok(tag);
-        } catch (TransactionException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        GetTagDto tag = tagService.getTagById(id, userId);
+        return ResponseEntity.ok(tag);
     }
 
     @GetMapping("/user")
@@ -51,39 +47,32 @@ public class TagController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<GetTagDto> createTag(@RequestBody CreateTagDto createTagDto) {
+    public ResponseEntity<GetTagDto> createTag(@RequestBody CreateTagDto createTagDto) throws TransactionException {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
-        
-        try {
-            Tag createdTag = tagService.createTag(createTagDto, userId);
-            GetTagDto tag = new GetTagDto(createdTag.getId(), createdTag.getName(), createdTag.getDescription(),userId, createdTag.getColor());
-            return ResponseEntity.ok().body(tag);
-        } catch (TransactionException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+
+        Tag createdTag = tagService.createTag(createTagDto, userId);
+        GetTagDto tag = new GetTagDto(createdTag.getId(),
+                createdTag.getName(),
+                createdTag.getDescription(),
+                userId,
+                createdTag.getColor());
+        return ResponseEntity.ok().body(tag);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTag(@PathVariable int id, @RequestBody UpdateTagDto updateTagDto) {
+    public ResponseEntity<?> updateTag(@PathVariable int id, @RequestBody UpdateTagDto updateTagDto)
+            throws TransactionException {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
-        
-        try {
-            tagService.updateTag(id, updateTagDto, userId);
-            return ResponseEntity.noContent().build();
-        } catch (TransactionException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        tagService.updateTag(id, updateTagDto, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteTag(@PathVariable int id) {
+    public ResponseEntity<?> deleteTag(@PathVariable int id) throws TransactionException {
         UUID userId = ControllersHelper.getUserIdFromSecurityContextHolder();
-        
-        try {
-            tagService.deleteTag(id, userId);
-            return ResponseEntity.noContent().build();
-        } catch (TransactionException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        tagService.deleteTag(id, userId);
+        return ResponseEntity.noContent().build();
     }
 }
