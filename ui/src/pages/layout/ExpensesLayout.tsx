@@ -52,9 +52,10 @@ export default function ExpensesLayout() {
 
   return (
     <Box
-      bg={theme.colors.gray[2]}
+      bg={theme.other['mainBackground'] ?? theme.colors.gray[2]}
       style={{
         minHeight: '100vh',
+        color: theme.other.textColor,
       }}
     >
       <Box
