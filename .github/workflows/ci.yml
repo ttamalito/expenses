@@ -34,6 +34,7 @@ jobs:
         run: |
           cd backend
           mvn flyway:migrate \
+            -Dflyway.configFiles=/dev/null \
             -Dflyway.url=jdbc:mysql://127.0.0.1:3306/test_expensesdb \
             -Dflyway.user=root \
             -Dflyway.password=test_db
