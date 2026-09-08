@@ -63,7 +63,7 @@ jobs:
       - name: Install UI Dependencies
         run: |
           cd ui
-          npm install
+          npm ci
 
       - name: Build UI
         run: |
