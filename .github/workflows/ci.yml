@@ -69,13 +69,12 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: ui/package-lock.json
+          package-manager-cache: false
 
       - name: Install UI Dependencies
         run: |
           cd ui
-          npm install
+          npm ci
 
       - name: Build UI
         run: |
