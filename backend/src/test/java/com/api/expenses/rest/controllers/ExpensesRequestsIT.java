@@ -3,6 +3,7 @@ package com.api.expenses.rest.controllers;
 import com.api.expenses.rest.controllers.utils.AuthenticationHelper;
 import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.dtos.*;
+import com.api.expenses.rest.utils.DateUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.jupiter.api.BeforeEach;
@@ -1226,6 +1227,139 @@ public class ExpensesRequestsIT {
         deleteTag(bearerToken, desirableTagId);
     }
 
+
+    @DisplayName("Total spent on a year for a tag and fetch the corresponding expenses")
+    @Test
+    public void getTotalSpentAndExpensesOnAYearInASingleTag() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+
+        // create the tags that will not be used
+        List<Integer> undesirableTags = createMultipleTags(bearerToken, "src/test/resources/expenses/tags/totalSpentOnAMonth/multipleTags.json");
+
+        // create the three categories for the expenses that will not be queried
+        List<Integer> undesirableCategoryIds = createMultipleExpenseCategories(bearerToken,
+                "src/test/resources/expenses/tags/totalSpentOnAMonth/multipleCategories.json");
+
+        // add the undesirable categories and tags ids to the expenses that should not be queried
+        List<Pair<Integer, Integer>> categoryIdsPairs = new ArrayList<>();
+        List<Pair<Integer, Integer>> tagIdsPairs = new ArrayList<>();
+        Pair<Integer, Integer> pair1 = Pair.of(0, undesirableCategoryIds.get(0));
+        Pair<Integer, Integer> tagPair1 = Pair.of(0, undesirableTags.get(0));
+        categoryIdsPairs.add(pair1);
+        tagIdsPairs.add(tagPair1);
+        Pair<Integer, Integer> pair2 = Pair.of(1, undesirableCategoryIds.get(0));
+        Pair<Integer, Integer> tagPair2 = Pair.of(1, undesirableTags.get(0));
+        categoryIdsPairs.add(pair2);
+        tagIdsPairs.add(tagPair2);
+        Pair<Integer, Integer> pair3 = Pair.of(2, undesirableCategoryIds.get(1));
+        Pair<Integer, Integer> tagPair3 = Pair.of(2, undesirableTags.get(1));
+        categoryIdsPairs.add(pair3);
+        tagIdsPairs.add(tagPair3);
+        Pair<Integer, Integer> pair4 = Pair.of(3, undesirableCategoryIds.get(1));
+        Pair<Integer, Integer> tagPair4 = Pair.of(3, undesirableTags.get(1));
+        categoryIdsPairs.add(pair4);
+        tagIdsPairs.add(tagPair4);
+        Pair<Integer, Integer> pair5 = Pair.of(4, undesirableCategoryIds.get(0));
+        Pair<Integer, Integer> tagPair5 = Pair.of(4, undesirableTags.get(0));
+        categoryIdsPairs.add(pair5);
+        tagIdsPairs.add(tagPair5);
+        Pair<Integer, Integer> pair6 = Pair.of(5, undesirableCategoryIds.get(2));
+        Pair<Integer, Integer> tagPair6 = Pair.of(5, undesirableTags.get(2));
+        categoryIdsPairs.add(pair6);
+        tagIdsPairs.add(tagPair6);
+
+        String expenseThatShouldNotBeQueried = addCategoryAndTagToListOfExpensesInSpecificPosition(
+                categoryIdsPairs,
+                tagIdsPairs,
+                "src/test/resources/expenses/tags/totalSpentOnAMonth/expensesNotToQuery.json");
+
+        List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
+        List<Integer> expenseIdsToIgnore = sendAndSaveExpenses(bearerToken,
+                expenseThatShouldNotBeQueried, expensesToSendAndIgnore);
+
+        int desirableCategoryId = createExpenseCategory(bearerToken, "src/test/resources/expenses/totalSpentOnAMonth/category/singleCategory.json");
+        int desirableTagId = createTag(bearerToken, "src/test/resources/expenses/tags/tagForExpense.json");
+
+        List<Pair<Integer, Integer>> desirableIdPairs = new ArrayList<>();
+        List<Pair<Integer, Integer>> desirableTagIdPairs = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            Pair<Integer, Integer> categoryIdPair = Pair.of(i, desirableCategoryId);
+            Pair<Integer, Integer> tagIdPair = Pair.of(i, desirableTagId);
+            desirableIdPairs.add(categoryIdPair);
+            desirableTagIdPairs.add(tagIdPair);
+        }
+
+        String expensesThatShouldBeQueried = addCategoryAndTagToListOfExpensesInSpecificPosition(
+                desirableIdPairs,
+                desirableTagIdPairs,
+                "src/test/resources/expenses/tags/totalSpentOnAYear/expensesToQuery.json");
+
+        List<CreateExpenseDto> expensesSentToServer = new ArrayList<>();
+        List<Integer> expenseIds = sendAndSaveExpenses(bearerToken,
+                expensesThatShouldBeQueried, expensesSentToServer);
+
+        // Determine the target year and expected total from the actual data sent, rather than
+        // hardcoding fixture-derived numbers, so the test stays correct if fixtures change.
+        int targetYear = DateUtils.getYearOfTheDate(expensesSentToServer.get(0).date());
+        float expectedTotal = 0f;
+        for (CreateExpenseDto expense : expensesSentToServer) {
+            if (DateUtils.getYearOfTheDate(expense.date()) == targetYear) {
+                expectedTotal += expense.amount();
+            }
+        }
+
+        ResultActions savedExpense = mockMvc.perform(MockMvcRequestBuilders.get("/expenses/filter/" + targetYear + "/tag/" + desirableTagId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"));
+
+        String expensesAndTotalSpent = savedExpense.andReturn().getResponse().getContentAsString();
+        GetExpensesByTagDto returnedDto = objectMapper.readValue(expensesAndTotalSpent, GetExpensesByTagDto.class);
+
+        for (int i = 0; i < expensesSentToServer.size(); i++) {
+            int expenseId = expenseIds.get(i);
+            CreateExpenseDto sentExpense = expensesSentToServer.get(i);
+            Optional<Expense> receivedExpenseOptional = returnedDto.expenses().stream().filter(expense -> expense.getId() == expenseId).findAny();
+            assertTrue(receivedExpenseOptional.isPresent());
+            Expense receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
+            assertEquals(sentExpense.currencyId(), receivedExpense.getCurrencyId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
+            assertEquals(sentExpense.description(), receivedExpense.getDescription());
+            assertEquals(targetYear, receivedExpense.getYear());
+            assertEquals(desirableTagId, receivedExpense.getTagId());
+        }
+
+        assertEquals(expectedTotal, returnedDto.totalSpent());
+
+        // delete the expenses
+        for (int expenseId : expenseIds) {
+            mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                            .header("Authorization", bearerToken))
+                    .andExpect(status().isNoContent());
+        }
+        for (int expenseId : expenseIdsToIgnore) {
+            mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                            .header("Authorization", bearerToken))
+                    .andExpect(status().isNoContent());
+        }
+        // delete the categories
+        for (int categoryId : undesirableCategoryIds) {
+            deleteExpenseCategory(bearerToken, categoryId);
+        }
+        deleteExpenseCategory(bearerToken, desirableCategoryId);
+
+        // delete the tags
+        for (int tagId : undesirableTags) {
+            deleteTag(bearerToken, tagId);
+        }
+        deleteTag(bearerToken, desirableTagId);
+    }
 
     @DisplayName("Filter expenses by tag")
     @Test

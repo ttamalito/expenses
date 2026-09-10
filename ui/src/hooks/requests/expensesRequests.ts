@@ -79,6 +79,19 @@ export const useGetMonthlyExpensesForATag = (): [
   return [callback];
 };
 
+export const useGetYearlyExpensesAndTotalForTag = (): [
+  (year: number, tagId: number) => Promise<AxiosResponse | undefined>,
+] => {
+  const { get } = useApi();
+  const callback = useCallback(
+    (year: number, tagId: number) => {
+      return get(routes.expenses.filterYearByTag(year, tagId));
+    },
+    [get],
+  );
+  return [callback];
+};
+
 export const useGetYearly = (): [
   (year: number) => Promise<AxiosResponse | undefined>,
 ] => {
@@ -117,6 +130,22 @@ export const useGetTotalSpent = (): [
       const params = new URLSearchParams();
       params.append('year', year.toString());
       return get(routes.expenses.totalSpent, params);
+    },
+    [get],
+  );
+  return [callback];
+};
+
+export const useGetTotalSpentYearlyCategory = (): [
+  (year: number, category: number) => Promise<AxiosResponse | undefined>,
+] => {
+  const { get } = useApi();
+  const callback = useCallback(
+    (year: number, category: number) => {
+      const params = new URLSearchParams();
+      params.append('year', year.toString());
+      params.append('category', category.toString());
+      return get(routes.expenses.totalSpentYearlyCategory, params);
     },
     [get],
   );

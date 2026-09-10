@@ -1,5 +1,5 @@
 #backend
 application.properties
 flyway.conf
-
+!src/test/resources/application.properties
 /target

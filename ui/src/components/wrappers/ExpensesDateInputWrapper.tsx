@@ -18,6 +18,7 @@ interface IExpensesDateInputWrapperProps {
   clearable?: boolean;
   leftSection?: ReactNode;
   mb?: number | string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'xs';
 }
 
 /**
@@ -67,6 +68,7 @@ export default function ExpensesDateInputWrapper(
       clearable={props.clearable}
       leftSection={props.leftSection}
       mb={props.mb}
+      size={props.size}
     />
   );
 }

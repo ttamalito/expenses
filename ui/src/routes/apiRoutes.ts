@@ -33,6 +33,7 @@ export const constants = {
   singleType: 'single-type',
   totalSpent: 'total-spent',
   compare: 'compare',
+  filter: 'filter',
 
   // Incomes
   incomes: 'incomes',
@@ -123,10 +124,14 @@ export const routes = {
     monthlyExpensesForTagId: (month: number, year: number, tagId: number) => {
       return `/${constants.expenses}/${month}/${year}/${constants.tag}/${tagId}`;
     },
+    filterYearByTag: (year: number, tagId: number) => {
+      return `/${constants.expenses}/${constants.filter}/${year}/${constants.tag}/${tagId}`;
+    },
     yearly: (year: number) => {
       return `/${constants.expenses}/${constants.yearly}/${year}`;
     },
     singleTypeYear: `/${constants.expenses}/${constants.singleType}`,
+    totalSpentYearlyCategory: `/${constants.expenses}/${constants.totalSpent}/${constants.yearly}/${constants.category}`,
     totalSpent: `/${constants.expenses}/${constants.totalSpent}`,
     modify: `/${constants.expenses}/${constants.modify}`,
     totalSpentMonthly: `/${constants.expenses}/${constants.totalSpent}/${constants.monthly}`,

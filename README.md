@@ -11,7 +11,7 @@ Originally built with JavaScript (both frontend and backend), the project has ev
 - **Expense Management**
   - Add, edit, and delete expenses
   - Categorize expenses
-  - Filter expenses by date, category, and amount
+  - Filter expenses by date, category, tag and amount
   - Bulk operations for expenses
 
 - **Income Tracking**
@@ -36,9 +36,11 @@ Originally built with JavaScript (both frontend and backend), the project has ev
   - Profile management
   - Secure access with JWT authentication
 
-- **Multi-currency Support**
-  - Track expenses in different currencies
-  - Currency conversion
+[//]: # (- **Multi-currency Support**)
+
+[//]: # (  - Track expenses in different currencies)
+
+[//]: # (  - Currency conversion)
 
 ## Technical Stack
 

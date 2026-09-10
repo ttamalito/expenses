@@ -7,10 +7,12 @@ import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.User;
 import com.api.expenses.rest.models.dtos.CategoryComparisonResponseDto;
 import com.api.expenses.rest.models.dtos.CreateExpenseDto;
+import com.api.expenses.rest.models.dtos.GetExpensesByTagDto;
 import com.api.expenses.rest.models.dtos.GetTotalSpentDto;
 import com.api.expenses.rest.services.ExpenseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -99,6 +101,28 @@ public class ExpensesController {
         float totalSpent = expenseService.getTotalSpentForAMonthOfAUserByTag(userId, month, year, tagId);
         GetTotalSpentDto totalSpentDto = new GetTotalSpentDto(totalSpent);
         return ResponseEntity.ok(totalSpentDto);
+    }
+
+    @GetMapping("/total-spent/yearly/category")
+    public ResponseEntity<GetTotalSpentDto> getTotalSpentOnAYearForACategory(@RequestParam int year,
+                                                                    @RequestParam int category)
+            throws TransactionException {
+        UUID userId = getUserId();
+        float totalSpent = expenseService.getTotalSpentForAYearOfAUserByCategory(userId, year, category);
+        GetTotalSpentDto totalSpentDto = new GetTotalSpentDto(totalSpent);
+        return ResponseEntity.ok().body(totalSpentDto);
+    }
+
+    @GetMapping("/filter/{year}/tag/{tagId}") // Tested
+    public ResponseEntity<GetExpensesByTagDto> getTotalSpentOnAYearForATag(@PathVariable int year,
+                                                                        @PathVariable int tagId)
+            throws TransactionException {
+        UUID userId = getUserId();
+        Pair<List<Expense>, Float> result = expenseService.getExpensesForAYearOfAUserByTag(userId, year, tagId);
+        List<Expense> expenses = result.getValue0();
+        float totalSpent = result.getValue1();
+        GetExpensesByTagDto dto = new GetExpensesByTagDto(expenses, totalSpent);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/yearly/{year}") // Tested

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import {
   Box,
@@ -14,29 +14,36 @@ import {
 } from '@mantine/core';
 import { PieChart } from '@mantine/charts';
 import { useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
-import { IExpense, IGetIncomeDto } from '@clients';
 import ExpensesTable from '../../../components/tables/ExpensesTable';
 import IncomesTable from '../../../components/tables/IncomesTable';
 import {
   useGetYearly,
   useGetSingleTypeYear,
   useGetTotalSpent,
+  useGetYearlyExpensesAndTotalForTag,
+  useGetTotalSpentYearlyCategory,
 } from '@requests/expensesRequests.ts';
 import {
   useGetYearlyIncomes,
   useGetTotalEarnedYear,
 } from '@requests/incomesRequests.ts';
-import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
-
-interface CategoryOption {
-  value: string;
-  label: string;
-}
+import { IconTag } from '@tabler/icons-react';
+import {
+  PeriodDataFetchers,
+  useExpensesAndIncomesSummary,
+} from '@hooks/useExpensesAndIncomesSummary.ts';
+import {
+  renderTagOptionWithColor,
+  useTagOptions,
+} from '@hooks/useTagOptions.tsx';
 
 interface FormValues {
   categoryId: string;
+}
+
+interface TagFormValues {
+  tagId: string;
 }
 
 const YearlyExpenses: React.FC = () => {
@@ -45,261 +52,103 @@ const YearlyExpenses: React.FC = () => {
     searchParams.get('year') || new Date().getFullYear().toString(),
   );
 
-  const [expenses, setExpenses] = useState<IExpense[]>([]);
-  const [incomes, setIncomes] = useState<IGetIncomeDto[]>([]);
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [totalSpent, setTotalSpent] = useState<number>(0);
-  const [totalEarned, setTotalEarned] = useState<number>(0);
-  const [totalSpentCategory, setTotalSpentCategory] = useState<number | null>(
-    null,
-  );
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [pieChartData, setPieChartData] = useState<
-    { name: string; value: number; color: string }[]
-  >([]);
+  const { userTags, userData } = useUserDataContext();
+  const { tags, tagsWithColor } = useTagOptions(userTags);
 
   const [getYearlyExpenses] = useGetYearly();
   const [getSingleTypeYearExpenses] = useGetSingleTypeYear();
   const [getTotalSpentYear] = useGetTotalSpent();
-  const [getAllCategories] = useGetAllExpenseCategories();
+  const [getTotalSpentYearByCategory] = useGetTotalSpentYearlyCategory();
+  const [getYearlyExpensesAndTotalForTag] =
+    useGetYearlyExpensesAndTotalForTag();
   const [getYearlyIncomes] = useGetYearlyIncomes();
   const [getTotalEarnedYear] = useGetTotalEarnedYear();
 
-  const { userData } = useUserDataContext();
+  const fetchers: PeriodDataFetchers = useMemo(() => {
+    return {
+      fetchExpenses: () => {
+        return getYearlyExpenses(year);
+      },
+      fetchTotalSpent: () => {
+        return getTotalSpentYear(year);
+      },
+      fetchExpensesByCategory: (categoryId: number) => {
+        return getSingleTypeYearExpenses(year, categoryId);
+      },
+      // Standardized: uses the same /expenses/total-spent endpoint as the
+      // plain yearly total, just with a categoryId param, instead of
+      // summing the fetched expenses client-side.
+      fetchTotalSpentByCategory: (categoryId: number) => {
+        return getTotalSpentYearByCategory(year, categoryId);
+      },
+      fetchIncomes: () => {
+        return getYearlyIncomes(year);
+      },
+      fetchTotalEarned: () => {
+        return getTotalEarnedYear(year);
+      },
+      fetchExpensesAndTotalByTag: async (tagId: number) => {
+        // Yearly's endpoint returns expenses + totalSpent in one call.
+        const response = await getYearlyExpensesAndTotalForTag(year, tagId);
+        return {
+          expenses: response?.data?.expenses ?? [],
+          totalSpent: response?.data?.totalSpent ?? 0,
+        };
+      },
+    };
+  }, [
+    year,
+    getYearlyExpenses,
+    getTotalSpentYear,
+    getSingleTypeYearExpenses,
+    getYearlyIncomes,
+    getTotalEarnedYear,
+    getYearlyExpensesAndTotalForTag,
+  ]);
+
+  const {
+    expenses,
+    incomes,
+    categories,
+    totalSpent,
+    totalEarned,
+    totalSpentCategory,
+    selectedCategoryName,
+    loading,
+    pieChartData,
+    handleCategorySubmit,
+    handleFilterByTag,
+    handleResetFilter,
+    handleExpenseUpdated,
+    handleIncomeUpdated,
+  } = useExpensesAndIncomesSummary([year], fetchers);
 
   const form = useForm<FormValues>({
-    initialValues: {
-      categoryId: '',
+    initialValues: { categoryId: '' },
+  });
+
+  const [selectedTagColor, setSelectedTagColor] = useState<string | undefined>(
+    undefined,
+  );
+
+  const tagForm = useForm<TagFormValues>({
+    mode: 'uncontrolled',
+    onValuesChange: (values) => {
+      if (values.tagId === undefined) {
+        setSelectedTagColor(undefined);
+        return;
+      }
+      const tag = tagsWithColor.find((t) => {
+        return t.value === String(values.tagId);
+      });
+      setSelectedTagColor(tag?.color);
     },
   });
 
-  // Fetch all expense categories
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await getAllCategories();
-      if (response?.data) {
-        const categoriesData = response.data;
-        const options: CategoryOption[] = categoriesData.map(
-          (category: any) => {
-            // console.log('Category: ', category);
-            return {
-              value: category.id.toString(),
-              label: category.name,
-            };
-          },
-        );
-        return options;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to load expense categories',
-        color: 'red',
-      });
-      return [];
-    }
-  }, []);
-
-  // Fetch expenses and total spent
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Fetch expenses
-        const expensesResponse = await getYearlyExpenses(year);
-        if (expensesResponse?.data) {
-          //console.log(expensesResponse);
-          setExpenses(expensesResponse.data);
-
-          // fetch all the categories
-          const categoriesOptions: CategoryOption[] = await fetchCategories();
-          setCategories(categoriesOptions);
-
-          // Create pie chart data from expenses
-          const categoryMap = new Map<string, number>();
-          expensesResponse.data.forEach((expense: IExpense) => {
-            //console.log('Expense: ', expense);
-            const categoryId = expense.categoryId?.toString() || 'Unknown';
-            const categoryFound = categoriesOptions.find((c) => {
-              // console.log('Category that is being searched: ', c);
-              // console.log('c.value: ', c.value);
-              // console.log('categoryId: ', categoryId);
-              return c.value === categoryId;
-            });
-            //console.log('Category found: ', categoryFound);
-            const categoryName = categoryFound?.label || 'NOTHING FOUND!!!';
-            // categoriesOptions.find((c) => {
-            //   // console.log('Category that is being searched: ', c);
-            //   // console.log('c.value: ', c.value);
-            //   // console.log('categoryId: ', categoryId);
-            //   return c.value === categoryId;
-            // })?.label || `Category ${categoryId}`;
-            //console.log('Category name: ', categoryName);
-            const currentAmount = categoryMap.get(categoryName) || 0;
-            categoryMap.set(
-              categoryName,
-              currentAmount + (expense.amount || 0),
-            );
-          });
-
-          // Convert to array and sort by amount (descending)
-          const chartData = Array.from(categoryMap.entries())
-            .map(([name, value]) => {
-              return { name, value };
-            })
-            .sort((a, b) => {
-              return b.value - a.value;
-            })
-            .slice(0, 6); // Take top 6 categories
-
-          const colors = [
-            '#4CAF50',
-            '#FF5252',
-            '#FFC107',
-            '#2196F3',
-            '#9C27B0',
-            '#FF9800',
-          ];
-
-          // add a random color to each category:
-          const dataWithColors = chartData.map((entry, index) => {
-            return {
-              name: entry.name,
-              value: Math.round(entry.value * 1e2) / 1e2,
-              color: colors[index],
-            };
-          });
-
-          setPieChartData(dataWithColors);
-        }
-
-        // Fetch total spent
-        const totalSpentResponse = await getTotalSpentYear(year);
-        if (totalSpentResponse?.data) {
-          setTotalSpent(totalSpentResponse.data.totalSpent);
-        }
-
-        // Fetch incomes
-        const incomesResponse = await getYearlyIncomes(year);
-        if (incomesResponse?.data) {
-          setIncomes(incomesResponse.data);
-        }
-
-        // Fetch total earned
-        const totalEarnedResponse = await getTotalEarnedYear(year);
-        if (totalEarnedResponse?.data) {
-          setTotalEarned(totalEarnedResponse.data.total);
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        notifications.show({
-          title: 'Error',
-          message: 'Failed to load expenses data',
-          color: 'red',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [year]);
-
-  const handleCategorySubmit = async (values: FormValues) => {
-    setLoading(true);
-    try {
-      if (values.categoryId) {
-        const categoryId = parseInt(values.categoryId);
-
-        // Fetch expenses for the selected category
-        const expensesResponse = await getSingleTypeYearExpenses(
-          year,
-          categoryId,
-        );
-        if (expensesResponse?.data) {
-          setExpenses(expensesResponse.data);
-        }
-
-        // Calculate total spent for the selected category
-        let categoryTotal = 0;
-        expensesResponse?.data?.forEach((expense: IExpense) => {
-          categoryTotal += expense.amount || 0;
-        });
-        setTotalSpentCategory(categoryTotal);
-
-        // Set selected category name
-        const category = categories.find((c) => {
-          return c.value === values.categoryId;
-        });
-        setSelectedCategoryName(category?.label || `Category ${categoryId}`);
-      }
-    } catch (error) {
-      console.error('Failed to fetch category data:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to load category data',
-        color: 'red',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetCategory = async () => {
-    setLoading(true);
-    try {
-      // Reset to all expenses
-      const expensesResponse = await getYearlyExpenses(year);
-      if (expensesResponse?.data) {
-        setExpenses(expensesResponse.data);
-      }
-
-      // Reset category-specific total
-      setTotalSpentCategory(null);
-      setSelectedCategoryName('');
-
-      // Reset form
-      form.reset();
-    } catch (error) {
-      console.error('Failed to reset data:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to reset data',
-        color: 'red',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleExpenseUpdated = async () => {
-    // Refetch data when an expense is updated or deleted
-    const expensesResponse = await getYearlyExpenses(year);
-    if (expensesResponse?.data) {
-      setExpenses(expensesResponse.data);
-    }
-
-    const totalSpentResponse = await getTotalSpentYear(year);
-    if (totalSpentResponse?.data) {
-      setTotalSpent(totalSpentResponse.data.totalSpent);
-    }
-  };
-
-  const handleIncomeUpdated = async () => {
-    // Refetch incomes when an income is deleted
-    const incomesResponse = await getYearlyIncomes(year);
-    if (incomesResponse?.data) {
-      setIncomes(incomesResponse.data);
-    }
-
-    const totalEarnedResponse = await getTotalEarnedYear(year);
-    if (totalEarnedResponse?.data) {
-      setTotalEarned(totalEarnedResponse.data.total);
-    }
+  const handleReset = async () => {
+    await handleResetFilter();
+    form.reset();
+    tagForm.reset();
   };
 
   if (loading && expenses.length === 0) {
@@ -337,34 +186,82 @@ const YearlyExpenses: React.FC = () => {
             )}
           </Paper>
 
-          {/* Category Filter */}
-          <Paper shadow="xs" p="md" withBorder>
-            <Title order={4} mb="md">
-              Filter by Expense Category
-            </Title>
-            <form onSubmit={form.onSubmit(handleCategorySubmit)}>
-              <Stack>
-                <Select
-                  label="Select Category"
-                  placeholder="Choose a category"
-                  data={categories}
-                  clearable
-                  key={form.key('categoryId')}
-                  {...form.getInputProps('categoryId')}
-                />
-                <Group>
-                  <Button type="submit">
-                    See expenses of a single category
-                  </Button>
-                  {selectedCategoryName && (
-                    <Button type="button" onClick={handleResetCategory}>
-                      Show all categories
+          {/* Category or Tag Filter */}
+          <Stack gap="md">
+            <Paper shadow="xs" p="md" withBorder>
+              <Title order={4} mb="md">
+                Filter by Expense Category
+              </Title>
+              <form
+                onSubmit={form.onSubmit((values) => {
+                  return handleCategorySubmit(values.categoryId);
+                })}
+              >
+                <Stack>
+                  <Select
+                    label="Select Category"
+                    placeholder="Choose a category"
+                    data={categories}
+                    clearable
+                    key={form.key('categoryId')}
+                    {...form.getInputProps('categoryId')}
+                  />
+                  <Group>
+                    <Button type="submit">
+                      See expenses of a single category
                     </Button>
-                  )}
-                </Group>
-              </Stack>
-            </form>
-          </Paper>
+                    {selectedCategoryName && (
+                      <Button type="button" onClick={handleReset}>
+                        Show all categories
+                      </Button>
+                    )}
+                  </Group>
+                </Stack>
+              </form>
+            </Paper>
+
+            <Paper shadow="xs" p="md" withBorder>
+              <Title order={4} mb="md">
+                Filter Expenses by Tag
+              </Title>
+              <form
+                onSubmit={tagForm.onSubmit((values) => {
+                  return handleFilterByTag(
+                    values.tagId,
+                    tags.find((t) => {
+                      return t.value === values.tagId;
+                    })?.label,
+                  );
+                })}
+              >
+                <Stack>
+                  <Select
+                    label="Select Tag"
+                    placeholder="Choose a tag"
+                    data={tags}
+                    clearable
+                    renderOption={renderTagOptionWithColor(tagsWithColor)}
+                    leftSection={
+                      <IconTag
+                        color={selectedTagColor ?? 'currentColor'}
+                        size={18}
+                      />
+                    }
+                    key={tagForm.key('tagId')}
+                    {...tagForm.getInputProps('tagId')}
+                  />
+                  <Group>
+                    <Button type="submit">See expenses of a single tag</Button>
+                    {selectedCategoryName && (
+                      <Button type="button" onClick={handleReset}>
+                        Show all expenses
+                      </Button>
+                    )}
+                  </Group>
+                </Stack>
+              </form>
+            </Paper>
+          </Stack>
         </Group>
 
         {/* Total Spent */}
