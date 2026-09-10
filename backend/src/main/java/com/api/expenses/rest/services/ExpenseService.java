@@ -12,6 +12,7 @@ import com.api.expenses.rest.repositories.ExpenseCategoryRepository;
 import com.api.expenses.rest.repositories.ExpenseRepository;
 import com.api.expenses.rest.repositories.TagRepository;
 import com.api.expenses.rest.utils.DateUtils;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -209,6 +210,29 @@ public class ExpenseService {
         userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
 
         List<Expense> expenses = expenseRepository.findByUserIdAndMonthAndYearAndTagId(userId, month, year, tagId);
+        float totalSpent = 0;
+        for (Expense expense : expenses) {
+            totalSpent += expense.getAmount();
+        }
+        return totalSpent;
+    }
+
+
+    public Pair<List<Expense>, Float> getExpensesForAYearOfAUserByTag(UUID userId, int year, int tagId) throws TransactionException {
+        userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
+
+        List<Expense> expenses = expenseRepository.findByUserIdAndYearAndTagId(userId, year, tagId);
+        float totalSpent = 0;
+        for (Expense expense : expenses) {
+            totalSpent += expense.getAmount();
+        }
+        return new Pair<>(expenses, totalSpent);
+    }
+
+    public float getTotalSpentForAYearOfAUserByTag(UUID userId, int year, int tagId) throws TransactionException {
+        userService.getUserById(userId).orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
+
+        List<Expense> expenses = expenseRepository.findByUserIdAndYearAndTagId(userId, year, tagId);
         float totalSpent = 0;
         for (Expense expense : expenses) {
             totalSpent += expense.getAmount();

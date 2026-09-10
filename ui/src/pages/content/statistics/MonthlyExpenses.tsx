@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import {
   Box,
@@ -8,15 +8,12 @@ import {
   Loader,
   Paper,
   Select,
-  SelectProps,
   Stack,
   Text,
   Title,
 } from '@mantine/core';
 import { PieChart } from '@mantine/charts';
 import { useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
-import { IExpense, IGetIncomeDto } from '@clients';
 import ExpensesTable from '../../../components/tables/ExpensesTable';
 import IncomesTable from '../../../components/tables/IncomesTable';
 import {
@@ -31,14 +28,16 @@ import {
   useGetMonthlyIncomes,
   useGetTotalEarnedMonth,
 } from '@requests/incomesRequests.ts';
-import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
-import { IconCheck, IconTag } from '@tabler/icons-react';
-
-interface CategoryOption {
-  value: string;
-  label: string;
-}
+import { IconTag } from '@tabler/icons-react';
+import {
+  PeriodDataFetchers,
+  useExpensesAndIncomesSummary,
+} from '@hooks/useExpensesAndIncomesSummary.ts';
+import {
+  renderTagOptionWithColor,
+  useTagOptions,
+} from '@hooks/useTagOptions.tsx';
 
 interface FormValues {
   categoryId: string;
@@ -46,11 +45,6 @@ interface FormValues {
 
 interface TagFormValues {
   tagId: string;
-}
-
-interface TagOption {
-  value: string;
-  label: string;
 }
 
 const MonthlyExpenses: React.FC = () => {
@@ -63,26 +57,7 @@ const MonthlyExpenses: React.FC = () => {
     searchParams.get('month') || (new Date().getMonth() + 1).toString(),
   );
 
-  const [expenses, setExpenses] = useState<IExpense[]>([]);
-  const [incomes, setIncomes] = useState<IGetIncomeDto[]>([]);
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [totalSpent, setTotalSpent] = useState<number>(0);
-  const [totalEarned, setTotalEarned] = useState<number>(0);
-  const [totalSpentCategory, setTotalSpentCategory] = useState<number | null>(
-    null,
-  );
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [pieChartData, setPieChartData] = useState<
-    { name: string; value: number; color: string }[]
-  >([]);
-  const [tags, setTags] = useState<TagOption[]>([]);
-  const [tagsWithColor, setTagsWithColor] = useState<
-    { value: string; color: string }[]
-  >([]);
-  const [selectedTag, setSelectedTag] = useState<
-    { value: string; color: string } | undefined
-  >(undefined);
+  const { tags, tagsWithColor } = useTagOptions(userTags);
 
   const [getMonthlyExpenses] = useGetMonthly();
   const [getSingleTypeExpenses] = useGetSingleType();
@@ -90,319 +65,104 @@ const MonthlyExpenses: React.FC = () => {
   const [getTotalSpentMonthly] = useGetTotalSpentMonthly();
   const [getTotalSpentMonthlyCategory] = useGetTotalSpentMonthlyCategory();
   const [getTotalSpentMonthlyForTag] = useGetTotalSpentMonthlyForTag();
-  const [getAllCategories] = useGetAllExpenseCategories();
   const [getMonthlyIncomes] = useGetMonthlyIncomes();
   const [getTotalEarnedMonth] = useGetTotalEarnedMonth();
 
-  const form = useForm<FormValues>({
-    initialValues: {
-      categoryId: '',
-    },
-  });
-
-  const tagForm = useForm<TagFormValues>({
-    mode: 'uncontrolled',
-    // validate: {
-    //   amount: (value) => {
-    //     return value && value <= 0 ? 'Amount must be greater than 0' : null;
-    //   },
-    //   categoryId: (value) => {
-    //     return value && value <= 0 ? 'Please select a category' : null;
-    //   },
-    //   name: (value) => {
-    //     return value.trim().length < 1 ? 'Name is required' : null;
-    //   },
-    // },
-    onValuesChange: (values) => {
-      if (values.tagId === undefined) {
-        setSelectedTag(undefined);
-        return;
-      }
-      const tagIdAsString = String(values.tagId);
-      if (tagIdAsString !== selectedTag?.value) {
-        const tag = tagsWithColor.find((tag) => {
-          return tag.value === tagIdAsString;
-        });
-        setSelectedTag(tag);
-      }
-    },
-  });
-
-  useEffect(() => {
-    const tagOptions = [];
-    const tagsWithColors: { value: string; color: string }[] = [];
-    for (const tag of userTags) {
-      const tagOption: TagOption = {
-        label: tag.name!,
-        value: tag.id?.toString() ?? '0',
-      };
-      tagOptions.push(tagOption);
-      const tagColorOption = {
-        value: tag.id?.toString() ?? '0',
-        color: tag.color!,
-      };
-      tagsWithColors.push(tagColorOption);
-    }
-    setTagsWithColor(tagsWithColors);
-    setTags(tagOptions);
-  }, [userTags]);
-
-  // Fetch all expense categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getAllCategories();
-        if (response?.data) {
-          const categoriesData = response.data;
-          const options = categoriesData.map((category: any) => {
-            return {
-              value: category.id.toString(),
-              label: category.name,
-            };
-          });
-          setCategories(options);
-        }
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-        notifications.show({
-          title: 'Error',
-          message: 'Failed to load expense categories',
-          color: 'red',
-        });
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  // Fetch expenses and total spent
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Fetch expenses
-        const expensesResponse = await getMonthlyExpenses(month, year);
-        if (expensesResponse?.data) {
-          setExpenses(expensesResponse.data);
-
-          // Create pie chart data from expenses
-          const categoryMap = new Map<string, number>();
-          expensesResponse.data.forEach((expense: IExpense) => {
-            const categoryId = expense.categoryId?.toString() || 'Unknown';
-            const categoryName =
-              categories.find((c) => {
-                return c.value === categoryId;
-              })?.label || `Category ${categoryId}`;
-            const currentAmount = categoryMap.get(categoryName) || 0;
-            categoryMap.set(
-              categoryName,
-              currentAmount + (expense.amount || 0),
-            );
-          });
-
-          // Convert to array and sort by amount (descending)
-          const chartData = Array.from(categoryMap.entries())
-            .map(([name, value]) => {
-              return { name, value };
-            })
-            .sort((a, b) => {
-              return b.value - a.value;
-            })
-            .slice(0, 6); // Take top 6 categories
-
-          const colors = [
-            '#4CAF50',
-            '#FF5252',
-            '#FFC107',
-            '#2196F3',
-            '#9C27B0',
-            '#FF9800',
-          ];
-
-          // add a random color to each category:
-          const dataWithColors = chartData.map((entry, index) => {
-            return {
-              name: entry.name,
-              value: Math.round(entry.value * 1e2) / 1e2,
-              color: colors[index],
-            };
-          });
-
-          setPieChartData(dataWithColors);
-        }
-
-        // Fetch total spent
-        const totalSpentResponse = await getTotalSpentMonthly(month, year);
-        if (totalSpentResponse?.data) {
-          setTotalSpent(totalSpentResponse.data.totalSpent);
-        }
-
-        // Fetch incomes
-        const incomesResponse = await getMonthlyIncomes(month, year);
-        if (incomesResponse?.data) {
-          setIncomes(incomesResponse.data);
-        }
-
-        // Fetch total earned
-        const totalEarnedResponse = await getTotalEarnedMonth(month, year);
-        if (totalEarnedResponse?.data) {
-          setTotalEarned(totalEarnedResponse.data.total);
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        notifications.show({
-          title: 'Error',
-          message: 'Failed to load expenses data',
-          color: 'red',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [month, year, categories]);
-
-  const handleCategorySubmit = async (values: FormValues) => {
-    setLoading(true);
-    try {
-      if (values.categoryId) {
-        const categoryId = parseInt(values.categoryId);
-
-        // Fetch expenses for the selected category
-        const expensesResponse = await getSingleTypeExpenses(
-          month,
-          year,
-          categoryId,
-        );
-        if (expensesResponse?.data) {
-          setExpenses(expensesResponse.data);
-        }
-
-        // Fetch total spent for the selected category
-        const totalSpentResponse = await getTotalSpentMonthlyCategory(
-          month,
-          year,
-          categoryId,
-        );
-        if (totalSpentResponse?.data) {
-          setTotalSpentCategory(totalSpentResponse.data.totalSpent);
-        }
-
-        // Set selected category name
-        const category = categories.find((c) => {
-          return c.value === values.categoryId;
-        });
-        setSelectedCategoryName(category?.label || `Category ${categoryId}`);
-      }
-    } catch (error) {
-      console.error('Failed to fetch category data:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to load category data',
-        color: 'red',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFilterByTag = async (values: TagFormValues) => {
-    setLoading(true);
-    try {
-      if (values.tagId) {
-        const tagId = parseInt(values.tagId);
-
-        // Fetch expenses for the selected category
+  const fetchers: PeriodDataFetchers = useMemo(() => {
+    return {
+      fetchExpenses: () => {
+        return getMonthlyExpenses(month, year);
+      },
+      fetchTotalSpent: () => {
+        return getTotalSpentMonthly(month, year);
+      },
+      fetchExpensesByCategory: (categoryId: number) => {
+        return getSingleTypeExpenses(month, year, categoryId);
+      },
+      fetchTotalSpentByCategory: (categoryId: number) => {
+        return getTotalSpentMonthlyCategory(month, year, categoryId);
+      },
+      fetchIncomes: () => {
+        return getMonthlyIncomes(month, year);
+      },
+      fetchTotalEarned: () => {
+        return getTotalEarnedMonth(month, year);
+      },
+      fetchExpensesAndTotalByTag: async (tagId: number) => {
+        // Monthly still needs two calls under the hood - the shared hook
+        // doesn't need to know that.
         const expensesResponse = await getMonthlyExpensesForTag(
           month,
           year,
           tagId,
         );
-        if (expensesResponse?.data) {
-          setExpenses(expensesResponse.data);
-        }
-
-        // Fetch total spent for the selected tag
         const totalSpentResponse = await getTotalSpentMonthlyForTag(
           month,
           year,
           tagId,
         );
-        if (totalSpentResponse?.data) {
-          setTotalSpentCategory(totalSpentResponse.data.totalSpent);
-        }
+        return {
+          expenses: expensesResponse?.data ?? [],
+          totalSpent: totalSpentResponse?.data?.totalSpent ?? 0,
+        };
+      },
+    };
+  }, [
+    month,
+    year,
+    getMonthlyExpenses,
+    getTotalSpentMonthly,
+    getSingleTypeExpenses,
+    getTotalSpentMonthlyCategory,
+    getMonthlyIncomes,
+    getTotalEarnedMonth,
+    getMonthlyExpensesForTag,
+    getTotalSpentMonthlyForTag,
+  ]);
 
-        // Set selected tag name
-        const tag = tags.find((c) => {
-          return c.value === values.tagId;
-        }); // TODO: Use proper setter, so that in the future we can filter by tag and category
-        setSelectedCategoryName(tag?.label || `Tag ${tagId}`);
+  const {
+    expenses,
+    incomes,
+    categories,
+    totalSpent,
+    totalEarned,
+    totalSpentCategory,
+    selectedCategoryName,
+    loading,
+    pieChartData,
+    handleCategorySubmit,
+    handleFilterByTag,
+    handleResetFilter,
+    handleExpenseUpdated,
+    handleIncomeUpdated,
+  } = useExpensesAndIncomesSummary([month, year], fetchers);
+
+  const form = useForm<FormValues>({
+    initialValues: { categoryId: '' },
+  });
+
+  const [selectedTagColor, setSelectedTagColor] = useState<string | undefined>(
+    undefined,
+  );
+
+  const tagForm = useForm<TagFormValues>({
+    mode: 'uncontrolled',
+    onValuesChange: (values) => {
+      if (values.tagId === undefined) {
+        setSelectedTagColor(undefined);
+        return;
       }
-    } catch (error) {
-      console.error('Failed to fetch category data:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to load category data',
-        color: 'red',
+      const tag = tagsWithColor.find((t) => {
+        return t.value === String(values.tagId);
       });
-    } finally {
-      setLoading(false);
-    }
-  };
+      setSelectedTagColor(tag?.color);
+    },
+  });
 
-  const handleResetCategory = async () => {
-    setLoading(true);
-    try {
-      // Reset to all expenses
-      const expensesResponse = await getMonthlyExpenses(month, year);
-      if (expensesResponse?.data) {
-        setExpenses(expensesResponse.data);
-      }
-
-      // Reset category-specific total
-      setTotalSpentCategory(null);
-      setSelectedCategoryName('');
-
-      // Reset form
-      form.reset();
-      tagForm.reset();
-    } catch (error) {
-      console.error('Failed to reset data:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to reset data',
-        color: 'red',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleExpenseUpdated = async () => {
-    // Refetch data when an expense is updated or deleted
-    const expensesResponse = await getMonthlyExpenses(month, year);
-    if (expensesResponse?.data) {
-      setExpenses(expensesResponse.data);
-    }
-
-    const totalSpentResponse = await getTotalSpentMonthly(month, year);
-    if (totalSpentResponse?.data) {
-      setTotalSpent(totalSpentResponse.data.totalSpent);
-    }
-  };
-
-  const handleIncomeUpdated = async () => {
-    // Refetch incomes when an income is deleted
-    const incomesResponse = await getMonthlyIncomes(month, year);
-    if (incomesResponse?.data) {
-      setIncomes(incomesResponse.data);
-    }
-
-    const totalEarnedResponse = await getTotalEarnedMonth(month, year);
-    if (totalEarnedResponse?.data) {
-      setTotalEarned(totalEarnedResponse.data.total);
-    }
+  const handleReset = async () => {
+    await handleResetFilter();
+    form.reset();
+    tagForm.reset();
   };
 
   if (loading && expenses.length === 0) {
@@ -412,39 +172,6 @@ const MonthlyExpenses: React.FC = () => {
       </Center>
     );
   }
-
-  // TODO: Extract it to common component
-  const renderTagsWithColor: SelectProps['renderOption'] = ({
-    option,
-    checked,
-  }) => {
-    const tag = tagsWithColor.find((tag) => {
-      return tag.value === option.value;
-    });
-    const iconProps = {
-      stroke: 1.5,
-      color: tag ? tag.color : 'currentColor',
-      size: 18,
-    };
-    const checkIconProps = {
-      stroke: 1.5,
-      color: 'currentColor',
-      opacity: 0.6,
-      size: 18,
-    };
-    return (
-      <Group flex="1" gap="xs">
-        {<IconTag {...iconProps} />}
-        {option.label}
-        {checked && (
-          <IconCheck
-            style={{ marginInlineStart: 'auto' }}
-            {...checkIconProps}
-          />
-        )}
-      </Group>
-    );
-  };
 
   return (
     <Box p="md">
@@ -479,7 +206,11 @@ const MonthlyExpenses: React.FC = () => {
               <Title order={4} mb="md">
                 Filter by Expense Category
               </Title>
-              <form onSubmit={form.onSubmit(handleCategorySubmit)}>
+              <form
+                onSubmit={form.onSubmit((values) => {
+                  return handleCategorySubmit(values.categoryId);
+                })}
+              >
                 <Stack>
                   <Select
                     label="Select Category"
@@ -494,7 +225,7 @@ const MonthlyExpenses: React.FC = () => {
                       See expenses of a single category
                     </Button>
                     {selectedCategoryName && (
-                      <Button type="button" onClick={handleResetCategory}>
+                      <Button type="button" onClick={handleReset}>
                         Show all categories
                       </Button>
                     )}
@@ -506,17 +237,26 @@ const MonthlyExpenses: React.FC = () => {
               <Title order={4} mb="md">
                 Filter Expenses by Tag
               </Title>
-              <form onSubmit={tagForm.onSubmit(handleFilterByTag)}>
+              <form
+                onSubmit={tagForm.onSubmit((values) => {
+                  return handleFilterByTag(
+                    values.tagId,
+                    tags.find((t) => {
+                      return t.value === values.tagId;
+                    })?.label,
+                  );
+                })}
+              >
                 <Stack>
                   <Select
                     label="Select Tag"
                     placeholder="Choose a tag"
                     data={tags}
                     clearable
-                    renderOption={renderTagsWithColor}
+                    renderOption={renderTagOptionWithColor(tagsWithColor)}
                     leftSection={
                       <IconTag
-                        color={selectedTag?.color ?? 'currentColor'}
+                        color={selectedTagColor ?? 'currentColor'}
                         size={18}
                       />
                     }
@@ -526,7 +266,7 @@ const MonthlyExpenses: React.FC = () => {
                   <Group>
                     <Button type="submit">See expenses of a single tag</Button>
                     {selectedCategoryName && (
-                      <Button type="button" onClick={handleResetCategory}>
+                      <Button type="button" onClick={handleReset}>
                         Show all expenses
                       </Button>
                     )}
