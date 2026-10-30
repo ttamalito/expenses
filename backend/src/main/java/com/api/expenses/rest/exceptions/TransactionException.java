@@ -13,6 +13,8 @@ public class TransactionException extends Exception {
         EXPENSE_NOT_FOUND("Expense not found in the database"),
         CATEGORY_HAS_LINKED_EXPENSES("Cannot delete category because it has linked expenses"),
         CATEGORY_HAS_LINKED_INCOMES("Cannot delete category because it has linked incomes"),
+        CATEGORIES_TYPE_MISMATCH("Both categories must be of the same type (either both expense categories or both income categories)"),
+        CATEGORY_UNAUTHORIZED("User is trying to migrate a category that does not belong to him"),
         TAG_NOT_FOUND("Tag not found in the database"),
         TAG_ALREADY_EXISTS("A tag with this name already exists for this user"),
         TAG_HAS_LINKED_EXPENSES("Cannot delete tag because it has linked expenses"),

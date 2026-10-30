@@ -3,6 +3,7 @@ package com.api.expenses.rest.controllers;
 import com.api.expenses.rest.controllers.utils.AuthenticationHelper;
 import com.api.expenses.rest.models.ExpenseCategory;
 import com.api.expenses.rest.models.IncomeCategory;
+import com.api.expenses.rest.models.dtos.MigrateCategoryDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -368,6 +369,224 @@ public class CategoriesControllerIT {
         ).andExpect(status().isNoContent());
 
         mockMvc.perform(delete("/category/income/delete/" + categoryId3)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Migrate expenses from one expense category to another")
+    public void migrateExpensesBetweenCategories() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String categoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/expense/validCategory.json")));
+
+        String categoryAId = mockMvc.perform(put("/category/expense/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(categoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String categoryBId = mockMvc.perform(put("/category/expense/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(categoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String expenseJson = new String(Files.readAllBytes(Path.of("src/test/resources/expenses/validExpenseToAdd.json")));
+        expenseJson = expenseJson.replace("\"categoryId\": 0", "\"categoryId\": " + categoryAId);
+
+        String expenseId = mockMvc.perform(post("/expenses/add")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(expenseJson))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String migrateBody = objectMapper.writeValueAsString(
+                new MigrateCategoryDto(Integer.parseInt(categoryAId), Integer.parseInt(categoryBId)));
+
+        mockMvc.perform(post("/category/migrate")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(migrateBody)
+        ).andExpect(status().isNoContent());
+
+        // Category A is now empty -> deletable
+        mockMvc.perform(delete("/category/expense/delete/" + categoryAId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+
+        // Category B now owns the expense -> delete should be blocked
+        ResultActions deleteBResult = mockMvc.perform(delete("/category/expense/delete/" + categoryBId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isBadRequest());
+        assertEquals("Cannot delete category because it has linked expenses",
+                deleteBResult.andReturn().getResponse().getContentAsString());
+
+        // cleanup
+        mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/category/expense/delete/" + categoryBId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Migrate incomes from one income category to another")
+    public void migrateIncomesBetweenCategories() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String categoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/income/validCategory.json")));
+
+        String categoryAId = mockMvc.perform(put("/category/income/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(categoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String categoryBId = mockMvc.perform(put("/category/income/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(categoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String incomeJson = new String(Files.readAllBytes(Path.of("src/test/resources/incomes/validIncomeToAdd.json")));
+        incomeJson = incomeJson.replace("\"categoryId\": 1", "\"categoryId\": " + categoryAId);
+
+        String incomeResponse = mockMvc.perform(post("/incomes/add")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(incomeJson))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        String incomeId = incomeResponse.split(":")[1].replace("\"", "").replace("}", "");
+
+        String migrateBody = objectMapper.writeValueAsString(
+                new MigrateCategoryDto(Integer.parseInt(categoryAId), Integer.parseInt(categoryBId)));
+
+        mockMvc.perform(post("/category/migrate")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(migrateBody)
+        ).andExpect(status().isNoContent());
+
+        // Category A is now empty -> deletable
+        mockMvc.perform(delete("/category/income/delete/" + categoryAId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+
+        // Category B now owns the income -> delete should be blocked
+        ResultActions deleteBResult = mockMvc.perform(delete("/category/income/delete/" + categoryBId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isBadRequest());
+        assertEquals("Cannot delete category because it has linked incomes",
+                deleteBResult.andReturn().getResponse().getContentAsString());
+
+        // cleanup
+        mockMvc.perform(delete("/incomes/delete/" + incomeId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/category/income/delete/" + categoryBId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Attempt to migrate between an expense category and an income category")
+    public void migrateCategoriesOfDifferentTypesFails() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String expenseCategoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/expense/validCategory.json")));
+        String expenseCategoryId = mockMvc.perform(put("/category/expense/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(expenseCategoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String incomeCategoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/income/validCategory.json")));
+        String incomeCategoryId = mockMvc.perform(put("/category/income/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(incomeCategoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String migrateBody = objectMapper.writeValueAsString(
+                new MigrateCategoryDto(Integer.parseInt(expenseCategoryId), Integer.parseInt(incomeCategoryId)));
+
+        ResultActions result = mockMvc.perform(post("/category/migrate")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(migrateBody)
+        ).andExpect(status().isBadRequest());
+
+        assertEquals("Both categories must be of the same type (either both expense categories or both income categories)",
+                result.andReturn().getResponse().getContentAsString());
+
+        // cleanup
+        mockMvc.perform(delete("/category/expense/delete/" + expenseCategoryId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/category/income/delete/" + incomeCategoryId)
+                .header("Authorization", bearerToken)
+        ).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Attempt to migrate to a category that does not exist")
+    public void migrateToNonExistentCategoryFails() throws Exception {
+        String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String categoryAsString = new String(Files.readAllBytes(Path.of("src/test/resources/categories/expense/validCategory.json")));
+        String categoryAId = mockMvc.perform(put("/category/expense/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(categoryAsString))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        int nonExistentCategoryId = Integer.MAX_VALUE;
+
+        String migrateBody = objectMapper.writeValueAsString(
+                new MigrateCategoryDto(Integer.parseInt(categoryAId), nonExistentCategoryId));
+
+        ResultActions result = mockMvc.perform(post("/category/migrate")
+                .header("Authorization", bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(migrateBody)
+        ).andExpect(status().isBadRequest());
+
+        assertEquals("Category not found in the database for the transaction",
+                result.andReturn().getResponse().getContentAsString());
+
+        // cleanup
+        mockMvc.perform(delete("/category/expense/delete/" + categoryAId)
                 .header("Authorization", bearerToken)
         ).andExpect(status().isNoContent());
     }

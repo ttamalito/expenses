@@ -5,6 +5,7 @@ import com.api.expenses.rest.models.Tag;
 import org.hibernate.annotations.NamedNativeQuery;
 import org.hibernate.annotations.NamedQuery;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -38,4 +39,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
 
     @Query(value = "SELECT * FROM expenses WHERE user_id = ?1 AND year = ?2 AND tag_id = ?3", nativeQuery = true)
     public List<Expense> findByUserIdAndYearAndTagId(UUID userId, int year, int tagId);
+
+    @Modifying
+    @Query(value = "UPDATE expenses SET category_id = ?2 WHERE category_id = ?1", nativeQuery = true)
+    void updateCategoryForExpenses(int oldCategoryId, int newCategoryId);
 }

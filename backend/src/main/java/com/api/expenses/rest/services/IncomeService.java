@@ -158,6 +158,13 @@ public class IncomeService {
         return incomeRepository.countByCategoryId(categoryId) > 0;
     }
 
+    /**
+     * Reassigns every income currently linked to fromCategoryId so it belongs to toCategoryId instead.
+     */
+    public void migrateIncomesToCategory(int fromCategoryId, int toCategoryId) {
+        incomeRepository.updateCategoryForIncomes(fromCategoryId, toCategoryId);
+    }
+
     public boolean hasIncomesLinkedToTag(int tagId) {
         return incomeRepository.countByTagId(tagId) > 0;
     }

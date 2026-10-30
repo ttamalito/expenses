@@ -20,6 +20,7 @@ export const constants = {
   category: 'category',
   expense: 'expense',
   income: 'income',
+  migrate: 'migrate',
   get: 'get',
   create: 'create',
   delete: 'delete',
@@ -107,6 +108,7 @@ export const routes = {
       return `/${constants.category}/${constants.income}/${constants.delete}/${categoryId}`;
     },
     incomeAll: `/${constants.category}/${constants.income}/${constants.all}`,
+    migrate: `/${constants.category}/${constants.migrate}`,
   },
 
   // Expenses Controller

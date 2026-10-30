@@ -307,6 +307,36 @@
         }
       }
     },
+    "/category/migrate": {
+      "post": {
+        "tags": [
+          "categories-controller"
+        ],
+        "operationId": "migrateCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrateCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/budget/modify": {
       "post": {
         "tags": [
@@ -1098,6 +1128,46 @@
         }
       }
     },
+    "/expenses/total-spent/yearly/category": {
+      "get": {
+        "tags": [
+          "expenses-controller"
+        ],
+        "operationId": "getTotalSpentOnAYearForACategory",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTotalSpentDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/expenses/total-spent/monthly": {
       "get": {
         "tags": [
@@ -1340,6 +1410,46 @@
               "application/json": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expenses/filter/{year}/tag/{tagId}": {
+      "get": {
+        "tags": [
+          "expenses-controller"
+        ],
+        "operationId": "getTotalSpentOnAYearForATag",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetExpensesByTagDto"
                 }
               }
             }
@@ -2075,6 +2185,19 @@
           }
         }
       },
+      "MigrateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "categoryAId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryBId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "UpdateBudgetDto": {
         "type": "object",
         "properties": {
@@ -2336,6 +2459,21 @@
       "GetTotalSpentDto": {
         "type": "object",
         "properties": {
+          "totalSpent": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "GetExpensesByTagDto": {
+        "type": "object",
+        "properties": {
+          "expenses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expense"
+            }
+          },
           "totalSpent": {
             "type": "number",
             "format": "float"
