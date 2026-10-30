@@ -22,6 +22,8 @@ import {
 } from '@tabler/icons-react';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 import styles from './SideBar.module.css';
+import LanguageSwitcher from '../../components/LanguageSwitcher.tsx';
+import { useTranslation } from 'react-i18next';
 
 interface SideBarProps {
   onLogout?: () => void;
@@ -32,6 +34,7 @@ export default function SideBar({ onLogout }: SideBarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useMantineTheme();
+  const { t } = useTranslation();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const handleLogout = () => {
@@ -50,22 +53,22 @@ export default function SideBar({ onLogout }: SideBarProps) {
   const navItems = [
     {
       icon: <IconLayoutDashboard size={18} />,
-      label: 'Dashboard',
+      label: t('sideBar.dashboard'),
       path: routes.content.home,
     },
     {
       icon: <IconChartBar size={18} />,
-      label: 'Statistics',
+      label: t('sideBar.statistics'),
       path: routes.content.statistics.index,
     },
     {
       icon: <IconWallet size={18} />,
-      label: 'Budget',
+      label: t('sideBar.budget'),
       path: routes.content.budget,
     },
     {
       icon: <IconUser size={18} />,
-      label: 'Profile',
+      label: t('sideBar.profile'),
       path: routes.content.profile,
     },
   ];
@@ -122,6 +125,9 @@ export default function SideBar({ onLogout }: SideBarProps) {
 
       {/* Footer: avatar + username + theme toggle + logout */}
       <Divider color={theme.other.borderColor} mb="sm" mt="sm" />
+      <Box px={6} mb="sm">
+        <LanguageSwitcher />
+      </Box>
       <Group justify="space-between" wrap="nowrap" px={6}>
         <Group gap={8} wrap="nowrap">
           <Box

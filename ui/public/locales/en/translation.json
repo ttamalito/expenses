@@ -1,0 +1,14 @@
+{
+  "landingPage": {
+    "documentation": "Documentation",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account"
+  },
+  "sideBar": {
+    "dashboard": "Dashboard",
+    "statistics": "Statistics",
+    "budget": "Budget",
+    "profile": "Profile"
+  }
+}
