@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Paper,
   Title,
@@ -26,6 +27,7 @@ import {
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 const StatisticalSummaries: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [summaryData, setSummaryData] = useState<StatisticalSummaryDto | null>(
     null,
@@ -45,8 +47,8 @@ const StatisticalSummaries: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch statistical summaries:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to load statistical summaries',
+        title: t('statistics.common.errorTitle'),
+        message: t('statistics.statisticalSummaries.error'),
         color: 'red',
       });
     } finally {
@@ -68,13 +70,13 @@ const StatisticalSummaries: React.FC = () => {
     return `${value.toFixed(1)}%`;
   };
 
-  // Format date values
+  // Format date values using the active language
   const formatDate = (dateStr: string): string => {
     if (dateStr === 'N/A') return dateStr;
 
     try {
       const date = new Date(dateStr);
-      return new Intl.DateTimeFormat('en-US', {
+      return new Intl.DateTimeFormat(i18n.language, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -84,23 +86,12 @@ const StatisticalSummaries: React.FC = () => {
     }
   };
 
-  // Get month name from month number
+  // Get translated month name from month number
   const getMonthName = (month: number): string => {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return months[month - 1] + ' ' || 'Unknown ';
+    if (month < 1 || month > 12) {
+      return t('statistics.statisticalSummaries.unknownMonth') + ' ';
+    }
+    return t(`statistics.months.long.${month}`) + ' ';
   };
 
   if (loading) {
@@ -114,7 +105,7 @@ const StatisticalSummaries: React.FC = () => {
   if (!summaryData) {
     return (
       <Center h={300}>
-        <Text c="dimmed">No statistical data available.</Text>
+        <Text c="dimmed">{t('statistics.statisticalSummaries.noData')}</Text>
       </Center>
     );
   }
@@ -126,13 +117,11 @@ const StatisticalSummaries: React.FC = () => {
   return (
     <Paper shadow="xs" p="md" withBorder>
       <Stack gap="md">
-        <Title order={4}>Statistical Summaries</Title>
+        <Title order={4}>{t('statistics.statisticalSummaries.title')}</Title>
 
         <Text size="sm" c="dimmed">
-          This section provides various financial statistics to help you
-          understand your spending patterns and savings habits. <br />
-          The data is from the last 2 years, anything older than that is not
-          taken into account
+          {t('statistics.statisticalSummaries.description')} <br />
+          {t('statistics.statisticalSummaries.descriptionRange')}
         </Text>
 
         <Grid>
@@ -141,7 +130,9 @@ const StatisticalSummaries: React.FC = () => {
             <Card shadow="sm" padding="lg" radius="md" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group justify="space-between">
-                  <Title order={5}>Highest Spending</Title>
+                  <Title order={5}>
+                    {t('statistics.statisticalSummaries.highestSpending.title')}
+                  </Title>
                   <ThemeIcon color="red" variant="light">
                     <IconArrowUp size={18} />
                   </ThemeIcon>
@@ -154,7 +145,9 @@ const StatisticalSummaries: React.FC = () => {
                     <IconCalendar size={20} />
                   </ThemeIcon>
                   <div>
-                    <Text fw={500}>Highest Spending Day</Text>
+                    <Text fw={500}>
+                      {t('statistics.statisticalSummaries.highestSpending.day')}
+                    </Text>
                     <Text size="sm">
                       {formatDate(
                         highestSpending?.highestSpendingDay?.date ?? '01-01-00',
@@ -172,7 +165,11 @@ const StatisticalSummaries: React.FC = () => {
                     <IconCalendar size={20} />
                   </ThemeIcon>
                   <div>
-                    <Text fw={500}>Highest Spending Month</Text>
+                    <Text fw={500}>
+                      {t(
+                        'statistics.statisticalSummaries.highestSpending.month',
+                      )}
+                    </Text>
                     <Text size="sm">
                       {getMonthName(
                         highestSpending?.highestSpendingMonth?.month ?? 0,
@@ -191,7 +188,11 @@ const StatisticalSummaries: React.FC = () => {
                     <IconCategory size={20} />
                   </ThemeIcon>
                   <div>
-                    <Text fw={500}>Highest Spending Category</Text>
+                    <Text fw={500}>
+                      {t(
+                        'statistics.statisticalSummaries.highestSpending.category',
+                      )}
+                    </Text>
                     <Text size="sm">
                       {highestSpending?.highestSpendingCategory?.categoryName}
                       {': '}
@@ -210,7 +211,9 @@ const StatisticalSummaries: React.FC = () => {
             <Card shadow="sm" padding="lg" radius="md" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group justify="space-between">
-                  <Title order={5}>Average Spending</Title>
+                  <Title order={5}>
+                    {t('statistics.statisticalSummaries.averageSpending.title')}
+                  </Title>
                   <ThemeIcon color="blue" variant="light">
                     <IconChartBar size={18} />
                   </ThemeIcon>
@@ -223,7 +226,11 @@ const StatisticalSummaries: React.FC = () => {
                     <IconCoin size={20} />
                   </ThemeIcon>
                   <div>
-                    <Text fw={500}>Average Daily Spend</Text>
+                    <Text fw={500}>
+                      {t(
+                        'statistics.statisticalSummaries.averageSpending.daily',
+                      )}
+                    </Text>
                     <Text size="sm">
                       {formatCurrency(averageSpending?.averageDailySpend ?? 0)}
                     </Text>
@@ -235,7 +242,11 @@ const StatisticalSummaries: React.FC = () => {
                     <IconCoin size={20} />
                   </ThemeIcon>
                   <div>
-                    <Text fw={500}>Average Weekly Spend</Text>
+                    <Text fw={500}>
+                      {t(
+                        'statistics.statisticalSummaries.averageSpending.weekly',
+                      )}
+                    </Text>
                     <Text size="sm">
                       {formatCurrency(averageSpending?.averageWeeklySpend ?? 0)}
                     </Text>
@@ -247,11 +258,22 @@ const StatisticalSummaries: React.FC = () => {
                     <IconTrendingUp size={20} />
                   </ThemeIcon>
                   <div>
-                    <Text fw={500}>Longest Streak Under Budget</Text>
+                    <Text fw={500}>
+                      {t(
+                        'statistics.statisticalSummaries.averageSpending.streak',
+                      )}
+                    </Text>
                     <Text size="sm">
-                      {budgetStreak?.longestStreakDays} days (
-                      {formatDate(budgetStreak?.streakStartDate ?? '0')} to
-                      {formatDate(budgetStreak?.streakEndDate ?? '0')})
+                      {t(
+                        'statistics.statisticalSummaries.averageSpending.streakValue',
+                        {
+                          days: budgetStreak?.longestStreakDays,
+                          start: formatDate(
+                            budgetStreak?.streakStartDate ?? '0',
+                          ),
+                          end: formatDate(budgetStreak?.streakEndDate ?? '0'),
+                        },
+                      )}
                     </Text>
                   </div>
                 </Group>
@@ -264,7 +286,9 @@ const StatisticalSummaries: React.FC = () => {
             <Card shadow="sm" padding="lg" radius="md" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group justify="space-between">
-                  <Title order={5}>Savings</Title>
+                  <Title order={5}>
+                    {t('statistics.statisticalSummaries.savings.title')}
+                  </Title>
                   <Badge
                     color={
                       savings &&
@@ -281,11 +305,18 @@ const StatisticalSummaries: React.FC = () => {
 
               <Stack gap="md" mt="md">
                 <Text fw={500}>
-                  Average Monthly Savings Rate:
-                  {formatPercentage(savings?.averageMonthlySavingsRate ?? 0)}
+                  {t('statistics.statisticalSummaries.savings.averageRate', {
+                    rate: formatPercentage(
+                      savings?.averageMonthlySavingsRate ?? 0,
+                    ),
+                  })}
                 </Text>
 
-                <Text fw={500}>Monthly Savings Percentages:</Text>
+                <Text fw={500}>
+                  {t(
+                    'statistics.statisticalSummaries.savings.monthlyPercentages',
+                  )}
+                </Text>
                 <Grid>
                   {Object.entries(savings?.monthlySavingsPercentage ?? 0).map(
                     ([monthYear, percentage]) => {

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Paper,
   Title,
@@ -30,28 +31,14 @@ import { notifications } from '@mantine/notifications';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 interface CashFlowData {
-  month: string;
+  monthIndex: number; // 1-12
   inflow: number;
   outflow: number;
   netFlow: number;
 }
 
-const monthNames = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
 const CashFlowChart: React.FC = () => {
+  const { t } = useTranslation();
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [loading, setLoading] = useState<boolean>(false);
   const [cashFlowData, setCashFlowData] = useState<CashFlowData[]>([]);
@@ -61,6 +48,17 @@ const CashFlowChart: React.FC = () => {
   const [getEarnedYearMonthly] = useGetEarnedYearMonthly();
 
   const { userData } = useUserDataContext();
+
+  // Translate the month labels at render time so a language switch
+  // updates the chart without refetching
+  const chartData = useMemo(() => {
+    return cashFlowData.map((entry) => {
+      return {
+        ...entry,
+        month: t(`statistics.months.short.${entry.monthIndex}`),
+      };
+    });
+  }, [cashFlowData, t]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -94,13 +92,13 @@ const CashFlowChart: React.FC = () => {
       );
 
       // Calculate cash flow data
-      const data: CashFlowData[] = monthNames.map((month, index) => {
+      const data: CashFlowData[] = Array.from({ length: 12 }, (_, index) => {
         const inflow = monthlyIncome[index] || 0;
         const outflow = monthlyExpenses[index] || 0;
         const netFlow = inflow - outflow;
 
         return {
-          month,
+          monthIndex: index + 1,
           inflow,
           outflow,
           netFlow,
@@ -111,8 +109,8 @@ const CashFlowChart: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch cash flow data:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to load cash flow data',
+        title: t('statistics.common.errorTitle'),
+        message: t('statistics.cashFlow.error'),
         color: 'red',
       });
     } finally {
@@ -138,10 +136,10 @@ const CashFlowChart: React.FC = () => {
     <Paper shadow="xs" p="md" withBorder>
       <Stack gap="md">
         <Group justify="space-between">
-          <Title order={4}>Cash Flow Visualization</Title>
+          <Title order={4}>{t('statistics.cashFlow.title')}</Title>
           <Group>
             <NumberInput
-              label="Year"
+              label={t('statistics.common.year')}
               value={year}
               onChange={handleYearChange}
               min={2000}
@@ -149,14 +147,13 @@ const CashFlowChart: React.FC = () => {
               w={120}
             />
             <Button onClick={handleRefresh} mt={25}>
-              Refresh
+              {t('statistics.common.refresh')}
             </Button>
           </Group>
         </Group>
 
         <Text size="sm" c="dimmed">
-          This chart shows your income (inflow) vs. expenses (outflow) over
-          time. Months with negative cash flow are highlighted.
+          {t('statistics.cashFlow.description')}
         </Text>
 
         {loading ? (
@@ -166,7 +163,7 @@ const CashFlowChart: React.FC = () => {
         ) : (
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart
-              data={cashFlowData}
+              data={chartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -185,7 +182,7 @@ const CashFlowChart: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="inflow"
-                name="Income"
+                name={t('statistics.cashFlow.income')}
                 stroke="#82ca9d"
                 fill="#82ca9d"
                 fillOpacity={0.3}
@@ -193,7 +190,7 @@ const CashFlowChart: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="outflow"
-                name="Expenses"
+                name={t('statistics.cashFlow.expenses')}
                 stroke="#8884d8"
                 fill="#8884d8"
                 fillOpacity={0.3}
@@ -201,13 +198,13 @@ const CashFlowChart: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="netFlow"
-                name="Net Cash Flow"
+                name={t('statistics.cashFlow.netCashFlow')}
                 stroke="#ff7300"
                 fill="#ff7300"
                 fillOpacity={0.3}
                 activeDot={{ r: 8 }}
               />
-              {cashFlowData.map((entry, index) => {
+              {chartData.map((entry, index) => {
                 return entry.netFlow < 0 ? (
                   <ReferenceLine
                     key={`ref-${index}`}

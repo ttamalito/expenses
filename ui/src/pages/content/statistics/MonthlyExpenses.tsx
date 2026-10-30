@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Button,
@@ -48,6 +49,7 @@ interface TagFormValues {
 }
 
 const MonthlyExpenses: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { userTags, userData } = useUserDataContext();
   const year = parseInt(
@@ -152,10 +154,10 @@ const MonthlyExpenses: React.FC = () => {
         setSelectedTagColor(undefined);
         return;
       }
-      const tag = tagsWithColor.find((t) => {
-        return t.value === String(values.tagId);
+      const tagOption = tagsWithColor.find((option) => {
+        return option.value === String(values.tagId);
       });
-      setSelectedTagColor(tag?.color);
+      setSelectedTagColor(tagOption?.color);
     },
   });
 
@@ -164,6 +166,8 @@ const MonthlyExpenses: React.FC = () => {
     form.reset();
     tagForm.reset();
   };
+
+  const currencySymbol = userData?.currency?.symbol ?? '';
 
   if (loading && expenses.length === 0) {
     return (
@@ -176,7 +180,7 @@ const MonthlyExpenses: React.FC = () => {
   return (
     <Box p="md">
       <Title order={2} mb="lg">
-        Monthly Expenses and Incomes - {month}/{year}
+        {t('statistics.periodSummary.monthly.title', { month, year })}
       </Title>
 
       <Stack gap="xl">
@@ -184,7 +188,7 @@ const MonthlyExpenses: React.FC = () => {
           {/* Pie Chart */}
           <Paper shadow="xs" p="md" withBorder>
             <Title order={4} mb="md">
-              Expense Categories
+              {t('statistics.periodSummary.expenseCategories')}
             </Title>
             {pieChartData.length > 0 ? (
               <PieChart
@@ -196,7 +200,7 @@ const MonthlyExpenses: React.FC = () => {
                 size={300}
               />
             ) : (
-              <Text>No expense data available</Text>
+              <Text>{t('statistics.periodSummary.noExpenseData')}</Text>
             )}
           </Paper>
 
@@ -204,7 +208,7 @@ const MonthlyExpenses: React.FC = () => {
           <Stack gap="md">
             <Paper shadow="xs" p="md" withBorder>
               <Title order={4} mb="md">
-                Filter by Expense Category
+                {t('statistics.periodSummary.filterByCategory')}
               </Title>
               <form
                 onSubmit={form.onSubmit((values) => {
@@ -213,8 +217,10 @@ const MonthlyExpenses: React.FC = () => {
               >
                 <Stack>
                   <Select
-                    label="Select Category"
-                    placeholder="Choose a category"
+                    label={t('statistics.periodSummary.selectCategory')}
+                    placeholder={t(
+                      'statistics.periodSummary.selectCategoryPlaceholder',
+                    )}
                     data={categories}
                     clearable
                     key={form.key('categoryId')}
@@ -222,11 +228,11 @@ const MonthlyExpenses: React.FC = () => {
                   />
                   <Group>
                     <Button type="submit">
-                      See expenses of a single category
+                      {t('statistics.periodSummary.seeSingleCategory')}
                     </Button>
                     {selectedCategoryName && (
                       <Button type="button" onClick={handleReset}>
-                        Show all categories
+                        {t('statistics.periodSummary.showAllCategories')}
                       </Button>
                     )}
                   </Group>
@@ -235,22 +241,24 @@ const MonthlyExpenses: React.FC = () => {
             </Paper>
             <Paper shadow="xs" p="md" withBorder>
               <Title order={4} mb="md">
-                Filter Expenses by Tag
+                {t('statistics.periodSummary.filterByTag')}
               </Title>
               <form
                 onSubmit={tagForm.onSubmit((values) => {
                   return handleFilterByTag(
                     values.tagId,
-                    tags.find((t) => {
-                      return t.value === values.tagId;
+                    tags.find((tagOption) => {
+                      return tagOption.value === values.tagId;
                     })?.label,
                   );
                 })}
               >
                 <Stack>
                   <Select
-                    label="Select Tag"
-                    placeholder="Choose a tag"
+                    label={t('statistics.periodSummary.selectTag')}
+                    placeholder={t(
+                      'statistics.periodSummary.selectTagPlaceholder',
+                    )}
                     data={tags}
                     clearable
                     renderOption={renderTagOptionWithColor(tagsWithColor)}
@@ -264,10 +272,12 @@ const MonthlyExpenses: React.FC = () => {
                     {...tagForm.getInputProps('tagId')}
                   />
                   <Group>
-                    <Button type="submit">See expenses of a single tag</Button>
+                    <Button type="submit">
+                      {t('statistics.periodSummary.seeSingleTag')}
+                    </Button>
                     {selectedCategoryName && (
                       <Button type="button" onClick={handleReset}>
-                        Show all expenses
+                        {t('statistics.periodSummary.showAllExpenses')}
                       </Button>
                     )}
                   </Group>
@@ -281,14 +291,16 @@ const MonthlyExpenses: React.FC = () => {
         <Paper shadow="xs" p="md" withBorder>
           <Group justify="space-between">
             <Text size="xl" fw={700}>
-              Total spent this month: {userData?.currency?.symbol}
-              {totalSpent.toFixed(2)}
+              {t('statistics.periodSummary.monthly.totalSpent', {
+                amount: `${currencySymbol}${totalSpent.toFixed(2)}`,
+              })}
             </Text>
             {totalSpentCategory !== null && selectedCategoryName && (
               <Text size="xl" fw={700}>
-                Total spent on {selectedCategoryName}:{' '}
-                {userData?.currency?.symbol}
-                {totalSpentCategory.toFixed(2)}
+                {t('statistics.periodSummary.totalSpentOn', {
+                  name: selectedCategoryName,
+                  amount: `${currencySymbol}${totalSpentCategory.toFixed(2)}`,
+                })}
               </Text>
             )}
           </Group>
@@ -297,7 +309,7 @@ const MonthlyExpenses: React.FC = () => {
         {/* Expenses Table */}
         <Paper shadow="xs" p="md" withBorder>
           <Title order={4} mb="md">
-            Expenses
+            {t('statistics.periodSummary.expenses')}
           </Title>
           <ExpensesTable
             expenses={expenses}
@@ -308,15 +320,16 @@ const MonthlyExpenses: React.FC = () => {
         {/* Total Earned */}
         <Paper shadow="xs" p="md" withBorder>
           <Text size="xl" fw={700}>
-            Total earned this month: {userData?.currency?.symbol}
-            {totalEarned.toFixed(2)}
+            {t('statistics.periodSummary.monthly.totalEarned', {
+              amount: `${currencySymbol}${totalEarned.toFixed(2)}`,
+            })}
           </Text>
         </Paper>
 
         {/* Incomes Table */}
         <Paper shadow="xs" p="md" withBorder>
           <Title order={4} mb="md">
-            Incomes
+            {t('statistics.periodSummary.incomes')}
           </Title>
           <IncomesTable
             incomes={incomes}
