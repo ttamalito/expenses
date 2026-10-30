@@ -403,6 +403,48 @@ export class Client {
     /**
      * @return OK
      */
+    migrateCategory(body: MigrateCategoryDto): Promise<string> {
+        let url_ = this.baseUrl + "/category/migrate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processMigrateCategory(_response);
+        });
+    }
+
+    protected processMigrateCategory(response: Response): Promise<string> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     modifySetUp(body: UpdateBudgetDto[]): Promise<string> {
         let url_ = this.baseUrl + "/budget/modify";
         url_ = url_.replace(/[?&]$/, "");
@@ -1439,6 +1481,51 @@ export class Client {
     /**
      * @return OK
      */
+    getTotalSpentOnAYearForACategory(year: number, category: number): Promise<GetTotalSpentDto> {
+        let url_ = this.baseUrl + "/expenses/total-spent/yearly/category?";
+        if (year === undefined || year === null)
+            throw new Error("The parameter 'year' must be defined and cannot be null.");
+        else
+            url_ += "year=" + encodeURIComponent("" + year) + "&";
+        if (category === undefined || category === null)
+            throw new Error("The parameter 'category' must be defined and cannot be null.");
+        else
+            url_ += "category=" + encodeURIComponent("" + category) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetTotalSpentOnAYearForACategory(_response);
+        });
+    }
+
+    protected processGetTotalSpentOnAYearForACategory(response: Response): Promise<GetTotalSpentDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetTotalSpentDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GetTotalSpentDto>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     getTotalSpentOnAMonth(month: number, year: number): Promise<string> {
         let url_ = this.baseUrl + "/expenses/total-spent/monthly?";
         if (month === undefined || month === null)
@@ -1709,6 +1796,49 @@ export class Client {
             });
         }
         return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTotalSpentOnAYearForATag(year: number, tagId: number): Promise<GetExpensesByTagDto> {
+        let url_ = this.baseUrl + "/expenses/filter/{year}/tag/{tagId}";
+        if (year === undefined || year === null)
+            throw new Error("The parameter 'year' must be defined.");
+        url_ = url_.replace("{year}", encodeURIComponent("" + year));
+        if (tagId === undefined || tagId === null)
+            throw new Error("The parameter 'tagId' must be defined.");
+        url_ = url_.replace("{tagId}", encodeURIComponent("" + tagId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetTotalSpentOnAYearForATag(_response);
+        });
+    }
+
+    protected processGetTotalSpentOnAYearForATag(response: Response): Promise<GetExpensesByTagDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetExpensesByTagDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GetExpensesByTagDto>(null as any);
     }
 
     /**
@@ -3195,6 +3325,58 @@ export interface IGetCurrencyDto {
     [key: string]: any;
 }
 
+export class MigrateCategoryDto implements IMigrateCategoryDto {
+    categoryAId?: number;
+    categoryBId?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IMigrateCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.categoryAId = _data["categoryAId"];
+            this.categoryBId = _data["categoryBId"];
+        }
+    }
+
+    static fromJS(data: any): MigrateCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MigrateCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["categoryAId"] = this.categoryAId;
+        data["categoryBId"] = this.categoryBId;
+        return data;
+    }
+}
+
+export interface IMigrateCategoryDto {
+    categoryAId?: number;
+    categoryBId?: number;
+
+    [key: string]: any;
+}
+
 export class UpdateBudgetDto implements IUpdateBudgetDto {
     categoryId?: number;
     newBudget?: number;
@@ -4034,6 +4216,66 @@ export class GetTotalSpentDto implements IGetTotalSpentDto {
 }
 
 export interface IGetTotalSpentDto {
+    totalSpent?: number;
+
+    [key: string]: any;
+}
+
+export class GetExpensesByTagDto implements IGetExpensesByTagDto {
+    expenses?: Expense[];
+    totalSpent?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetExpensesByTagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["expenses"])) {
+                this.expenses = [] as any;
+                for (let item of _data["expenses"])
+                    this.expenses!.push(Expense.fromJS(item));
+            }
+            this.totalSpent = _data["totalSpent"];
+        }
+    }
+
+    static fromJS(data: any): GetExpensesByTagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetExpensesByTagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.expenses)) {
+            data["expenses"] = [];
+            for (let item of this.expenses)
+                data["expenses"].push(item.toJSON());
+        }
+        data["totalSpent"] = this.totalSpent;
+        return data;
+    }
+}
+
+export interface IGetExpensesByTagDto {
+    expenses?: Expense[];
     totalSpent?: number;
 
     [key: string]: any;

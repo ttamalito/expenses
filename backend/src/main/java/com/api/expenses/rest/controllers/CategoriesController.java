@@ -5,10 +5,7 @@ import com.api.expenses.rest.exceptions.TransactionException;
 import com.api.expenses.rest.models.ExpenseCategory;
 import com.api.expenses.rest.models.IncomeCategory;
 import com.api.expenses.rest.models.User;
-import com.api.expenses.rest.models.dtos.CreateExpenseCategoryDto;
-import com.api.expenses.rest.models.dtos.CreateIncomeCategoryDto;
-import com.api.expenses.rest.models.dtos.GetExpenseCategoryDto;
-import com.api.expenses.rest.models.dtos.GetIncomeCategoryDto;
+import com.api.expenses.rest.models.dtos.*;
 import com.api.expenses.rest.services.ExpenseCategoryService;
 import com.api.expenses.rest.services.IncomeCategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -171,5 +168,58 @@ public class CategoriesController {
         }
 
         return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/migrate")
+    public ResponseEntity<String> migrateCategory(@RequestBody MigrateCategoryDto migrateCategoryDto) throws TransactionException {
+        Optional<User> optionalUser = ControllersHelper.getUserFromSecurityContextHolder();
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("No user found with the token");
+        }
+        User user = optionalUser.get();
+
+        int categoryAId = migrateCategoryDto.categoryAId();
+        int categoryBId = migrateCategoryDto.categoryBId();
+
+        boolean categoryAIsExpense = expenseCategoryService.categoryExists(categoryAId);
+        boolean categoryAIsIncome = incomeCategoryService.categoryExists(categoryAId);
+        boolean categoryBIsExpense = expenseCategoryService.categoryExists(categoryBId);
+        boolean categoryBIsIncome = incomeCategoryService.categoryExists(categoryBId);
+
+        if (!categoryAIsExpense && !categoryAIsIncome) {
+            throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_NOT_FOUND);
+        }
+        if (!categoryBIsExpense && !categoryBIsIncome) {
+            throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_NOT_FOUND);
+        }
+        if (categoryAIsExpense != categoryBIsExpense) {
+            throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORIES_TYPE_MISMATCH);
+        }
+
+        if (categoryAIsExpense) {
+            ExpenseCategory categoryA = expenseCategoryService.getCategoryById(categoryAId)
+                    .orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_NOT_FOUND));
+            ExpenseCategory categoryB = expenseCategoryService.getCategoryById(categoryBId)
+                    .orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_NOT_FOUND));
+
+            if (!categoryA.getUserId().equals(user.getId()) || !categoryB.getUserId().equals(user.getId())) {
+                throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_UNAUTHORIZED);
+            }
+
+            expenseCategoryService.migrateExpenses(categoryAId, categoryBId);
+        } else {
+            IncomeCategory categoryA = incomeCategoryService.getCategoryById(categoryAId)
+                    .orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_NOT_FOUND));
+            IncomeCategory categoryB = incomeCategoryService.getCategoryById(categoryBId)
+                    .orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_NOT_FOUND));
+
+            if (!categoryA.getUserId().equals(user.getId()) || !categoryB.getUserId().equals(user.getId())) {
+                throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_UNAUTHORIZED);
+            }
+
+            incomeCategoryService.migrateIncomes(categoryAId, categoryBId);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -303,6 +303,13 @@ public class ExpenseService {
         return expenseRepository.countByCategoryId(categoryId) > 0;
     }
 
+    /**
+     * Reassigns every expense currently linked to fromCategoryId so it belongs to toCategoryId instead.
+     */
+    public void migrateExpensesToCategory(int fromCategoryId, int toCategoryId) {
+        expenseRepository.updateCategoryForExpenses(fromCategoryId, toCategoryId);
+    }
+
     public boolean hasExpensesLinkedToTag(int tagId) {
         return expenseRepository.countByTagId(tagId) > 0;
     }

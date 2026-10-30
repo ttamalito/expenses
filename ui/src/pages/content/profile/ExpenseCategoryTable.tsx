@@ -8,8 +8,9 @@ import {
   NumberInput,
   Textarea,
   Box,
+  Tooltip,
 } from '@mantine/core';
-import { IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconReplace } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -19,14 +20,19 @@ import {
   useGetAllExpenseCategories,
   usePutExpenseCreate,
 } from '@requests/categoryRequests.ts';
+import MigrateCategoryModal from './MigrateCategoryModal.tsx';
 
 export default function ExpenseCategoryTable() {
   const [categories, setCategories] = useState<IGetExpenseCategoryDto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isMigrateModalOpen, setIsMigrateModalOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null,
   );
+  const [selectedCategoryName, setSelectedCategoryName] = useState<
+    string | undefined
+  >();
   const [getAllExpenseCategories] = useGetAllExpenseCategories();
   const [createExpenseCategory] = usePutExpenseCreate();
   const [deleteExpenseCategory] = useDeleteExpenseCategory();
@@ -105,6 +111,12 @@ export default function ExpenseCategoryTable() {
     setIsDeleteModalOpen(true);
   };
 
+  const openMigrationModal = (categoryId: number, categoryName: string) => {
+    setSelectedCategoryId(categoryId);
+    setSelectedCategoryName(categoryName);
+    setIsMigrateModalOpen(true);
+  };
+
   return (
     <Box>
       <Group justify="flex-end" mb="md">
@@ -133,17 +145,37 @@ export default function ExpenseCategoryTable() {
             render: (category) => {
               return (
                 <Group gap={4} justify="right" wrap="nowrap">
-                  <ActionIcon
-                    size="sm"
-                    variant="subtle"
-                    color="red"
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      openDeleteModal(category.id!);
-                    }}
+                  <Tooltip
+                    label={'Migrate all expenses to a different category'}
                   >
-                    <IconTrash size={16} />
-                  </ActionIcon>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="blue"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        openMigrationModal(
+                          category.id!,
+                          category.name ?? 'Error',
+                        );
+                      }}
+                    >
+                      <IconReplace size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label={'Delete category'}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="red"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        openDeleteModal(category.id!);
+                      }}
+                    >
+                      <IconTrash size={16} />
+                    </ActionIcon>
+                  </Tooltip>
                 </Group>
               );
             },
@@ -215,6 +247,21 @@ export default function ExpenseCategoryTable() {
           </Button>
         </Group>
       </Modal>
+
+      {/* Migrate category modal*/}
+      <MigrateCategoryModal
+        title={`Migrate expenses from "${selectedCategoryName}" to`}
+        opened={isMigrateModalOpen}
+        setIsModalOpen={setIsMigrateModalOpen}
+        originCategoryId={selectedCategoryId ?? -1}
+        categories={categories
+          .filter((c) => {
+            return c.id !== selectedCategoryId;
+          })
+          .map((c) => {
+            return { value: c.id?.toString() ?? '', label: c.name ?? '' };
+          })}
+      />
     </Box>
   );
 }

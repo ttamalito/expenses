@@ -6,6 +6,7 @@ import com.api.expenses.rest.repositories.IncomeCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +55,14 @@ public class IncomeCategoryService {
             throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_HAS_LINKED_INCOMES);
         }
         incomeCategoryRepository.deleteById(categoryId);
+    }
+
+    /**
+     * Migrates all incomes linked to fromCategoryId so they now belong to toCategoryId.
+     */
+    @Transactional
+    public void migrateIncomes(int fromCategoryId, int toCategoryId) {
+        incomeService.migrateIncomesToCategory(fromCategoryId, toCategoryId);
     }
 
     public void updateCategory(IncomeCategory category) {

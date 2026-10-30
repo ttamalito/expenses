@@ -5,6 +5,7 @@ import com.api.expenses.rest.models.ExpenseCategory;
 import com.api.expenses.rest.repositories.ExpenseCategoryRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,14 @@ public class ExpenseCategoryService {
             throw new TransactionException(TransactionException.TransactionExceptionType.CATEGORY_HAS_LINKED_EXPENSES);
         }
         expenseCategoryRepository.deleteById(categoryId);
+    }
+
+    /**
+     * Migrates all expenses linked to fromCategoryId so they now belong to toCategoryId.
+     */
+    @Transactional
+    public void migrateExpenses(int fromCategoryId, int toCategoryId) {
+        expenseService.migrateExpensesToCategory(fromCategoryId, toCategoryId);
     }
 
 

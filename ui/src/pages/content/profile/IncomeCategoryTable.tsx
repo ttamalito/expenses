@@ -7,8 +7,9 @@ import {
   TextInput,
   Textarea,
   Box,
+  Tooltip,
 } from '@mantine/core';
-import { IconTrash } from '@tabler/icons-react';
+import { IconReplace, IconTrash } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -18,6 +19,7 @@ import {
   useGetAllIncomeCategories,
   usePutIncomeCreate,
 } from '@requests/categoryRequests.ts';
+import MigrateCategoryModal from './MigrateCategoryModal.tsx';
 
 export default function IncomeCategoryTable() {
   const [categories, setCategories] = useState<IGetIncomeCategoryDto[]>([]);
@@ -26,6 +28,11 @@ export default function IncomeCategoryTable() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null,
   );
+
+  const [selectedCategoryName, setSelectedCategoryName] = useState<
+    string | undefined
+  >();
+  const [isMigrateModalOpen, setIsMigrateModalOpen] = useState(false);
   const [getAllIncomeCategories] = useGetAllIncomeCategories();
   const [createIncomeCategory] = usePutIncomeCreate();
   const [deleteIncomeCategory] = useDeleteIncomeCategory();
@@ -101,6 +108,11 @@ export default function IncomeCategoryTable() {
     setIsDeleteModalOpen(true);
   };
 
+  const openMigrationModal = (categoryId: number, categoryName: string) => {
+    setSelectedCategoryId(categoryId);
+    setSelectedCategoryName(categoryName);
+    setIsMigrateModalOpen(true);
+  };
   return (
     <Box>
       <Group justify="flex-end" mb="md">
@@ -128,17 +140,37 @@ export default function IncomeCategoryTable() {
             render: (category) => {
               return (
                 <Group gap={4} justify="right" wrap="nowrap">
-                  <ActionIcon
-                    size="sm"
-                    variant="subtle"
-                    color="red"
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      openDeleteModal(category.id!);
-                    }}
+                  <Tooltip
+                    label={'Migrate all incomes to a different category'}
                   >
-                    <IconTrash size={16} />
-                  </ActionIcon>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="blue"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        openMigrationModal(
+                          category.id!,
+                          category.name ?? 'Error',
+                        );
+                      }}
+                    >
+                      <IconReplace size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label={'Delete category'}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="red"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        openDeleteModal(category.id!);
+                      }}
+                    >
+                      <IconTrash size={16} />
+                    </ActionIcon>
+                  </Tooltip>
                 </Group>
               );
             },
@@ -202,6 +234,21 @@ export default function IncomeCategoryTable() {
           </Button>
         </Group>
       </Modal>
+
+      {/* Migrate category modal*/}
+      <MigrateCategoryModal
+        title={`Migrate incomes from "${selectedCategoryName}" to`}
+        opened={isMigrateModalOpen}
+        setIsModalOpen={setIsMigrateModalOpen}
+        originCategoryId={selectedCategoryId ?? -1}
+        categories={categories
+          .filter((c) => {
+            return c.id !== selectedCategoryId;
+          })
+          .map((c) => {
+            return { value: c.id?.toString() ?? '', label: c.name ?? '' };
+          })}
+      />
     </Box>
   );
 }

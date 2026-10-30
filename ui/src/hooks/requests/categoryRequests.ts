@@ -1,8 +1,12 @@
-import { ICreateExpenseCategoryDto, ICreateIncomeCategoryDto } from '@clients';
+import {
+  ICreateExpenseCategoryDto,
+  ICreateIncomeCategoryDto,
+  IMigrateCategoryDto,
+} from '@clients';
 import { AxiosResponse } from 'axios';
 import { useCallback } from 'react';
 import useApi from './useApi.ts';
-import { routes } from '../../routes/apiRoutes.ts';
+import { routes } from '@apiRoutes';
 
 export const useGetExpenseCategory = (): [
   (categoryId: number) => Promise<AxiosResponse | undefined>,
@@ -99,5 +103,18 @@ export const useGetAllIncomeCategories = (): [
   const callback = useCallback(() => {
     return get(routes.category.incomeAll);
   }, [get]);
+  return [callback];
+};
+
+export const useMigrateCategory = (): [
+  (body: IMigrateCategoryDto) => Promise<AxiosResponse | undefined>,
+] => {
+  const { post } = useApi();
+  const callback = useCallback(
+    (body: IMigrateCategoryDto) => {
+      return post(routes.category.migrate, body);
+    },
+    [post],
+  );
   return [callback];
 };
