@@ -14,6 +14,7 @@ import {
   SelectProps,
   Box,
 } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { ICreateExpenseDto, ICreateIncomeDto, IGetTagDto } from '@clients';
 import { usePostAdd as usePostAddExpense } from '@requests/expensesRequests.ts';
 import { usePostAdd as usePostAddIncome } from '@requests/incomesRequests';
@@ -47,6 +48,7 @@ export default function AddTransaction({
   tagsDto,
   setUpdateCharts,
 }: IAddTransactionProps) {
+  const { t } = useTranslation();
   const { userData } = useUserDataContext();
 
   const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
@@ -133,8 +135,8 @@ export default function AddTransaction({
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load expense categories',
+          title: t('home.addTransaction.notifications.errorTitle'),
+          message: t('home.addTransaction.notifications.loadExpenseCategories'),
           color: 'red',
         });
       }
@@ -160,8 +162,8 @@ export default function AddTransaction({
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load income categories',
+          title: t('home.addTransaction.notifications.errorTitle'),
+          message: t('home.addTransaction.notifications.loadIncomeCategories'),
           color: 'red',
         });
       }
@@ -208,8 +210,8 @@ export default function AddTransaction({
       const response = await postAddExpense(formData);
       if (response) {
         notifications.show({
-          title: 'Success',
-          message: 'Expense added successfully',
+          title: t('home.addTransaction.notifications.successTitle'),
+          message: t('home.addTransaction.notifications.expenseAdded'),
           color: 'green',
         });
         expenseForm.reset();
@@ -220,8 +222,8 @@ export default function AddTransaction({
     } catch (error) {
       console.error('Failed to add expense:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to add expense',
+        title: t('home.addTransaction.notifications.errorTitle'),
+        message: t('home.addTransaction.notifications.expenseAddFailed'),
         color: 'red',
       });
     } finally {
@@ -240,8 +242,8 @@ export default function AddTransaction({
       const response = await postAddIncome(formData);
       if (response) {
         notifications.show({
-          title: 'Success',
-          message: 'Income added successfully',
+          title: t('home.addTransaction.notifications.successTitle'),
+          message: t('home.addTransaction.notifications.incomeAdded'),
           color: 'green',
         });
         incomeForm.reset();
@@ -252,8 +254,8 @@ export default function AddTransaction({
     } catch (error) {
       console.error('Failed to add income:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to add income',
+        title: t('home.addTransaction.notifications.errorTitle'),
+        message: t('home.addTransaction.notifications.incomeAddFailed'),
         color: 'red',
       });
     } finally {
@@ -266,8 +268,8 @@ export default function AddTransaction({
     option,
     checked,
   }) => {
-    const tag = tagsWithColor.find((t) => {
-      return t.value === option.value;
+    const tag = tagsWithColor.find((tagWithColor) => {
+      return tagWithColor.value === option.value;
     });
     return (
       <Group flex="1" gap="xs">
@@ -290,6 +292,8 @@ export default function AddTransaction({
     );
   };
 
+  const amountPlaceholder = `${userData?.currency?.symbol ?? ''} 0.00`;
+
   return (
     <Paper p="md" radius="md" withBorder>
       <Box h={'100%'}>{/* ...other content */}</Box>
@@ -301,10 +305,10 @@ export default function AddTransaction({
       >
         <Tabs.List grow mb="md">
           <Tabs.Tab value="expense">
-            <Text size="lg">Add Expense</Text>
+            <Text size="lg">{t('home.addTransaction.tabs.expense')}</Text>
           </Tabs.Tab>
           <Tabs.Tab value="income">
-            <Text size="lg">Add Income</Text>
+            <Text size="lg">{t('home.addTransaction.tabs.income')}</Text>
           </Tabs.Tab>
         </Tabs.List>
 
@@ -325,8 +329,8 @@ export default function AddTransaction({
           />
           <form onSubmit={expenseForm.onSubmit(handleSubmitExpense)}>
             <Select
-              label="Category"
-              placeholder="Select a category"
+              label={t('home.addTransaction.fields.category')}
+              placeholder={t('home.addTransaction.fields.categoryPlaceholder')}
               data={expenseCategories}
               required
               mb="md"
@@ -335,8 +339,8 @@ export default function AddTransaction({
               {...expenseForm.getInputProps('categoryId')}
             />
             <NumberInput
-              label="Amount"
-              placeholder={`${userData?.currency?.symbol} 0.00`}
+              label={t('home.addTransaction.fields.amount')}
+              placeholder={amountPlaceholder}
               required
               min={0.01}
               step={0.01}
@@ -346,24 +350,26 @@ export default function AddTransaction({
               {...expenseForm.getInputProps('amount')}
             />
             <ExpensesDateInputWrapper
-              label="Date"
-              placeholder="Pick a date"
+              label={t('home.addTransaction.fields.date')}
+              placeholder={t('home.addTransaction.fields.datePlaceholder')}
               mb="md"
               size="md"
               key={expenseForm.key('date')}
               {...expenseForm.getInputProps('date')}
             />
             <Textarea
-              label="Description"
-              placeholder="Optional description"
+              label={t('home.addTransaction.fields.description')}
+              placeholder={t(
+                'home.addTransaction.fields.descriptionPlaceholder',
+              )}
               mb="md"
               size="md"
               key={expenseForm.key('description')}
               {...expenseForm.getInputProps('description')}
             />
             <Select
-              label="Tag"
-              placeholder="Optional Tag"
+              label={t('home.addTransaction.fields.tag')}
+              placeholder={t('home.addTransaction.fields.tagPlaceholder')}
               data={tags}
               mb="md"
               size="md"
@@ -382,7 +388,7 @@ export default function AddTransaction({
             <Group justify="flex-end" mt="md">
               <Tooltip
                 disabled={currencyId !== undefined}
-                label="Cannot submit expense, because no currency was found"
+                label={t('home.addTransaction.tooltips.noCurrencyExpense')}
                 color="teal"
                 withArrow
                 position="top"
@@ -392,7 +398,7 @@ export default function AddTransaction({
                   disabled={currencyId === undefined || loadingExpense}
                   type="submit"
                 >
-                  Add Expense
+                  {t('home.addTransaction.buttons.addExpense')}
                 </Button>
               </Tooltip>
             </Group>
@@ -416,8 +422,8 @@ export default function AddTransaction({
           />
           <form onSubmit={incomeForm.onSubmit(handleSubmitIncome)}>
             <Select
-              label="Category"
-              placeholder="Select a category"
+              label={t('home.addTransaction.fields.category')}
+              placeholder={t('home.addTransaction.fields.categoryPlaceholder')}
               data={incomeCategories}
               required
               mb="md"
@@ -426,8 +432,8 @@ export default function AddTransaction({
               {...incomeForm.getInputProps('categoryId')}
             />
             <NumberInput
-              label="Amount"
-              placeholder={`${userData?.currency?.symbol} 0.00`}
+              label={t('home.addTransaction.fields.amount')}
+              placeholder={amountPlaceholder}
               required
               min={0.01}
               step={0.01}
@@ -437,24 +443,26 @@ export default function AddTransaction({
               {...incomeForm.getInputProps('amount')}
             />
             <ExpensesDateInputWrapper
-              label="Date"
-              placeholder="Pick a date"
+              label={t('home.addTransaction.fields.date')}
+              placeholder={t('home.addTransaction.fields.datePlaceholder')}
               mb="md"
               size="md"
               key={incomeForm.key('date')}
               {...incomeForm.getInputProps('date')}
             />
             <Textarea
-              label="Description"
-              placeholder="Optional description"
+              label={t('home.addTransaction.fields.description')}
+              placeholder={t(
+                'home.addTransaction.fields.descriptionPlaceholder',
+              )}
               mb="md"
               size="md"
               key={incomeForm.key('description')}
               {...incomeForm.getInputProps('description')}
             />
             <Select
-              label="Tag"
-              placeholder="Optional Tag"
+              label={t('home.addTransaction.fields.tag')}
+              placeholder={t('home.addTransaction.fields.tagPlaceholder')}
               data={tags}
               mb="md"
               size="md"
@@ -472,7 +480,7 @@ export default function AddTransaction({
             />
             <Group justify="flex-end" mt="md">
               <Tooltip
-                label="Cannot submit income, no currency was found for the user"
+                label={t('home.addTransaction.tooltips.noCurrencyIncome')}
                 disabled={currencyId !== undefined}
                 color="teal"
                 withArrow
@@ -484,7 +492,7 @@ export default function AddTransaction({
                   color="green"
                   size="md"
                 >
-                  Add Income
+                  {t('home.addTransaction.buttons.addIncome')}
                 </Button>
               </Tooltip>
             </Group>

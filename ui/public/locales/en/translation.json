@@ -10,5 +10,63 @@
     "statistics": "Statistics",
     "budget": "Budget",
     "profile": "Profile"
+  },
+  "home": {
+    "title": "Dashboard",
+    "addTransaction": {
+      "tabs": {
+        "expense": "Add Expense",
+        "income": "Add Income"
+      },
+      "fields": {
+        "category": "Category",
+        "categoryPlaceholder": "Select a category",
+        "amount": "Amount",
+        "date": "Date",
+        "datePlaceholder": "Pick a date",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description",
+        "tag": "Tag",
+        "tagPlaceholder": "Optional Tag"
+      },
+      "buttons": {
+        "addExpense": "Add Expense",
+        "addIncome": "Add Income"
+      },
+      "tooltips": {
+        "noCurrencyExpense": "Cannot submit expense, because no currency was found",
+        "noCurrencyIncome": "Cannot submit income, no currency was found for the user"
+      },
+      "notifications": {
+        "errorTitle": "Error",
+        "successTitle": "Success",
+        "loadExpenseCategories": "Failed to load expense categories",
+        "loadIncomeCategories": "Failed to load income categories",
+        "expenseAdded": "Expense added successfully",
+        "incomeAdded": "Income added successfully",
+        "expenseAddFailed": "Failed to add expense",
+        "incomeAddFailed": "Failed to add income"
+      }
+    },
+    "lineChart": {
+      "title": "Monthly Expenses & Income",
+      "spent": "Spent",
+      "earned": "Earned",
+      "error": "Failed to load chart data"
+    },
+    "budgetChart": {
+      "title": "Monthly Budget",
+      "error": "Failed to load budget data",
+      "spentAmount": "Spent: {{symbol}} {{amount}}",
+      "budgetAmount": "Budget: {{symbol}} {{amount}}",
+      "remainingAmount": "Remaining: {{amount}} ({{percent}}%)",
+      "overBudgetAmount": "Over budget: {{amount}} ({{percent}}%)",
+      "slices": {
+        "spent": "Spent",
+        "remaining": "Remaining",
+        "budget": "Budget",
+        "overspent": "Overspent"
+      }
+    }
   }
 }

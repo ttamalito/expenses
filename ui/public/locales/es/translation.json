@@ -10,5 +10,63 @@
     "statistics": "Estadísticas",
     "budget": "Presupuesto",
     "profile": "Perfil"
+  },
+  "home": {
+    "title": "Panel de control",
+    "addTransaction": {
+      "tabs": {
+        "expense": "Añadir gasto",
+        "income": "Añadir ingreso"
+      },
+      "fields": {
+        "category": "Categoría",
+        "categoryPlaceholder": "Selecciona una categoría",
+        "amount": "Importe",
+        "date": "Fecha",
+        "datePlaceholder": "Elige una fecha",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción opcional",
+        "tag": "Etiqueta",
+        "tagPlaceholder": "Etiqueta opcional"
+      },
+      "buttons": {
+        "addExpense": "Añadir gasto",
+        "addIncome": "Añadir ingreso"
+      },
+      "tooltips": {
+        "noCurrencyExpense": "No se puede añadir el gasto porque no se encontró ninguna moneda",
+        "noCurrencyIncome": "No se puede añadir el ingreso porque no se encontró ninguna moneda para el usuario"
+      },
+      "notifications": {
+        "errorTitle": "Error",
+        "successTitle": "Éxito",
+        "loadExpenseCategories": "No se pudieron cargar las categorías de gastos",
+        "loadIncomeCategories": "No se pudieron cargar las categorías de ingresos",
+        "expenseAdded": "Gasto añadido correctamente",
+        "incomeAdded": "Ingreso añadido correctamente",
+        "expenseAddFailed": "No se pudo añadir el gasto",
+        "incomeAddFailed": "No se pudo añadir el ingreso"
+      }
+    },
+    "lineChart": {
+      "title": "Gastos e ingresos mensuales",
+      "spent": "Gastos",
+      "earned": "Ingresos",
+      "error": "No se pudieron cargar los datos del gráfico"
+    },
+    "budgetChart": {
+      "title": "Presupuesto mensual",
+      "error": "No se pudieron cargar los datos del presupuesto",
+      "spentAmount": "Gastado: {{symbol}} {{amount}}",
+      "budgetAmount": "Presupuesto: {{symbol}} {{amount}}",
+      "remainingAmount": "Restante: {{amount}} ({{percent}}%)",
+      "overBudgetAmount": "Presupuesto excedido: {{amount}} ({{percent}}%)",
+      "slices": {
+        "spent": "Gastado",
+        "remaining": "Restante",
+        "budget": "Presupuesto",
+        "overspent": "Exceso"
+      }
+    }
   }
 }
