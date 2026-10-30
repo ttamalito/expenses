@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { routes } from '@routes';
 import {
   Box,
@@ -18,6 +19,7 @@ import StatisticalSummaries from './StatisticalSummaries';
 import CategorySpendingTimelineChart from './CategorySpendingTimelineChart';
 
 const Statistics: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [yearForSummary, setYearForSummary] = useState<number | undefined>(
     new Date().getFullYear(),
@@ -46,17 +48,17 @@ const Statistics: React.FC = () => {
   return (
     <Box p="md">
       <Title order={2} mb="lg">
-        Statistics
+        {t('statistics.title')}
       </Title>
       <Stack gap="xl">
         <Paper shadow="xs" p="md" withBorder>
           <Title order={4} mb="md">
-            Yearly Summary
+            {t('statistics.yearlySummary.title')}
           </Title>
           <Group gap="md">
             <NumberInput
-              label="Year"
-              placeholder="Enter year"
+              label={t('statistics.common.year')}
+              placeholder={t('statistics.yearlySummary.yearPlaceholder')}
               value={yearForSummary}
               onChange={(value) => {
                 return setYearForSummary(value as number | undefined);
@@ -71,19 +73,19 @@ const Statistics: React.FC = () => {
               disabled={!yearForSummary}
               mt={25}
             >
-              Go to summary for year
+              {t('statistics.yearlySummary.button')}
             </Button>
           </Group>
         </Paper>
 
         <Paper shadow="xs" p="md" withBorder>
           <Title order={4} mb="md">
-            Monthly Summary
+            {t('statistics.monthlySummary.title')}
           </Title>
           <Group gap="md">
             <NumberInput
-              label="Year"
-              placeholder="Enter year"
+              label={t('statistics.common.year')}
+              placeholder={t('statistics.yearlySummary.yearPlaceholder')}
               value={yearForMonthSummary}
               onChange={(value) => {
                 return setYearForMonthSummary(value as number | undefined);
@@ -94,8 +96,8 @@ const Statistics: React.FC = () => {
               w={200}
             />
             <NumberInput
-              label="Month"
-              placeholder="Enter month"
+              label={t('statistics.common.month')}
+              placeholder={t('statistics.monthlySummary.monthPlaceholder')}
               value={month}
               onChange={(value) => {
                 return setMonth(value as number | undefined);
@@ -110,7 +112,7 @@ const Statistics: React.FC = () => {
               disabled={!yearForMonthSummary || !month}
               mt={25}
             >
-              Go to summary for a specific month
+              {t('statistics.monthlySummary.button')}
             </Button>
           </Group>
         </Paper>

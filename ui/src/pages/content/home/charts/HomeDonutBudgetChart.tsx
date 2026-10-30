@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { DonutChart } from '@mantine/charts';
 import { Paper, Title, Text, Box, Loader, Center, Group } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useGetTotalSpentMonthly } from '@requests/expensesRequests';
 import { useGetBudget } from '@requests/budgetRequests';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
@@ -18,9 +19,9 @@ interface HomeDonutBudgetChartProps {
 export default function HomeDonutBudgetChart({
   updateChart,
 }: HomeDonutBudgetChartProps) {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<boolean>(false);
   const [totalSpent, setTotalSpent] = useState(0);
   const [budget, setBudget] = useState(0);
 
@@ -31,7 +32,7 @@ export default function HomeDonutBudgetChart({
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
 
     try {
       const currentDate = new Date();
@@ -58,44 +59,9 @@ export default function HomeDonutBudgetChart({
         },
         0,
       );
-      const budgetAmount = totalBudget;
-      setBudget(budgetAmount);
-
-      // Calculate remaining budget (or overspent amount)
-      const remaining = Math.max(0, budgetAmount - spent);
-      const overspent = spent > budgetAmount ? spent - budgetAmount : 0;
-
-      const newChartData: ChartData[] = [];
-
-      if (spent <= budgetAmount) {
-        // If within budget
-        newChartData.push({
-          name: 'Spent',
-          value: spent,
-          color: 'blue.6',
-        });
-        newChartData.push({
-          name: 'Remaining',
-          value: remaining,
-          color: 'teal.6',
-        });
-      } else {
-        // If over budget
-        newChartData.push({
-          name: 'Budget',
-          value: budgetAmount,
-          color: 'red.6',
-        });
-        newChartData.push({
-          name: 'Overspent',
-          value: overspent,
-          color: 'amber.6',
-        });
-      }
-
-      setChartData(newChartData);
+      setBudget(totalBudget);
     } catch (err) {
-      setError('Failed to load budget data');
+      setError(true);
       console.error(err);
     } finally {
       setLoading(false);
@@ -106,11 +72,43 @@ export default function HomeDonutBudgetChart({
     fetchData();
   }, [updateChart]);
 
+  // Slice names depend on the active language, so they are built at render time
+  const chartData = useMemo<ChartData[]>(() => {
+    if (totalSpent <= budget) {
+      // Within budget
+      return [
+        {
+          name: t('home.budgetChart.slices.spent'),
+          value: totalSpent,
+          color: 'blue.6',
+        },
+        {
+          name: t('home.budgetChart.slices.remaining'),
+          value: Math.max(0, budget - totalSpent),
+          color: 'teal.6',
+        },
+      ];
+    }
+    // Over budget
+    return [
+      {
+        name: t('home.budgetChart.slices.budget'),
+        value: budget,
+        color: 'red.6',
+      },
+      {
+        name: t('home.budgetChart.slices.overspent'),
+        value: totalSpent - budget,
+        color: 'amber.6',
+      },
+    ];
+  }, [totalSpent, budget, t]);
+
   if (loading) {
     return (
       <Paper p="md" radius="md" withBorder>
         <Title order={3} mb="md">
-          Monthly Budget
+          {t('home.budgetChart.title')}
         </Title>
         <Center style={{ height: 300 }}>
           <Loader />
@@ -123,10 +121,10 @@ export default function HomeDonutBudgetChart({
     return (
       <Paper p="md" radius="md" withBorder>
         <Title order={3} mb="md">
-          Monthly Budget
+          {t('home.budgetChart.title')}
         </Title>
         <Center style={{ height: 300 }}>
-          <Text c="red">{error}</Text>
+          <Text c="red">{t('home.budgetChart.error')}</Text>
         </Center>
       </Paper>
     );
@@ -134,22 +132,37 @@ export default function HomeDonutBudgetChart({
 
   const percentSpent = budget > 0 ? Math.round((totalSpent / budget) * 100) : 0;
   const isOverBudget = totalSpent > budget;
+  const symbol = userData?.currency?.symbol ?? '';
+  const difference = Math.abs(budget - totalSpent).toFixed(2);
 
   return (
     <Paper p="md" radius="md" withBorder>
       <Title order={3} mb="md">
-        Monthly Budget
+        {t('home.budgetChart.title')}
       </Title>
       <Group justify="space-between" mb="md">
         <Text>
-          Spent: {userData?.currency?.symbol} {totalSpent.toFixed(2)}
+          {t('home.budgetChart.spentAmount', {
+            symbol,
+            amount: totalSpent.toFixed(2),
+          })}
         </Text>
         <Text>
-          Budget: {userData?.currency?.symbol} {budget.toFixed(2)}
+          {t('home.budgetChart.budgetAmount', {
+            symbol,
+            amount: budget.toFixed(2),
+          })}
         </Text>
         <Text c={isOverBudget ? 'red' : 'green'}>
-          {isOverBudget ? 'Over budget: ' : 'Remaining: '}
-          {Math.abs(budget - totalSpent).toFixed(2)} ({percentSpent}%)
+          {isOverBudget
+            ? t('home.budgetChart.overBudgetAmount', {
+                amount: difference,
+                percent: percentSpent,
+              })
+            : t('home.budgetChart.remainingAmount', {
+                amount: difference,
+                percent: percentSpent,
+              })}
         </Text>
       </Group>
       <Box style={{ height: 250 }}>

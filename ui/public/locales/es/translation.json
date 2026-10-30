@@ -1,0 +1,234 @@
+{
+  "landingPage": {
+    "documentation": "Documentación",
+    "login": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "createAccount": "Crear una Cuenta"
+  },
+  "sideBar": {
+    "dashboard": "Panel",
+    "statistics": "Estadísticas",
+    "budget": "Presupuesto",
+    "profile": "Perfil"
+  },
+  "home": {
+    "title": "Panel de control",
+    "addTransaction": {
+      "tabs": {
+        "expense": "Añadir gasto",
+        "income": "Añadir ingreso"
+      },
+      "fields": {
+        "category": "Categoría",
+        "categoryPlaceholder": "Selecciona una categoría",
+        "amount": "Importe",
+        "date": "Fecha",
+        "datePlaceholder": "Elige una fecha",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción opcional",
+        "tag": "Etiqueta",
+        "tagPlaceholder": "Etiqueta opcional"
+      },
+      "buttons": {
+        "addExpense": "Añadir gasto",
+        "addIncome": "Añadir ingreso"
+      },
+      "tooltips": {
+        "noCurrencyExpense": "No se puede añadir el gasto porque no se encontró ninguna moneda",
+        "noCurrencyIncome": "No se puede añadir el ingreso porque no se encontró ninguna moneda para el usuario"
+      },
+      "notifications": {
+        "errorTitle": "Error",
+        "successTitle": "Éxito",
+        "loadExpenseCategories": "No se pudieron cargar las categorías de gastos",
+        "loadIncomeCategories": "No se pudieron cargar las categorías de ingresos",
+        "expenseAdded": "Gasto añadido correctamente",
+        "incomeAdded": "Ingreso añadido correctamente",
+        "expenseAddFailed": "No se pudo añadir el gasto",
+        "incomeAddFailed": "No se pudo añadir el ingreso"
+      }
+    },
+    "lineChart": {
+      "title": "Gastos e ingresos mensuales",
+      "spent": "Gastos",
+      "earned": "Ingresos",
+      "error": "No se pudieron cargar los datos del gráfico"
+    },
+    "budgetChart": {
+      "title": "Presupuesto mensual",
+      "error": "No se pudieron cargar los datos del presupuesto",
+      "spentAmount": "Gastado: {{symbol}} {{amount}}",
+      "budgetAmount": "Presupuesto: {{symbol}} {{amount}}",
+      "remainingAmount": "Restante: {{amount}} ({{percent}}%)",
+      "overBudgetAmount": "Presupuesto excedido: {{amount}} ({{percent}}%)",
+      "slices": {
+        "spent": "Gastado",
+        "remaining": "Restante",
+        "budget": "Presupuesto",
+        "overspent": "Exceso"
+      }
+    }
+  },
+  "statistics": {
+    "title": "Estadísticas",
+    "periodSummary": {
+      "expenseCategories": "Categorías de gastos",
+      "noExpenseData": "No hay datos de gastos disponibles",
+      "filterByCategory": "Filtrar por categoría de gasto",
+      "selectCategory": "Seleccionar categoría",
+      "selectCategoryPlaceholder": "Elige una categoría",
+      "seeSingleCategory": "Ver los gastos de una sola categoría",
+      "showAllCategories": "Mostrar todas las categorías",
+      "filterByTag": "Filtrar gastos por etiqueta",
+      "selectTag": "Seleccionar etiqueta",
+      "selectTagPlaceholder": "Elige una etiqueta",
+      "seeSingleTag": "Ver los gastos de una sola etiqueta",
+      "showAllExpenses": "Mostrar todos los gastos",
+      "totalSpentOn": "Total gastado en {{name}}: {{amount}}",
+      "expenses": "Gastos",
+      "incomes": "Ingresos",
+      "monthly": {
+        "title": "Gastos e ingresos mensuales - {{month}}/{{year}}",
+        "totalSpent": "Total gastado este mes: {{amount}}",
+        "totalEarned": "Total ingresado este mes: {{amount}}"
+      },
+      "yearly": {
+        "title": "Gastos e ingresos anuales - {{year}}",
+        "totalSpent": "Total gastado este año: {{amount}}",
+        "totalEarned": "Total ingresado este año: {{amount}}"
+      }
+    },
+    "common": {
+      "year": "Año",
+      "month": "Mes",
+      "category": "Categoría",
+      "refresh": "Actualizar",
+      "errorTitle": "Error"
+    },
+    "months": {
+      "long": {
+        "1": "Enero",
+        "2": "Febrero",
+        "3": "Marzo",
+        "4": "Abril",
+        "5": "Mayo",
+        "6": "Junio",
+        "7": "Julio",
+        "8": "Agosto",
+        "9": "Septiembre",
+        "10": "Octubre",
+        "11": "Noviembre",
+        "12": "Diciembre"
+      },
+      "short": {
+        "1": "Ene",
+        "2": "Feb",
+        "3": "Mar",
+        "4": "Abr",
+        "5": "May",
+        "6": "Jun",
+        "7": "Jul",
+        "8": "Ago",
+        "9": "Sep",
+        "10": "Oct",
+        "11": "Nov",
+        "12": "Dic"
+      }
+    },
+    "yearlySummary": {
+      "title": "Resumen anual",
+      "yearPlaceholder": "Introduce el año",
+      "button": "Ir al resumen del año"
+    },
+    "monthlySummary": {
+      "title": "Resumen mensual",
+      "monthPlaceholder": "Introduce el mes",
+      "button": "Ir al resumen de un mes específico"
+    },
+    "cashFlow": {
+      "title": "Visualización del flujo de caja",
+      "description": "Este gráfico muestra tus ingresos (entradas) frente a tus gastos (salidas) a lo largo del tiempo. Los meses con flujo de caja negativo aparecen resaltados.",
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "netCashFlow": "Flujo de caja neto",
+      "error": "No se pudieron cargar los datos del flujo de caja"
+    },
+    "budgetBurndown": {
+      "title": "Gráfico de consumo del presupuesto",
+      "description": "Este gráfico muestra con qué rapidez se va consumiendo tu presupuesto a lo largo del mes. Muestra el gasto diario y el presupuesto restante de cada categoría.",
+      "allCategories": "Todas las categorías",
+      "categoryUsed": "{{name}} ({{percent}}% usado)",
+      "dayOfMonth": "Día del mes",
+      "amountAxis": "Importe ({{symbol}})",
+      "day": "Día {{day}}",
+      "remainingBudget": "Presupuesto restante",
+      "dailySpending": "Gasto diario",
+      "noData": "No hay datos de presupuesto disponibles para la categoría y el período seleccionados.",
+      "error": "No se pudieron cargar los datos del consumo del presupuesto"
+    },
+    "categoryComparison": {
+      "title": "Comparación de categorías",
+      "currentPeriod": "Período actual",
+      "previousPeriod": "Período anterior",
+      "periodType": "Tipo de período",
+      "periodTypePlaceholder": "Selecciona el tipo de período",
+      "periodMonth": "Mes",
+      "periodYear": "Año",
+      "monthPlaceholder": "Selecciona el mes",
+      "yearPlaceholder": "Selecciona el año",
+      "compare": "Comparar",
+      "versus": "{{current}} vs {{previous}}",
+      "totalFor": "Total de {{period}}",
+      "difference": "Diferencia",
+      "noData": "No hay datos de comparación disponibles",
+      "error": "No se pudieron cargar los datos de comparación de categorías",
+      "validation": {
+        "currentRequired": "El valor del período actual es obligatorio",
+        "previousRequired": "El valor del período anterior es obligatorio",
+        "monthRange": "El mes debe estar entre 1 y 12",
+        "currentYearRequired": "El año actual es obligatorio para la comparación mensual",
+        "previousYearRequired": "El año anterior es obligatorio para la comparación mensual"
+      }
+    },
+    "categoryTimeline": {
+      "title": "Evolución del gasto por categoría",
+      "description": "Este gráfico muestra cómo evoluciona tu gasto en las distintas categorías a lo largo del tiempo. Haz clic en las categorías de la leyenda para ocultar o mostrar líneas concretas.",
+      "timeframe": "Intervalo de tiempo",
+      "last3": "Últimos 3 meses",
+      "last6": "Últimos 6 meses",
+      "last12": "Últimos 12 meses",
+      "last24": "Últimos 24 meses",
+      "filterCategories": "Filtrar categorías",
+      "filterPlaceholder": "Selecciona las categorías a mostrar",
+      "noData": "No hay datos disponibles. Por favor, selecciona al menos una categoría.",
+      "errorCategories": "No se pudieron cargar las categorías de gastos",
+      "errorData": "No se pudieron cargar los datos de gasto por categoría"
+    },
+    "statisticalSummaries": {
+      "title": "Resúmenes estadísticos",
+      "description": "Esta sección ofrece diversas estadísticas financieras para ayudarte a entender tus patrones de gasto y tus hábitos de ahorro.",
+      "descriptionRange": "Los datos corresponden a los últimos 2 años; lo anterior a eso no se tiene en cuenta",
+      "noData": "No hay datos estadísticos disponibles.",
+      "error": "No se pudieron cargar los resúmenes estadísticos",
+      "unknownMonth": "Desconocido",
+      "highestSpending": {
+        "title": "Mayor gasto",
+        "day": "Día de mayor gasto",
+        "month": "Mes de mayor gasto",
+        "category": "Categoría de mayor gasto"
+      },
+      "averageSpending": {
+        "title": "Gasto medio",
+        "daily": "Gasto diario medio",
+        "weekly": "Gasto semanal medio",
+        "streak": "Racha más larga dentro del presupuesto",
+        "streakValue": "{{days}} días ({{start}} a {{end}})"
+      },
+      "savings": {
+        "title": "Ahorros",
+        "averageRate": "Tasa media de ahorro mensual: {{rate}}",
+        "monthlyPercentages": "Porcentajes de ahorro mensual:"
+      }
+    }
+  }
+}

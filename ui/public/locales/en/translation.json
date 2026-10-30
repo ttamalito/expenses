@@ -1,0 +1,234 @@
+{
+  "landingPage": {
+    "documentation": "Documentation",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account"
+  },
+  "sideBar": {
+    "dashboard": "Dashboard",
+    "statistics": "Statistics",
+    "budget": "Budget",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Dashboard",
+    "addTransaction": {
+      "tabs": {
+        "expense": "Add Expense",
+        "income": "Add Income"
+      },
+      "fields": {
+        "category": "Category",
+        "categoryPlaceholder": "Select a category",
+        "amount": "Amount",
+        "date": "Date",
+        "datePlaceholder": "Pick a date",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description",
+        "tag": "Tag",
+        "tagPlaceholder": "Optional Tag"
+      },
+      "buttons": {
+        "addExpense": "Add Expense",
+        "addIncome": "Add Income"
+      },
+      "tooltips": {
+        "noCurrencyExpense": "Cannot submit expense, because no currency was found",
+        "noCurrencyIncome": "Cannot submit income, no currency was found for the user"
+      },
+      "notifications": {
+        "errorTitle": "Error",
+        "successTitle": "Success",
+        "loadExpenseCategories": "Failed to load expense categories",
+        "loadIncomeCategories": "Failed to load income categories",
+        "expenseAdded": "Expense added successfully",
+        "incomeAdded": "Income added successfully",
+        "expenseAddFailed": "Failed to add expense",
+        "incomeAddFailed": "Failed to add income"
+      }
+    },
+    "lineChart": {
+      "title": "Monthly Expenses & Income",
+      "spent": "Spent",
+      "earned": "Earned",
+      "error": "Failed to load chart data"
+    },
+    "budgetChart": {
+      "title": "Monthly Budget",
+      "error": "Failed to load budget data",
+      "spentAmount": "Spent: {{symbol}} {{amount}}",
+      "budgetAmount": "Budget: {{symbol}} {{amount}}",
+      "remainingAmount": "Remaining: {{amount}} ({{percent}}%)",
+      "overBudgetAmount": "Over budget: {{amount}} ({{percent}}%)",
+      "slices": {
+        "spent": "Spent",
+        "remaining": "Remaining",
+        "budget": "Budget",
+        "overspent": "Overspent"
+      }
+    }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "periodSummary": {
+      "expenseCategories": "Expense Categories",
+      "noExpenseData": "No expense data available",
+      "filterByCategory": "Filter by Expense Category",
+      "selectCategory": "Select Category",
+      "selectCategoryPlaceholder": "Choose a category",
+      "seeSingleCategory": "See expenses of a single category",
+      "showAllCategories": "Show all categories",
+      "filterByTag": "Filter Expenses by Tag",
+      "selectTag": "Select Tag",
+      "selectTagPlaceholder": "Choose a tag",
+      "seeSingleTag": "See expenses of a single tag",
+      "showAllExpenses": "Show all expenses",
+      "totalSpentOn": "Total spent on {{name}}: {{amount}}",
+      "expenses": "Expenses",
+      "incomes": "Incomes",
+      "monthly": {
+        "title": "Monthly Expenses and Incomes - {{month}}/{{year}}",
+        "totalSpent": "Total spent this month: {{amount}}",
+        "totalEarned": "Total earned this month: {{amount}}"
+      },
+      "yearly": {
+        "title": "Yearly Expenses and Incomes - {{year}}",
+        "totalSpent": "Total spent this year: {{amount}}",
+        "totalEarned": "Total earned this year: {{amount}}"
+      }
+    },
+    "common": {
+      "year": "Year",
+      "month": "Month",
+      "category": "Category",
+      "refresh": "Refresh",
+      "errorTitle": "Error"
+    },
+    "months": {
+      "long": {
+        "1": "January",
+        "2": "February",
+        "3": "March",
+        "4": "April",
+        "5": "May",
+        "6": "June",
+        "7": "July",
+        "8": "August",
+        "9": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December"
+      },
+      "short": {
+        "1": "Jan",
+        "2": "Feb",
+        "3": "Mar",
+        "4": "Apr",
+        "5": "May",
+        "6": "Jun",
+        "7": "Jul",
+        "8": "Aug",
+        "9": "Sep",
+        "10": "Oct",
+        "11": "Nov",
+        "12": "Dec"
+      }
+    },
+    "yearlySummary": {
+      "title": "Yearly Summary",
+      "yearPlaceholder": "Enter year",
+      "button": "Go to summary for year"
+    },
+    "monthlySummary": {
+      "title": "Monthly Summary",
+      "monthPlaceholder": "Enter month",
+      "button": "Go to summary for a specific month"
+    },
+    "cashFlow": {
+      "title": "Cash Flow Visualization",
+      "description": "This chart shows your income (inflow) vs. expenses (outflow) over time. Months with negative cash flow are highlighted.",
+      "income": "Income",
+      "expenses": "Expenses",
+      "netCashFlow": "Net Cash Flow",
+      "error": "Failed to load cash flow data"
+    },
+    "budgetBurndown": {
+      "title": "Budget Burn-down Chart",
+      "description": "This chart tracks how quickly your budget is being used throughout the month. It shows the daily spending and remaining budget for each category.",
+      "allCategories": "All Categories",
+      "categoryUsed": "{{name}} ({{percent}}% used)",
+      "dayOfMonth": "Day of Month",
+      "amountAxis": "Amount ({{symbol}})",
+      "day": "Day {{day}}",
+      "remainingBudget": "Remaining Budget",
+      "dailySpending": "Daily Spending",
+      "noData": "No budget data available for the selected category and period.",
+      "error": "Failed to load budget burndown data"
+    },
+    "categoryComparison": {
+      "title": "Category Comparison",
+      "currentPeriod": "Current Period",
+      "previousPeriod": "Previous Period",
+      "periodType": "Period Type",
+      "periodTypePlaceholder": "Select period type",
+      "periodMonth": "Month",
+      "periodYear": "Year",
+      "monthPlaceholder": "Select month",
+      "yearPlaceholder": "Select year",
+      "compare": "Compare",
+      "versus": "{{current}} vs {{previous}}",
+      "totalFor": "Total for {{period}}",
+      "difference": "Difference",
+      "noData": "No comparison data available",
+      "error": "Failed to load category comparison data",
+      "validation": {
+        "currentRequired": "Current period value is required",
+        "previousRequired": "Previous period value is required",
+        "monthRange": "Month must be between 1 and 12",
+        "currentYearRequired": "Current year is required for monthly comparison",
+        "previousYearRequired": "Previous year is required for monthly comparison"
+      }
+    },
+    "categoryTimeline": {
+      "title": "Category Spending Timeline",
+      "description": "This chart shows how your spending in different categories evolves over time. Toggle categories in the legend to hide/show specific lines.",
+      "timeframe": "Timeframe",
+      "last3": "Last 3 months",
+      "last6": "Last 6 months",
+      "last12": "Last 12 months",
+      "last24": "Last 24 months",
+      "filterCategories": "Filter Categories",
+      "filterPlaceholder": "Select categories to display",
+      "noData": "No data available. Please select at least one category.",
+      "errorCategories": "Failed to load expense categories",
+      "errorData": "Failed to load category spending data"
+    },
+    "statisticalSummaries": {
+      "title": "Statistical Summaries",
+      "description": "This section provides various financial statistics to help you understand your spending patterns and savings habits.",
+      "descriptionRange": "The data is from the last 2 years, anything older than that is not taken into account",
+      "noData": "No statistical data available.",
+      "error": "Failed to load statistical summaries",
+      "unknownMonth": "Unknown",
+      "highestSpending": {
+        "title": "Highest Spending",
+        "day": "Highest Spending Day",
+        "month": "Highest Spending Month",
+        "category": "Highest Spending Category"
+      },
+      "averageSpending": {
+        "title": "Average Spending",
+        "daily": "Average Daily Spend",
+        "weekly": "Average Weekly Spend",
+        "streak": "Longest Streak Under Budget",
+        "streakValue": "{{days}} days ({{start}} to {{end}})"
+      },
+      "savings": {
+        "title": "Savings",
+        "averageRate": "Average Monthly Savings Rate: {{rate}}",
+        "monthlyPercentages": "Monthly Savings Percentages:"
+      }
+    }
+  }
+}

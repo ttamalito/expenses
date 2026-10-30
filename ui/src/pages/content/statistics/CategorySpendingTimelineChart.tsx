@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Paper,
   Title,
@@ -32,6 +33,7 @@ interface Category {
 }
 
 interface ChartDataPoint {
+  // Stored as "<month>-<year>" (e.g. "3-2026") and translated at render time
   month: string;
   [categoryId: string]: string | number;
 }
@@ -52,22 +54,8 @@ const CHART_COLORS = [
   '#8dd1e1',
 ];
 
-const monthNames = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
 const CategorySpendingTimelineChart: React.FC = () => {
+  const { t } = useTranslation();
   const [timeframe, setTimeframe] = useState<number>(6); // Default: 6 months
   const [loading, setLoading] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -80,6 +68,12 @@ const CategorySpendingTimelineChart: React.FC = () => {
 
   const [getAllExpenseCategories] = useGetAllExpenseCategories();
   const [getTotalSpentMonthlyCategory] = useGetTotalSpentMonthlyCategory();
+
+  // Converts "<month>-<year>" into a translated label like "Mar 2026"
+  const formatMonthLabel = (value: string | number): string => {
+    const [monthNumber, yearNumber] = String(value).split('-');
+    return `${t(`statistics.months.short.${monthNumber}`)} ${yearNumber}`;
+  };
 
   // Fetch all expense categories
   useEffect(() => {
@@ -109,8 +103,8 @@ const CategorySpendingTimelineChart: React.FC = () => {
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load expense categories',
+          title: t('statistics.common.errorTitle'),
+          message: t('statistics.categoryTimeline.errorCategories'),
           color: 'red',
         });
       }
@@ -147,7 +141,7 @@ const CategorySpendingTimelineChart: React.FC = () => {
         // Initialize chart data with months
         const data: ChartDataPoint[] = months.map((m) => {
           return {
-            month: `${monthNames[m.month - 1]} ${m.year}`,
+            month: `${m.month}-${m.year}`,
           };
         });
 
@@ -177,8 +171,8 @@ const CategorySpendingTimelineChart: React.FC = () => {
       } catch (error) {
         console.error('Failed to fetch category spending data:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load category spending data',
+          title: t('statistics.common.errorTitle'),
+          message: t('statistics.categoryTimeline.errorData'),
           color: 'red',
         });
       } finally {
@@ -238,7 +232,7 @@ const CategorySpendingTimelineChart: React.FC = () => {
             borderRadius: '5px',
           }}
         >
-          <p style={{ margin: '0 0 5px 0' }}>{label}</p>
+          <p style={{ margin: '0 0 5px 0' }}>{formatMonthLabel(label)}</p>
           {payload.map((entry: any, index: number) => {
             return (
               <p
@@ -259,22 +253,22 @@ const CategorySpendingTimelineChart: React.FC = () => {
     <Paper shadow="xs" p="md" withBorder>
       <Stack gap="md">
         <Group justify="space-between">
-          <Title order={4}>Category Spending Timeline</Title>
+          <Title order={4}>{t('statistics.categoryTimeline.title')}</Title>
           <Group>
             <Select
-              label="Timeframe"
+              label={t('statistics.categoryTimeline.timeframe')}
               value={timeframe.toString()}
               onChange={handleTimeframeChange}
               data={[
-                { value: '3', label: 'Last 3 months' },
-                { value: '6', label: 'Last 6 months' },
-                { value: '12', label: 'Last 12 months' },
-                { value: '24', label: 'Last 24 months' },
+                { value: '3', label: t('statistics.categoryTimeline.last3') },
+                { value: '6', label: t('statistics.categoryTimeline.last6') },
+                { value: '12', label: t('statistics.categoryTimeline.last12') },
+                { value: '24', label: t('statistics.categoryTimeline.last24') },
               ]}
               w={150}
             />
             <NumberInput
-              label="Month"
+              label={t('statistics.common.month')}
               value={endDate.month}
               onChange={handleMonthChange}
               min={1}
@@ -282,7 +276,7 @@ const CategorySpendingTimelineChart: React.FC = () => {
               w={100}
             />
             <NumberInput
-              label="Year"
+              label={t('statistics.common.year')}
               value={endDate.year}
               onChange={handleYearChange}
               min={2000}
@@ -293,14 +287,12 @@ const CategorySpendingTimelineChart: React.FC = () => {
         </Group>
 
         <Text size="sm" c="dimmed">
-          This chart shows how your spending in different categories evolves
-          over time. Toggle categories in the legend to hide/show specific
-          lines.
+          {t('statistics.categoryTimeline.description')}
         </Text>
 
         <MultiSelect
-          label="Filter Categories"
-          placeholder="Select categories to display"
+          label={t('statistics.categoryTimeline.filterCategories')}
+          placeholder={t('statistics.categoryTimeline.filterPlaceholder')}
           data={categories.map((cat) => {
             return {
               value: cat.id.toString(),
@@ -324,7 +316,7 @@ const CategorySpendingTimelineChart: React.FC = () => {
               margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
               <Legend
@@ -364,7 +356,7 @@ const CategorySpendingTimelineChart: React.FC = () => {
           </ResponsiveContainer>
         ) : (
           <Center h={400}>
-            <Text>No data available. Please select at least one category.</Text>
+            <Text>{t('statistics.categoryTimeline.noData')}</Text>
           </Center>
         )}
       </Stack>

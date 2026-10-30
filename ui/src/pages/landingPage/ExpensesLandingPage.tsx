@@ -18,6 +18,8 @@ import {
 import classes from './ExpensesLandingPage.module.css';
 import { useNavigate } from 'react-router';
 import { routes } from '@routes';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/LanguageSwitcher.tsx';
 
 /**
  * Landing page for the Expenses application
@@ -26,11 +28,13 @@ import { routes } from '@routes';
 function ExpensesLandingPage() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Container size="xl">
       {/* Header with login/signup buttons */}
       <Group className={classes.headerButtons}>
+        <LanguageSwitcher />
         <Button
           variant="subtle"
           className={classes.navButton}
@@ -38,7 +42,7 @@ function ExpensesLandingPage() {
             return navigate(routes.documentation.index);
           }}
         >
-          Documentation
+          {t('landingPage.documentation')}
         </Button>
         <Button
           variant="subtle"
@@ -47,7 +51,7 @@ function ExpensesLandingPage() {
             return navigate(routes.login.index);
           }}
         >
-          Login
+          {t('landingPage.login')}
         </Button>
         <Button
           variant="filled"
@@ -56,7 +60,7 @@ function ExpensesLandingPage() {
             return navigate(routes.register.index);
           }}
         >
-          Sign Up
+          {t('landingPage.signUp')}
         </Button>
       </Group>
 
@@ -151,7 +155,7 @@ function ExpensesLandingPage() {
             }}
             variant="outline"
           >
-            Login
+            {t('landingPage.login')}
           </Button>
           <Button
             size="lg"
@@ -159,7 +163,7 @@ function ExpensesLandingPage() {
               return navigate(routes.register.index);
             }}
           >
-            Create Account
+            {t('landingPage.createAccount')}
           </Button>
         </Group>
       </Paper>

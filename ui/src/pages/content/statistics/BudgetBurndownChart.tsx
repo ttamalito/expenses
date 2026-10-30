@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Paper,
   Title,
@@ -38,6 +39,7 @@ interface ChartDataPoint {
 }
 
 const BudgetBurndownChart: React.FC = () => {
+  const { t } = useTranslation();
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1); // JavaScript months are 0-indexed
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,6 +52,14 @@ const BudgetBurndownChart: React.FC = () => {
   const [getBudgetBurndown] = useGetBudgetBurndown();
 
   const { userData } = useUserDataContext();
+
+  // The "All Categories" entry (id -1) comes from the backend with an
+  // English name, so it is translated here
+  const getCategoryName = (category: CategoryBurndownData): string => {
+    return category.categoryId === -1
+      ? t('statistics.budgetBurndown.allCategories')
+      : category.categoryName;
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -106,8 +116,8 @@ const BudgetBurndownChart: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch budget burndown data:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to load budget burndown data',
+        title: t('statistics.common.errorTitle'),
+        message: t('statistics.budgetBurndown.error'),
         color: 'red',
       });
     } finally {
@@ -173,41 +183,26 @@ const BudgetBurndownChart: React.FC = () => {
     fetchData();
   };
 
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
   return (
     <Paper shadow="xs" p="md" withBorder>
       <Stack gap="md">
         <Group justify="space-between">
-          <Title order={4}>Budget Burn-down Chart</Title>
+          <Title order={4}>{t('statistics.budgetBurndown.title')}</Title>
           <Group>
             <Select
-              label="Month"
+              label={t('statistics.common.month')}
               value={month.toString()}
               onChange={handleMonthChange}
               data={Array.from({ length: 12 }, (_, i) => {
                 return {
                   value: (i + 1).toString(),
-                  label: monthNames[i],
+                  label: t(`statistics.months.long.${i + 1}`),
                 };
               })}
               w={150}
             />
             <NumberInput
-              label="Year"
+              label={t('statistics.common.year')}
               value={year}
               onChange={handleYearChange}
               min={2000}
@@ -215,20 +210,18 @@ const BudgetBurndownChart: React.FC = () => {
               w={120}
             />
             <Button onClick={handleRefresh} mt={25}>
-              Refresh
+              {t('statistics.common.refresh')}
             </Button>
           </Group>
         </Group>
 
         <Text size="sm" c="dimmed">
-          This chart tracks how quickly your budget is being used throughout the
-          month. It shows the daily spending and remaining budget for each
-          category.
+          {t('statistics.budgetBurndown.description')}
         </Text>
 
         {burndownData && burndownData.categories.length > 0 ? (
           <Select
-            label="Category"
+            label={t('statistics.common.category')}
             value={selectedCategory}
             onChange={handleCategoryChange}
             data={burndownData.categories
@@ -239,7 +232,13 @@ const BudgetBurndownChart: React.FC = () => {
               .map((category) => {
                 return {
                   value: category.categoryId.toString(), // TODO: label produces NaN when there are no categories
-                  label: `${category.categoryName} (${((category.totalSpent / category.budget) * 100).toFixed(1)}% used)`,
+                  label: t('statistics.budgetBurndown.categoryUsed', {
+                    name: getCategoryName(category),
+                    percent: (
+                      (category.totalSpent / category.budget) *
+                      100
+                    ).toFixed(1),
+                  }),
                 };
               })}
             w={300}
@@ -260,14 +259,16 @@ const BudgetBurndownChart: React.FC = () => {
               <XAxis
                 dataKey="day"
                 label={{
-                  value: 'Day of Month',
+                  value: t('statistics.budgetBurndown.dayOfMonth'),
                   position: 'insideBottomRight',
                   offset: -10,
                 }}
               />
               <YAxis
                 label={{
-                  value: `Amount (${userData?.currency?.symbol})`,
+                  value: t('statistics.budgetBurndown.amountAxis', {
+                    symbol: userData?.currency?.symbol,
+                  }),
                   angle: -90,
                   position: 'insideLeft',
                 }}
@@ -280,7 +281,7 @@ const BudgetBurndownChart: React.FC = () => {
                   ];
                 }}
                 labelFormatter={(label) => {
-                  return `Day ${label}`;
+                  return t('statistics.budgetBurndown.day', { day: label });
                 }}
               />
               <Legend />
@@ -288,7 +289,7 @@ const BudgetBurndownChart: React.FC = () => {
               <Line
                 type="monotone"
                 dataKey="remaining"
-                name="Remaining Budget"
+                name={t('statistics.budgetBurndown.remainingBudget')}
                 stroke="#82ca9d"
                 dot={false}
                 strokeWidth={2}
@@ -296,7 +297,7 @@ const BudgetBurndownChart: React.FC = () => {
               <Line
                 type="monotone"
                 dataKey="spent"
-                name="Daily Spending"
+                name={t('statistics.budgetBurndown.dailySpending')}
                 stroke="#8884d8"
                 dot={{ r: 4 }}
                 strokeWidth={2}
@@ -305,9 +306,7 @@ const BudgetBurndownChart: React.FC = () => {
           </ResponsiveContainer>
         ) : (
           <Center h={300}>
-            <Text c="dimmed">
-              No budget data available for the selected category and period.
-            </Text>
+            <Text c="dimmed">{t('statistics.budgetBurndown.noData')}</Text>
           </Center>
         )}
       </Stack>

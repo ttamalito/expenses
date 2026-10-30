@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BarChart } from '@mantine/charts';
 import {
   Paper,
@@ -45,6 +46,7 @@ interface ComparisonResponse {
 }
 
 const CategoryComparisonChart: React.FC = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(false);
   const [comparisonData, setComparisonData] =
     useState<ComparisonResponse | null>(null);
@@ -55,6 +57,23 @@ const CategoryComparisonChart: React.FC = () => {
   const [compareCategories] = useCompareCategories();
 
   const { userData } = useUserDataContext();
+
+  const periodTypeOptions = [
+    { value: 'month', label: t('statistics.categoryComparison.periodMonth') },
+    { value: 'year', label: t('statistics.categoryComparison.periodYear') },
+  ];
+
+  const monthOptions = Array.from({ length: 12 }, (_, i) => {
+    return {
+      value: (i + 1).toString(),
+      label: t(`statistics.months.long.${i + 1}`),
+    };
+  });
+
+  const yearOptions = Array.from({ length: 10 }, (_, i) => {
+    const year = new Date().getFullYear() - 5 + i;
+    return { value: year.toString(), label: year.toString() };
+  });
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -71,34 +90,42 @@ const CategoryComparisonChart: React.FC = () => {
     },
     validate: {
       currentPeriodValue: (value) => {
-        if (!value) return 'Current period value is required';
+        if (!value) {
+          return t('statistics.categoryComparison.validation.currentRequired');
+        }
         if (
           form.values.currentPeriodType === 'month' &&
           (parseInt(value) < 1 || parseInt(value) > 12)
         ) {
-          return 'Month must be between 1 and 12';
+          return t('statistics.categoryComparison.validation.monthRange');
         }
         return null;
       },
       previousPeriodValue: (value) => {
-        if (!value) return 'Previous period value is required';
+        if (!value) {
+          return t('statistics.categoryComparison.validation.previousRequired');
+        }
         if (
           form.values.previousPeriodType === 'month' &&
           (parseInt(value) < 1 || parseInt(value) > 12)
         ) {
-          return 'Month must be between 1 and 12';
+          return t('statistics.categoryComparison.validation.monthRange');
         }
         return null;
       },
       currentYear: (value, values) => {
         if (values.currentPeriodType === 'month' && !value) {
-          return 'Current year is required for monthly comparison';
+          return t(
+            'statistics.categoryComparison.validation.currentYearRequired',
+          );
         }
         return null;
       },
       previousYear: (value, values) => {
         if (values.previousPeriodType === 'month' && !value) {
-          return 'Previous year is required for monthly comparison';
+          return t(
+            'statistics.categoryComparison.validation.previousYearRequired',
+          );
         }
         return null;
       },
@@ -138,8 +165,8 @@ const CategoryComparisonChart: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch comparison data:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to load category comparison data',
+        title: t('statistics.common.errorTitle'),
+        message: t('statistics.categoryComparison.error'),
         color: 'red',
       });
     } finally {
@@ -150,121 +177,97 @@ const CategoryComparisonChart: React.FC = () => {
   return (
     <Paper shadow="xs" p="md" withBorder>
       <Title order={4} mb="md">
-        Category Comparison
+        {t('statistics.categoryComparison.title')}
       </Title>
 
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <Group grow>
             <Stack>
-              <Title order={6}>Current Period</Title>
+              <Title order={6}>
+                {t('statistics.categoryComparison.currentPeriod')}
+              </Title>
               <Select
-                label="Period Type"
-                placeholder="Select period type"
-                data={[
-                  { value: 'month', label: 'Month' },
-                  { value: 'year', label: 'Year' },
-                ]}
+                label={t('statistics.categoryComparison.periodType')}
+                placeholder={t(
+                  'statistics.categoryComparison.periodTypePlaceholder',
+                )}
+                data={periodTypeOptions}
                 {...form.getInputProps('currentPeriodType')}
               />
 
               {form.values.currentPeriodType === 'month' ? (
                 <>
                   <Select
-                    label="Month"
-                    placeholder="Select month"
-                    data={[
-                      { value: '1', label: 'January' },
-                      { value: '2', label: 'February' },
-                      { value: '3', label: 'March' },
-                      { value: '4', label: 'April' },
-                      { value: '5', label: 'May' },
-                      { value: '6', label: 'June' },
-                      { value: '7', label: 'July' },
-                      { value: '8', label: 'August' },
-                      { value: '9', label: 'September' },
-                      { value: '10', label: 'October' },
-                      { value: '11', label: 'November' },
-                      { value: '12', label: 'December' },
-                    ]}
+                    label={t('statistics.common.month')}
+                    placeholder={t(
+                      'statistics.categoryComparison.monthPlaceholder',
+                    )}
+                    data={monthOptions}
                     {...form.getInputProps('currentPeriodValue')}
                   />
 
                   <Select
-                    label="Year"
-                    placeholder="Select year"
-                    data={Array.from({ length: 10 }, (_, i) => {
-                      const year = new Date().getFullYear() - 5 + i;
-                      return { value: year.toString(), label: year.toString() };
-                    })}
+                    label={t('statistics.common.year')}
+                    placeholder={t(
+                      'statistics.categoryComparison.yearPlaceholder',
+                    )}
+                    data={yearOptions}
                     {...form.getInputProps('currentYear')}
                   />
                 </>
               ) : (
                 <Select
-                  label="Year"
-                  placeholder="Select year"
-                  data={Array.from({ length: 10 }, (_, i) => {
-                    const year = new Date().getFullYear() - 5 + i;
-                    return { value: year.toString(), label: year.toString() };
-                  })}
+                  label={t('statistics.common.year')}
+                  placeholder={t(
+                    'statistics.categoryComparison.yearPlaceholder',
+                  )}
+                  data={yearOptions}
                   {...form.getInputProps('currentPeriodValue')}
                 />
               )}
             </Stack>
 
             <Stack>
-              <Title order={6}>Previous Period</Title>
+              <Title order={6}>
+                {t('statistics.categoryComparison.previousPeriod')}
+              </Title>
               <Select
-                label="Period Type"
-                placeholder="Select period type"
-                data={[
-                  { value: 'month', label: 'Month' },
-                  { value: 'year', label: 'Year' },
-                ]}
+                label={t('statistics.categoryComparison.periodType')}
+                placeholder={t(
+                  'statistics.categoryComparison.periodTypePlaceholder',
+                )}
+                data={periodTypeOptions}
                 {...form.getInputProps('previousPeriodType')}
               />
 
               {form.values.previousPeriodType === 'month' ? (
                 <>
                   <Select
-                    label="Month"
-                    placeholder="Select month"
-                    data={[
-                      { value: '1', label: 'January' },
-                      { value: '2', label: 'February' },
-                      { value: '3', label: 'March' },
-                      { value: '4', label: 'April' },
-                      { value: '5', label: 'May' },
-                      { value: '6', label: 'June' },
-                      { value: '7', label: 'July' },
-                      { value: '8', label: 'August' },
-                      { value: '9', label: 'September' },
-                      { value: '10', label: 'October' },
-                      { value: '11', label: 'November' },
-                      { value: '12', label: 'December' },
-                    ]}
+                    label={t('statistics.common.month')}
+                    placeholder={t(
+                      'statistics.categoryComparison.monthPlaceholder',
+                    )}
+                    data={monthOptions}
                     {...form.getInputProps('previousPeriodValue')}
                   />
 
                   <Select
-                    label="Year"
-                    placeholder="Select year"
-                    data={Array.from({ length: 10 }, (_, i) => {
-                      const year = new Date().getFullYear() - 5 + i;
-                      return { value: year.toString(), label: year.toString() };
-                    })}
+                    label={t('statistics.common.year')}
+                    placeholder={t(
+                      'statistics.categoryComparison.yearPlaceholder',
+                    )}
+                    data={yearOptions}
                     {...form.getInputProps('previousYear')}
                   />
                 </>
               ) : (
                 <Select
-                  label="Year"
-                  placeholder="Select year"
-                  data={Array.from({ length: 10 }, (_, i) => {
-                    const year = new Date().getFullYear() - 5 + i;
-                    return { value: year.toString(), label: year.toString() };
-                  })}
+                  label={t('statistics.common.year')}
+                  placeholder={t(
+                    'statistics.categoryComparison.yearPlaceholder',
+                  )}
+                  data={yearOptions}
                   {...form.getInputProps('previousPeriodValue')}
                 />
               )}
@@ -272,7 +275,7 @@ const CategoryComparisonChart: React.FC = () => {
           </Group>
 
           <Button type="submit" loading={loading}>
-            Compare
+            {t('statistics.categoryComparison.compare')}
           </Button>
         </Stack>
       </form>
@@ -286,8 +289,10 @@ const CategoryComparisonChart: React.FC = () => {
       {!loading && comparisonData && (
         <>
           <Title order={5} mt="xl" mb="md">
-            {comparisonData.currentPeriodLabel} vs{' '}
-            {comparisonData.previousPeriodLabel}
+            {t('statistics.categoryComparison.versus', {
+              current: comparisonData.currentPeriodLabel,
+              previous: comparisonData.previousPeriodLabel,
+            })}
           </Title>
 
           {chartData.length > 0 ? (
@@ -303,13 +308,15 @@ const CategoryComparisonChart: React.FC = () => {
               withTooltip
             />
           ) : (
-            <Text>No comparison data available</Text>
+            <Text>{t('statistics.categoryComparison.noData')}</Text>
           )}
 
           <Group justify={'space-between'} mt="xl">
             <Stack gap="xs">
               <Text fw={500}>
-                Total for {comparisonData.currentPeriodLabel}
+                {t('statistics.categoryComparison.totalFor', {
+                  period: comparisonData.currentPeriodLabel,
+                })}
               </Text>
               <Text size="xl" fw={700}>
                 {userData?.currency?.symbol}
@@ -319,7 +326,9 @@ const CategoryComparisonChart: React.FC = () => {
 
             <Stack gap="xs">
               <Text fw={500}>
-                Total for {comparisonData.previousPeriodLabel}
+                {t('statistics.categoryComparison.totalFor', {
+                  period: comparisonData.previousPeriodLabel,
+                })}
               </Text>
               <Text size="xl" fw={700}>
                 {userData?.currency?.symbol}
@@ -328,7 +337,9 @@ const CategoryComparisonChart: React.FC = () => {
             </Stack>
 
             <Stack gap="xs">
-              <Text fw={500}>Difference</Text>
+              <Text fw={500}>
+                {t('statistics.categoryComparison.difference')}
+              </Text>
               <Text
                 size="xl"
                 fw={700}
