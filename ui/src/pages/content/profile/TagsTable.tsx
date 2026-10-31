@@ -16,6 +16,7 @@ import { IconTrash, IconEdit, IconTag } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
 import { ICreateTagDto, IUpdateTagDto } from '@clients';
 import {
   useDeleteTagById,
@@ -26,6 +27,7 @@ import {
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
 
 export default function TagsTable() {
+  const { t } = useTranslation();
   const { userTags, setUserTags } = useUserDataContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,7 +42,7 @@ export default function TagsTable() {
   const form = useForm<ICreateTagDto>({
     validate: {
       name: (value) => {
-        return value ? null : 'Name is required';
+        return value ? null : t('tags.nameRequired');
       },
     },
   });
@@ -48,7 +50,7 @@ export default function TagsTable() {
   const updateForm = useForm<IUpdateTagDto>({
     validate: {
       name: (value) => {
-        return value ? null : 'Name is required';
+        return value ? null : t('tags.nameRequired');
       },
     },
   });
@@ -77,15 +79,15 @@ export default function TagsTable() {
       setIsModalOpen(false);
       fetchTags();
       notifications.show({
-        title: 'Success',
-        message: 'Tag created successfully',
+        title: t('tables.common.successTitle'),
+        message: t('tags.created'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error creating tag:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to create tag: ' + error,
+        title: t('tables.common.errorTitle'),
+        message: t('tags.createFailed', { error: String(error) }),
         color: 'red',
       });
     }
@@ -102,20 +104,20 @@ export default function TagsTable() {
         setIsEditModalOpen(false);
         fetchTags();
         notifications.show({
-          title: 'Success',
-          message: 'Tag updated successfully',
+          title: t('tables.common.successTitle'),
+          message: t('tags.updated'),
           color: 'green',
         });
       } catch (error) {
         console.error('Error updating tag:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to update tag: ' + error,
+          title: t('tables.common.errorTitle'),
+          message: t('tags.updateFailed', { error: String(error) }),
           color: 'red',
         });
       }
     },
-    [],
+    [t],
   );
 
   const handleDeleteTag = async () => {
@@ -125,15 +127,15 @@ export default function TagsTable() {
         setIsDeleteModalOpen(false);
         fetchTags();
         notifications.show({
-          title: 'Success',
-          message: 'Tag deleted successfully',
+          title: t('tables.common.successTitle'),
+          message: t('tags.deleted'),
           color: 'green',
         });
       } catch (error: any) {
         console.error('Error deleting Tag:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to delete Tag: ' + error.response.data,
+          title: t('tables.common.errorTitle'),
+          message: t('tags.deleteFailed', { error: error.response.data }),
           color: 'red',
         });
       }
@@ -158,7 +160,7 @@ export default function TagsTable() {
             setIsModalOpen(true);
           }}
         >
-          Add Tag
+          {t('tags.addButton')}
         </Button>
       </Group>
 
@@ -168,18 +170,21 @@ export default function TagsTable() {
         withColumnBorders
         records={userTags}
         columns={[
-          { accessor: 'name', title: 'Name', noWrap: true },
-          { accessor: 'description', title: 'Description' },
+          { accessor: 'name', title: t('tags.name'), noWrap: true },
+          {
+            accessor: 'description',
+            title: t('tables.common.description'),
+          },
           {
             accessor: 'color',
-            title: 'Color',
+            title: t('tags.color'),
             render: (tag) => {
               return <IconTag color={tag.color} size={25} />;
             },
           },
           {
             accessor: 'actions',
-            title: 'Actions',
+            title: t('tables.common.actions'),
             textAlign: 'right',
             render: (tag) => {
               return (
@@ -222,23 +227,23 @@ export default function TagsTable() {
           setIsModalOpen(false);
           form.reset();
         }}
-        title="Add Tag"
+        title={t('tags.addModalTitle')}
       >
         <form onSubmit={form.onSubmit(handleCreateTag)}>
           <TextInput
-            label="Name"
-            placeholder="Tag name"
+            label={t('tags.name')}
+            placeholder={t('tags.namePlaceholder')}
             required
             {...form.getInputProps('name')}
             mb="md"
           />
           <Textarea
-            label="Description"
-            placeholder="Tag description"
+            label={t('tables.common.description')}
+            placeholder={t('tags.descriptionPlaceholder')}
             {...form.getInputProps('description')}
             mb="md"
           />
-          <Text>Tag Color</Text>
+          <Text>{t('tags.tagColor')}</Text>
           <Space h="xs" />
           <Grid>
             <Grid.Col span={8}>
@@ -250,7 +255,7 @@ export default function TagsTable() {
           </Grid>
 
           <Group justify="flex-end">
-            <Button type="submit">Create</Button>
+            <Button type="submit">{t('tags.create')}</Button>
           </Group>
         </form>
       </Modal>
@@ -262,7 +267,7 @@ export default function TagsTable() {
           setIsEditModalOpen(false);
           form.reset();
         }}
-        title="Update Tag"
+        title={t('tags.updateModalTitle')}
       >
         <form
           onSubmit={updateForm.onSubmit((values) => {
@@ -270,21 +275,21 @@ export default function TagsTable() {
           })}
         >
           <TextInput
-            label="Name"
-            placeholder="Tag name"
+            label={t('tags.name')}
+            placeholder={t('tags.namePlaceholder')}
             required
             key={updateForm.key('name')}
             {...updateForm.getInputProps('name')}
             mb="md"
           />
           <Textarea
-            label="Description"
-            placeholder="Tag description"
+            label={t('tables.common.description')}
+            placeholder={t('tags.descriptionPlaceholder')}
             key={updateForm.key('description')}
             {...updateForm.getInputProps('description')}
             mb="md"
           />
-          <Text>Tag Color</Text>
+          <Text>{t('tags.tagColor')}</Text>
           <Space h="xs" />
           <Grid>
             <Grid.Col span={8}>
@@ -295,7 +300,7 @@ export default function TagsTable() {
             </Grid.Col>
           </Grid>
           <Group justify="flex-end">
-            <Button type="submit">Update</Button>
+            <Button type="submit">{t('tags.update')}</Button>
           </Group>
         </form>
       </Modal>
@@ -306,13 +311,10 @@ export default function TagsTable() {
         onClose={() => {
           setIsDeleteModalOpen(false);
         }}
-        title="Confirm Deletion"
+        title={t('tables.common.confirmDeletion')}
       >
-        <p>Are you sure you want to delete this tag?</p>
-        <p>
-          If there are expenses/incomes with this tag the tag will NOT be
-          deleted.
-        </p>
+        <p>{t('tags.deleteConfirm')}</p>
+        <p>{t('tags.deleteWarning')}</p>
         <Group justify="flex-end">
           <Button
             variant="outline"
@@ -320,10 +322,10 @@ export default function TagsTable() {
               setIsDeleteModalOpen(false);
             }}
           >
-            Cancel
+            {t('tables.common.cancel')}
           </Button>
           <Button color="red" onClick={handleDeleteTag}>
-            Delete
+            {t('tables.common.delete')}
           </Button>
         </Group>
       </Modal>

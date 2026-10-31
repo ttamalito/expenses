@@ -3,6 +3,8 @@ import { AxiosResponse } from 'axios';
 import { notifications } from '@mantine/notifications';
 import { IExpense, IGetIncomeDto } from '@clients';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 export interface CategoryOption {
   value: string;
@@ -32,6 +34,7 @@ const PIE_CHART_COLORS = [
 const buildPieChartData = (
   expenses: IExpense[],
   categories: CategoryOption[],
+  t: TFunction,
 ): PieChartEntry[] => {
   const categoryMap = new Map<string, number>();
   expenses.forEach((expense) => {
@@ -39,7 +42,10 @@ const buildPieChartData = (
     const categoryName =
       categories.find((c) => {
         return c.value === categoryId;
-      })?.label || `Category ${categoryId}`;
+      })?.label ||
+      t('statistics.periodSummary.errors.fallbackCategory', {
+        id: categoryId,
+      });
     const currentAmount = categoryMap.get(categoryName) || 0;
     categoryMap.set(categoryName, currentAmount + (expense.amount || 0));
   });
@@ -94,6 +100,8 @@ export function useExpensesAndIncomesSummary(
   const [loading, setLoading] = useState(true);
   const [pieChartData, setPieChartData] = useState<PieChartEntry[]>([]);
 
+  const { t } = useTranslation();
+
   const [getAllCategories] = useGetAllExpenseCategories();
 
   const fetchCategories = useCallback(async (): Promise<CategoryOption[]> => {
@@ -111,13 +119,13 @@ export function useExpensesAndIncomesSummary(
     } catch (error) {
       console.error('Failed to fetch categories:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to load expense categories',
+        title: t('statistics.common.errorTitle'),
+        message: t('statistics.periodSummary.errors.loadCategories'),
         color: 'red',
       });
       return [];
     }
-  }, [getAllCategories]);
+  }, [getAllCategories, t]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,7 +140,7 @@ export function useExpensesAndIncomesSummary(
         if (expensesResponse?.data) {
           setExpenses(expensesResponse.data);
           setPieChartData(
-            buildPieChartData(expensesResponse.data, categoriesOptions),
+            buildPieChartData(expensesResponse.data, categoriesOptions, t),
           );
         }
 
@@ -153,8 +161,8 @@ export function useExpensesAndIncomesSummary(
       } catch (error) {
         console.error('Failed to fetch data:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load expenses data',
+          title: t('statistics.common.errorTitle'),
+          message: t('statistics.periodSummary.errors.loadData'),
           color: 'red',
         });
       } finally {
@@ -191,19 +199,24 @@ export function useExpensesAndIncomesSummary(
         const category = categories.find((c) => {
           return c.value === categoryIdStr;
         });
-        setSelectedCategoryName(category?.label || `Category ${categoryId}`);
+        setSelectedCategoryName(
+          category?.label ||
+            t('statistics.periodSummary.errors.fallbackCategory', {
+              id: categoryId,
+            }),
+        );
       } catch (error) {
         console.error('Failed to fetch category data:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load category data',
+          title: t('statistics.common.errorTitle'),
+          message: t('statistics.periodSummary.errors.loadCategoryData'),
           color: 'red',
         });
       } finally {
         setLoading(false);
       }
     },
-    [categories, fetchers],
+    [categories, fetchers, t],
   );
 
   const handleFilterByTag = useCallback(
@@ -217,19 +230,22 @@ export function useExpensesAndIncomesSummary(
           setExpenses(result.expenses);
           setTotalSpentCategory(result.totalSpent);
         }
-        setSelectedCategoryName(tagLabel || `Tag ${tagId}`);
+        setSelectedCategoryName(
+          tagLabel ||
+            t('statistics.periodSummary.errors.fallbackTag', { id: tagId }),
+        );
       } catch (error) {
         console.error('Failed to fetch tag data:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load tag data',
+          title: t('statistics.common.errorTitle'),
+          message: t('statistics.periodSummary.errors.loadTagData'),
           color: 'red',
         });
       } finally {
         setLoading(false);
       }
     },
-    [fetchers],
+    [fetchers, t],
   );
 
   const handleResetFilter = useCallback(async () => {
@@ -244,14 +260,14 @@ export function useExpensesAndIncomesSummary(
     } catch (error) {
       console.error('Failed to reset data:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to reset data',
+        title: t('statistics.common.errorTitle'),
+        message: t('statistics.periodSummary.errors.resetData'),
         color: 'red',
       });
     } finally {
       setLoading(false);
     }
-  }, [fetchers]);
+  }, [fetchers, t]);
 
   const handleExpenseUpdated = useCallback(async () => {
     const expensesResponse = await fetchers.fetchExpenses();

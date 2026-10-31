@@ -9,7 +9,11 @@
     "dashboard": "Panel",
     "statistics": "Estadísticas",
     "budget": "Presupuesto",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "title": "Gestor de Gastos",
+    "lightMode": "Activar el modo claro",
+    "darkMode": "Activar el modo oscuro",
+    "logout": "Cerrar Sesión"
   },
   "home": {
     "title": "Panel de control",
@@ -96,6 +100,15 @@
         "title": "Gastos e ingresos anuales - {{year}}",
         "totalSpent": "Total gastado este año: {{amount}}",
         "totalEarned": "Total ingresado este año: {{amount}}"
+      },
+      "errors": {
+        "loadCategories": "No se pudieron cargar las categorías de gastos",
+        "loadData": "No se pudieron cargar los datos de gastos",
+        "loadCategoryData": "No se pudieron cargar los datos de la categoría",
+        "loadTagData": "No se pudieron cargar los datos de la etiqueta",
+        "resetData": "No se pudieron restablecer los datos",
+        "fallbackCategory": "Categoría {{id}}",
+        "fallbackTag": "Etiqueta {{id}}"
       }
     },
     "common": {
@@ -230,5 +243,161 @@
         "monthlyPercentages": "Porcentajes de ahorro mensual:"
       }
     }
+  },
+  "tables": {
+    "common": {
+      "description": "Descripción",
+      "amount": "Importe",
+      "category": "Categoría",
+      "date": "Fecha",
+      "tag": "Etiqueta",
+      "actions": "Acciones",
+      "unknownCategory": "Categoría {{id}} - ¡Revisar!",
+      "confirmDeletion": "Confirmar eliminación",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "successTitle": "Éxito",
+      "errorTitle": "Error"
+    },
+    "expenses": {
+      "deleteConfirm": "¿Seguro que quieres eliminar este gasto?",
+      "deleted": "Gasto eliminado correctamente",
+      "deleteFailed": "No se pudo eliminar el gasto",
+      "loadCategoriesFailed": "No se pudieron cargar las categorías de gastos"
+    },
+    "incomes": {
+      "deleteConfirm": "¿Seguro que quieres eliminar este ingreso?",
+      "deleted": "Ingreso eliminado correctamente",
+      "deleteFailed": "No se pudo eliminar el ingreso",
+      "loadCategoriesFailed": "No se pudieron cargar las categorías de ingresos"
+    },
+    "editExpense": {
+      "title": "Editar gasto",
+      "descriptionPlaceholder": "Introduce la descripción",
+      "amountPlaceholder": "Introduce el importe",
+      "categoryPlaceholder": "Selecciona la categoría",
+      "datePlaceholder": "Selecciona la fecha",
+      "tagPlaceholder": "Etiqueta opcional",
+      "save": "Guardar",
+      "updated": "Gasto actualizado correctamente",
+      "updateFailed": "No se pudo actualizar el gasto"
+    }
+  },
+  "budget": {
+    "title": "Gestión del presupuesto",
+    "monthlyTotal": "Presupuesto mensual total:",
+    "table": {
+      "categoryName": "Nombre de la categoría",
+      "description": "Descripción",
+      "currentBudget": "Presupuesto actual",
+      "newBudget": "Nuevo presupuesto"
+    },
+    "buttons": {
+      "save": "Guardar cambios"
+    },
+    "notifications": {
+      "errorTitle": "Error",
+      "successTitle": "Éxito",
+      "fetchFailed": "Error al cargar los datos del presupuesto",
+      "updated": "Presupuesto actualizado correctamente",
+      "updateFailed": "Error al actualizar el presupuesto"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "changePicture": "Cambiar foto de perfil",
+    "fields": {
+      "firstName": "Nombre",
+      "firstNamePlaceholder": "Tu nombre",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Tu apellido",
+      "currency": "Moneda"
+    },
+    "buttons": {
+      "save": "Guardar cambios"
+    },
+    "tooltips": {
+      "cannotUpdate": "No se puede actualizar el perfil, no se puede leer la información del usuario: E-101"
+    },
+    "sections": {
+      "expenseCategories": "Categorías de gastos",
+      "incomeCategories": "Categorías de ingresos",
+      "tags": "Etiquetas"
+    },
+    "notifications": {
+      "updated": "Datos del usuario actualizados correctamente",
+      "missingUsername": "No se pudieron actualizar los datos del usuario - E-201",
+      "updateFailed": "No se pudieron actualizar los datos del usuario",
+      "fetchUserFailed": "No se pudieron obtener los datos del usuario. E-101"
+    }
+  },
+  "categories": {
+    "common": {
+      "name": "Nombre",
+      "namePlaceholder": "Nombre de la categoría",
+      "descriptionPlaceholder": "Descripción de la categoría",
+      "nameRequired": "El nombre es obligatorio",
+      "create": "Crear",
+      "deleteTooltip": "Eliminar categoría"
+    },
+    "expense": {
+      "addButton": "Añadir categoría de gastos",
+      "modalTitle": "Añadir categoría de gastos",
+      "budget": "Presupuesto",
+      "budgetPlaceholder": "Importe del presupuesto",
+      "budgetInvalid": "El presupuesto debe ser un número positivo",
+      "migrateTooltip": "Migrar todos los gastos a otra categoría",
+      "deleteConfirm": "¿Seguro que quieres eliminar esta categoría de gastos?",
+      "deleteWarning": "Si hay gastos con esta categoría, la categoría NO se eliminará.",
+      "created": "Categoría de gastos creada correctamente",
+      "createFailed": "No se pudo crear la categoría de gastos",
+      "deleted": "Categoría de gastos eliminada correctamente",
+      "deleteFailed": "No se pudo eliminar la categoría de gastos: {{error}}"
+    },
+    "income": {
+      "addButton": "Añadir categoría de ingresos",
+      "modalTitle": "Añadir categoría de ingresos",
+      "migrateTooltip": "Migrar todos los ingresos a otra categoría",
+      "deleteConfirm": "¿Seguro que quieres eliminar esta categoría de ingresos?",
+      "deleteWarning": "Si hay ingresos con esta categoría, la categoría NO se eliminará.",
+      "created": "Categoría de ingresos creada correctamente",
+      "createFailed": "No se pudo crear la categoría de ingresos",
+      "deleted": "Categoría de ingresos eliminada correctamente",
+      "deleteFailed": "No se pudo eliminar la categoría de ingresos: {{error}}"
+    },
+    "migrate": {
+      "expenseTitle": "Migrar gastos de \"{{name}}\" a",
+      "incomeTitle": "Migrar ingresos de \"{{name}}\" a",
+      "titleWithTarget": "{{title}} \"{{target}}\"",
+      "titleWithoutTarget": "{{title}} ...",
+      "selectLabel": "Selecciona la categoría de destino",
+      "selectPlaceholder": "Categoría de destino",
+      "categoryRequired": "La categoría es obligatoria",
+      "warning": "¡Todos los elementos se migrarán a la categoría \"{{name}}\"!",
+      "migrate": "Migrar",
+      "success": "Elementos migrados a: \"{{name}}\"",
+      "failed": "No se pudo migrar la categoría"
+    }
+  },
+  "tags": {
+    "addButton": "Añadir etiqueta",
+    "addModalTitle": "Añadir etiqueta",
+    "updateModalTitle": "Actualizar etiqueta",
+    "name": "Nombre",
+    "namePlaceholder": "Nombre de la etiqueta",
+    "descriptionPlaceholder": "Descripción de la etiqueta",
+    "nameRequired": "El nombre es obligatorio",
+    "color": "Color",
+    "tagColor": "Color de la etiqueta",
+    "create": "Crear",
+    "update": "Actualizar",
+    "deleteConfirm": "¿Seguro que quieres eliminar esta etiqueta?",
+    "deleteWarning": "Si hay gastos/ingresos con esta etiqueta, la etiqueta NO se eliminará.",
+    "created": "Etiqueta creada correctamente",
+    "createFailed": "No se pudo crear la etiqueta: {{error}}",
+    "updated": "Etiqueta actualizada correctamente",
+    "updateFailed": "No se pudo actualizar la etiqueta: {{error}}",
+    "deleted": "Etiqueta eliminada correctamente",
+    "deleteFailed": "No se pudo eliminar la etiqueta: {{error}}"
   }
 }

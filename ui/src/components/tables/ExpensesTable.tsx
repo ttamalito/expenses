@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -24,6 +25,7 @@ export function ExpensesTable({
   expenses,
   onExpenseUpdated,
 }: ExpensesTableProps) {
+  const { t } = useTranslation();
   const { userTags } = useUserDataContext();
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<IExpense>>({
     columnAccessor: 'date',
@@ -54,8 +56,8 @@ export function ExpensesTable({
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load expense categories',
+          title: t('tables.common.errorTitle'),
+          message: t('tables.expenses.loadCategoriesFailed'),
           color: 'red',
         });
       }
@@ -91,16 +93,16 @@ export function ExpensesTable({
     try {
       await deleteExpense(selectedExpense.id!);
       notifications.show({
-        title: 'Success',
-        message: 'Expense deleted successfully',
+        title: t('tables.common.successTitle'),
+        message: t('tables.expenses.deleted'),
         color: 'green',
       });
       setDeleteConfirmOpened(false);
       if (onExpenseUpdated) onExpenseUpdated();
     } catch {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to delete expense',
+        title: t('tables.common.errorTitle'),
+        message: t('tables.expenses.deleteFailed'),
         color: 'red',
       });
     }
@@ -132,12 +134,12 @@ export function ExpensesTable({
         columns={[
           {
             accessor: 'description',
-            title: 'Description',
+            title: t('tables.common.description'),
             width: '30%',
           },
           {
             accessor: 'amount',
-            title: 'Amount',
+            title: t('tables.common.amount'),
             sortable: true,
             width: '15%',
             render: ({ amount }) => {
@@ -146,11 +148,13 @@ export function ExpensesTable({
           },
           {
             accessor: 'categoryId',
-            title: 'Category',
+            title: t('tables.common.category'),
             width: '20%',
             // In a real app, you would fetch category names and map IDs to names
             render: ({ categoryId }) => {
-              let possibleCategoryName = `Category ${categoryId} - Check!`;
+              let possibleCategoryName = t('tables.common.unknownCategory', {
+                id: categoryId,
+              });
               categories.forEach((category) => {
                 if (category.value === categoryId?.toString()) {
                   possibleCategoryName = category.label;
@@ -161,7 +165,7 @@ export function ExpensesTable({
           },
           {
             accessor: 'date',
-            title: 'Date',
+            title: t('tables.common.date'),
             sortable: true,
             width: '10%',
             render: ({ date }) => {
@@ -170,7 +174,7 @@ export function ExpensesTable({
           },
           {
             accessor: 'tagId',
-            title: 'Tag',
+            title: t('tables.common.tag'),
             sortable: false,
             width: '14%',
             render: ({ tagId }) => {
@@ -179,7 +183,7 @@ export function ExpensesTable({
           },
           {
             accessor: 'actions',
-            title: 'Actions',
+            title: t('tables.common.actions'),
             width: '15%',
             render: (expense) => {
               return (
@@ -213,9 +217,9 @@ export function ExpensesTable({
         onClose={() => {
           return setDeleteConfirmOpened(false);
         }}
-        title="Confirm Deletion"
+        title={t('tables.common.confirmDeletion')}
       >
-        <Text>Are you sure you want to delete this expense?</Text>
+        <Text>{t('tables.expenses.deleteConfirm')}</Text>
         <Group justify="flex-end" mt="md">
           <Button
             variant="outline"
@@ -223,10 +227,10 @@ export function ExpensesTable({
               return setDeleteConfirmOpened(false);
             }}
           >
-            Cancel
+            {t('tables.common.cancel')}
           </Button>
           <Button color="red" onClick={handleConfirmDelete}>
-            Delete
+            {t('tables.common.delete')}
           </Button>
         </Group>
       </Modal>

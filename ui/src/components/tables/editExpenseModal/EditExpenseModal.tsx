@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { IExpense } from '@clients';
@@ -30,6 +31,7 @@ interface IEditExpenseModalProps {
 }
 
 export default function EditExpenseModal(props: IEditExpenseModalProps) {
+  const { t } = useTranslation();
   const { userTags } = useUserDataContext();
   const [disabled, setDisabled] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
@@ -41,16 +43,16 @@ export default function EditExpenseModal(props: IEditExpenseModalProps) {
     try {
       await modifyExpense(values);
       notifications.show({
-        title: 'Success',
-        message: 'Expense updated successfully',
+        title: t('tables.common.successTitle'),
+        message: t('tables.editExpense.updated'),
         color: 'green',
       });
       close();
       if (props.onExpenseUpdated) props.onExpenseUpdated();
     } catch {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update expense',
+        title: t('tables.common.errorTitle'),
+        message: t('tables.editExpense.updateFailed'),
         color: 'red',
       });
     } finally {
@@ -68,38 +70,42 @@ export default function EditExpenseModal(props: IEditExpenseModalProps) {
   return (
     <>
       {/* Edit Modal */}
-      <Modal opened={opened} onClose={close} title="Edit Expense">
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={t('tables.editExpense.title')}
+      >
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack>
             <TextInput
-              label="Description"
-              placeholder="Enter description"
+              label={t('tables.common.description')}
+              placeholder={t('tables.editExpense.descriptionPlaceholder')}
               key={form.key('description')}
               {...form.getInputProps('description')}
             />
             <NumberInput
-              label="Amount"
-              placeholder="Enter amount"
+              label={t('tables.common.amount')}
+              placeholder={t('tables.editExpense.amountPlaceholder')}
               decimalScale={2}
               key={form.key('amount')}
               {...form.getInputProps('amount')}
             />
             <Select
-              label="Category"
-              placeholder="Select category"
+              label={t('tables.common.category')}
+              placeholder={t('tables.editExpense.categoryPlaceholder')}
               data={props.categories}
               key={form.key('categoryId')}
               {...form.getInputProps('categoryId')}
             />
             <ExpensesDateInputWrapper
-              label="Date"
-              placeholder="Select date"
+              label={t('tables.common.date')}
+              placeholder={t('tables.editExpense.datePlaceholder')}
               key={form.key('date')}
               {...form.getInputProps('date')}
             />
             <Select
-              label="Tag"
-              placeholder="Optional tag"
+              label={t('tables.common.tag')}
+              placeholder={t('tables.editExpense.tagPlaceholder')}
               data={userTags.map((tag) => {
                 return {
                   value: tag.id?.toString() ?? '0',
@@ -111,7 +117,7 @@ export default function EditExpenseModal(props: IEditExpenseModalProps) {
             />
             <Group justify="flex-end" mt="md">
               <Button disabled={disabled} type="submit">
-                Save
+                {t('tables.editExpense.save')}
               </Button>
             </Group>
           </Stack>
