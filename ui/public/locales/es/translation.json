@@ -96,6 +96,15 @@
         "title": "Gastos e ingresos anuales - {{year}}",
         "totalSpent": "Total gastado este año: {{amount}}",
         "totalEarned": "Total ingresado este año: {{amount}}"
+      },
+      "errors": {
+        "loadCategories": "No se pudieron cargar las categorías de gastos",
+        "loadData": "No se pudieron cargar los datos de gastos",
+        "loadCategoryData": "No se pudieron cargar los datos de la categoría",
+        "loadTagData": "No se pudieron cargar los datos de la etiqueta",
+        "resetData": "No se pudieron restablecer los datos",
+        "fallbackCategory": "Categoría {{id}}",
+        "fallbackTag": "Etiqueta {{id}}"
       }
     },
     "common": {
@@ -229,6 +238,45 @@
         "averageRate": "Tasa media de ahorro mensual: {{rate}}",
         "monthlyPercentages": "Porcentajes de ahorro mensual:"
       }
+    }
+  },
+  "tables": {
+    "common": {
+      "description": "Descripción",
+      "amount": "Importe",
+      "category": "Categoría",
+      "date": "Fecha",
+      "tag": "Etiqueta",
+      "actions": "Acciones",
+      "unknownCategory": "Categoría {{id}} - ¡Revisar!",
+      "confirmDeletion": "Confirmar eliminación",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "successTitle": "Éxito",
+      "errorTitle": "Error"
+    },
+    "expenses": {
+      "deleteConfirm": "¿Seguro que quieres eliminar este gasto?",
+      "deleted": "Gasto eliminado correctamente",
+      "deleteFailed": "No se pudo eliminar el gasto",
+      "loadCategoriesFailed": "No se pudieron cargar las categorías de gastos"
+    },
+    "incomes": {
+      "deleteConfirm": "¿Seguro que quieres eliminar este ingreso?",
+      "deleted": "Ingreso eliminado correctamente",
+      "deleteFailed": "No se pudo eliminar el ingreso",
+      "loadCategoriesFailed": "No se pudieron cargar las categorías de ingresos"
+    },
+    "editExpense": {
+      "title": "Editar gasto",
+      "descriptionPlaceholder": "Introduce la descripción",
+      "amountPlaceholder": "Introduce el importe",
+      "categoryPlaceholder": "Selecciona la categoría",
+      "datePlaceholder": "Selecciona la fecha",
+      "tagPlaceholder": "Etiqueta opcional",
+      "save": "Guardar",
+      "updated": "Gasto actualizado correctamente",
+      "updateFailed": "No se pudo actualizar el gasto"
     }
   }
 }

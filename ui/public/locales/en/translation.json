@@ -96,6 +96,15 @@
         "title": "Yearly Expenses and Incomes - {{year}}",
         "totalSpent": "Total spent this year: {{amount}}",
         "totalEarned": "Total earned this year: {{amount}}"
+      },
+      "errors": {
+        "loadCategories": "Failed to load expense categories",
+        "loadData": "Failed to load expenses data",
+        "loadCategoryData": "Failed to load category data",
+        "loadTagData": "Failed to load tag data",
+        "resetData": "Failed to reset data",
+        "fallbackCategory": "Category {{id}}",
+        "fallbackTag": "Tag {{id}}"
       }
     },
     "common": {
@@ -229,6 +238,45 @@
         "averageRate": "Average Monthly Savings Rate: {{rate}}",
         "monthlyPercentages": "Monthly Savings Percentages:"
       }
+    }
+  },
+  "tables": {
+    "common": {
+      "description": "Description",
+      "amount": "Amount",
+      "category": "Category",
+      "date": "Date",
+      "tag": "Tag",
+      "actions": "Actions",
+      "unknownCategory": "Category {{id}} - Check!",
+      "confirmDeletion": "Confirm Deletion",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "successTitle": "Success",
+      "errorTitle": "Error"
+    },
+    "expenses": {
+      "deleteConfirm": "Are you sure you want to delete this expense?",
+      "deleted": "Expense deleted successfully",
+      "deleteFailed": "Failed to delete expense",
+      "loadCategoriesFailed": "Failed to load expense categories"
+    },
+    "incomes": {
+      "deleteConfirm": "Are you sure you want to delete this income?",
+      "deleted": "Income deleted successfully",
+      "deleteFailed": "Failed to delete income",
+      "loadCategoriesFailed": "Failed to load income categories"
+    },
+    "editExpense": {
+      "title": "Edit Expense",
+      "descriptionPlaceholder": "Enter description",
+      "amountPlaceholder": "Enter amount",
+      "categoryPlaceholder": "Select category",
+      "datePlaceholder": "Select date",
+      "tagPlaceholder": "Optional tag",
+      "save": "Save",
+      "updated": "Expense updated successfully",
+      "updateFailed": "Failed to update expense"
     }
   }
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -20,6 +21,7 @@ interface IncomesTableProps {
 }
 
 export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
+  const { t } = useTranslation();
   const { userTags } = useUserDataContext();
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<IGetIncomeDto>
@@ -55,8 +57,8 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load income categories',
+          title: t('tables.common.errorTitle'),
+          message: t('tables.incomes.loadCategoriesFailed'),
           color: 'red',
         });
       }
@@ -86,16 +88,16 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
     try {
       await deleteIncome(selectedIncome.id!);
       notifications.show({
-        title: 'Success',
-        message: 'Income deleted successfully',
+        title: t('tables.common.successTitle'),
+        message: t('tables.incomes.deleted'),
         color: 'green',
       });
       setDeleteConfirmOpened(false);
       if (onIncomeUpdated) onIncomeUpdated();
     } catch {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to delete income',
+        title: t('tables.common.errorTitle'),
+        message: t('tables.incomes.deleteFailed'),
         color: 'red',
       });
     }
@@ -127,12 +129,12 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
         columns={[
           {
             accessor: 'description',
-            title: 'Description',
+            title: t('tables.common.description'),
             width: '30%',
           },
           {
             accessor: 'amount',
-            title: 'Amount',
+            title: t('tables.common.amount'),
             sortable: true,
             width: '20%',
             render: ({ amount }) => {
@@ -141,11 +143,13 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
           },
           {
             accessor: 'categoryId',
-            title: 'Category',
+            title: t('tables.common.category'),
             width: '20%',
             // In a real app, you would fetch category names and map IDs to names
             render: ({ categoryId }) => {
-              let possibleCategoryName = `Category ${categoryId} - Check!`;
+              let possibleCategoryName = t('tables.common.unknownCategory', {
+                id: categoryId,
+              });
               categories.forEach((category) => {
                 if (category.value === categoryId?.toString()) {
                   possibleCategoryName = category.label;
@@ -156,7 +160,7 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
           },
           {
             accessor: 'date',
-            title: 'Date',
+            title: t('tables.common.date'),
             sortable: true,
             width: '10%',
             render: ({ date }) => {
@@ -165,7 +169,7 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
           },
           {
             accessor: 'tagId',
-            title: 'Tag',
+            title: t('tables.common.tag'),
             sortable: false,
             width: '15%',
             render: ({ tagId }) => {
@@ -174,7 +178,7 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
           },
           {
             accessor: 'actions',
-            title: 'Actions',
+            title: t('tables.common.actions'),
             width: '10%',
             render: (income) => {
               return (
@@ -203,9 +207,9 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
         onClose={() => {
           return setDeleteConfirmOpened(false);
         }}
-        title="Confirm Deletion"
+        title={t('tables.common.confirmDeletion')}
       >
-        <Text>Are you sure you want to delete this income?</Text>
+        <Text>{t('tables.incomes.deleteConfirm')}</Text>
         <Group justify="flex-end" mt="md">
           <Button
             variant="outline"
@@ -213,10 +217,10 @@ export function IncomesTable({ incomes, onIncomeUpdated }: IncomesTableProps) {
               return setDeleteConfirmOpened(false);
             }}
           >
-            Cancel
+            {t('tables.common.cancel')}
           </Button>
           <Button color="red" onClick={handleConfirmDelete}>
-            Delete
+            {t('tables.common.delete')}
           </Button>
         </Group>
       </Modal>
