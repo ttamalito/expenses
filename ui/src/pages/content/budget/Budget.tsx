@@ -13,6 +13,7 @@ import { useForm } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { DataTable } from 'mantine-datatable';
+import { useTranslation } from 'react-i18next';
 import { IUpdateBudgetDto } from '@clients';
 import { useGetBudget, usePostModify } from '@requests/budgetRequests.ts';
 import BudgetBurndownChart from '../statistics/BudgetBurndownChart.tsx';
@@ -27,6 +28,7 @@ interface BudgetItem {
 }
 
 export default function Budget() {
+  const { t } = useTranslation();
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalMonthlyBudget, setTotalMonthlyBudget] = useState<number>(0);
@@ -75,8 +77,8 @@ export default function Budget() {
     } catch (error) {
       console.error('Error fetching budget:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to fetch budget data',
+        title: t('budget.notifications.errorTitle'),
+        message: t('budget.notifications.fetchFailed'),
         color: 'red',
       });
     } finally {
@@ -107,16 +109,16 @@ export default function Budget() {
     try {
       await modifyBudget(values.budgets);
       notifications.show({
-        title: 'Success',
-        message: 'Budget updated successfully',
+        title: t('budget.notifications.successTitle'),
+        message: t('budget.notifications.updated'),
         color: 'green',
       });
       fetchBudget(); // Refresh data after update
     } catch (error) {
       console.error('Error updating budget:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update budget',
+        title: t('budget.notifications.errorTitle'),
+        message: t('budget.notifications.updateFailed'),
         color: 'red',
       });
     }
@@ -125,13 +127,13 @@ export default function Budget() {
   return (
     <Container fluid>
       <Title order={1} mb="xl">
-        Budget Management
+        {t('budget.title')}
       </Title>
 
       <Paper shadow="xs" p="md" mb="xl">
         <Box mb="lg">
           <Text size="lg" fw={500}>
-            Monthly Budget Total:{' '}
+            {t('budget.monthlyTotal')}{' '}
             <Text span fw={700} c="blue">
               {userData?.currency?.symbol} {totalMonthlyBudget.toFixed(2)}
             </Text>
@@ -148,11 +150,19 @@ export default function Budget() {
             //loading={loading}
             records={budgetItems}
             columns={[
-              { accessor: 'name', title: 'Category Name', width: 200 },
-              { accessor: 'description', title: 'Description', width: 300 },
+              {
+                accessor: 'name',
+                title: t('budget.table.categoryName'),
+                width: 200,
+              },
+              {
+                accessor: 'description',
+                title: t('budget.table.description'),
+                width: 300,
+              },
               {
                 accessor: 'budget',
-                title: 'Current Budget',
+                title: t('budget.table.currentBudget'),
                 width: 150,
                 render: (item) => {
                   return `${userData?.currency?.symbol} ${item.budget.toFixed(2)}`;
@@ -160,7 +170,7 @@ export default function Budget() {
               },
               {
                 accessor: 'newBudget',
-                title: 'New Budget',
+                title: t('budget.table.newBudget'),
                 width: 200,
                 render: (item, index) => {
                   return (
@@ -179,7 +189,7 @@ export default function Budget() {
 
           <Group justify="flex-end" mt="xl">
             <Button type="submit" disabled={loading}>
-              Save Changes
+              {t('budget.buttons.save')}
             </Button>
           </Group>
         </form>

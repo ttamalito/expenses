@@ -278,5 +278,25 @@
       "updated": "Gasto actualizado correctamente",
       "updateFailed": "No se pudo actualizar el gasto"
     }
+  },
+  "budget": {
+    "title": "Gestión del presupuesto",
+    "monthlyTotal": "Presupuesto mensual total:",
+    "table": {
+      "categoryName": "Nombre de la categoría",
+      "description": "Descripción",
+      "currentBudget": "Presupuesto actual",
+      "newBudget": "Nuevo presupuesto"
+    },
+    "buttons": {
+      "save": "Guardar cambios"
+    },
+    "notifications": {
+      "errorTitle": "Error",
+      "successTitle": "Éxito",
+      "fetchFailed": "Error al cargar los datos del presupuesto",
+      "updated": "Presupuesto actualizado correctamente",
+      "updateFailed": "Error al actualizar el presupuesto"
+    }
   }
 }

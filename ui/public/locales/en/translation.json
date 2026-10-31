@@ -278,5 +278,25 @@
       "updated": "Expense updated successfully",
       "updateFailed": "Failed to update expense"
     }
+  },
+  "budget": {
+    "title": "Budget Management",
+    "monthlyTotal": "Monthly Budget Total:",
+    "table": {
+      "categoryName": "Category Name",
+      "description": "Description",
+      "currentBudget": "Current Budget",
+      "newBudget": "New Budget"
+    },
+    "buttons": {
+      "save": "Save Changes"
+    },
+    "notifications": {
+      "errorTitle": "Error",
+      "successTitle": "Success",
+      "fetchFailed": "Failed to fetch budget data",
+      "updated": "Budget updated successfully",
+      "updateFailed": "Failed to update budget"
+    }
   }
 }
