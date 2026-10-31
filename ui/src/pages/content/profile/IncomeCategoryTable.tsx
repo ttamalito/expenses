@@ -13,6 +13,7 @@ import { IconReplace, IconTrash } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
 import { ICreateIncomeCategoryDto, IGetIncomeCategoryDto } from '@clients';
 import {
   useDeleteIncomeCategory,
@@ -22,6 +23,7 @@ import {
 import MigrateCategoryModal from './MigrateCategoryModal.tsx';
 
 export default function IncomeCategoryTable() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<IGetIncomeCategoryDto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,7 +42,7 @@ export default function IncomeCategoryTable() {
   const form = useForm<ICreateIncomeCategoryDto>({
     validate: {
       name: (value) => {
-        return value ? null : 'Name is required';
+        return value ? null : t('categories.common.nameRequired');
       },
     },
   });
@@ -67,15 +69,15 @@ export default function IncomeCategoryTable() {
       setIsModalOpen(false);
       fetchCategories();
       notifications.show({
-        title: 'Success',
-        message: 'Income category created successfully',
+        title: t('tables.common.successTitle'),
+        message: t('categories.income.created'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error creating income category:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to create income category',
+        title: t('tables.common.errorTitle'),
+        message: t('categories.income.createFailed'),
         color: 'red',
       });
     }
@@ -88,15 +90,17 @@ export default function IncomeCategoryTable() {
         setIsDeleteModalOpen(false);
         fetchCategories();
         notifications.show({
-          title: 'Success',
-          message: 'Income category deleted successfully',
+          title: t('tables.common.successTitle'),
+          message: t('categories.income.deleted'),
           color: 'green',
         });
       } catch (error: any) {
         console.error('Error deleting income category:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to delete income category: ' + error.response.data,
+          title: t('tables.common.errorTitle'),
+          message: t('categories.income.deleteFailed', {
+            error: error.response.data,
+          }),
           color: 'red',
         });
       }
@@ -121,7 +125,7 @@ export default function IncomeCategoryTable() {
             setIsModalOpen(true);
           }}
         >
-          Add Income Category
+          {t('categories.income.addButton')}
         </Button>
       </Group>
 
@@ -131,18 +135,23 @@ export default function IncomeCategoryTable() {
         withColumnBorders
         records={categories}
         columns={[
-          { accessor: 'name', title: 'Name', noWrap: true },
-          { accessor: 'description', title: 'Description' },
+          {
+            accessor: 'name',
+            title: t('categories.common.name'),
+            noWrap: true,
+          },
+          {
+            accessor: 'description',
+            title: t('tables.common.description'),
+          },
           {
             accessor: 'actions',
-            title: 'Actions',
+            title: t('tables.common.actions'),
             textAlign: 'right',
             render: (category) => {
               return (
                 <Group gap={4} justify="right" wrap="nowrap">
-                  <Tooltip
-                    label={'Migrate all incomes to a different category'}
-                  >
+                  <Tooltip label={t('categories.income.migrateTooltip')}>
                     <ActionIcon
                       size="sm"
                       variant="subtle"
@@ -158,7 +167,7 @@ export default function IncomeCategoryTable() {
                       <IconReplace size={16} />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label={'Delete category'}>
+                  <Tooltip label={t('categories.common.deleteTooltip')}>
                     <ActionIcon
                       size="sm"
                       variant="subtle"
@@ -185,24 +194,24 @@ export default function IncomeCategoryTable() {
           setIsModalOpen(false);
           form.reset();
         }}
-        title="Add Income Category"
+        title={t('categories.income.modalTitle')}
       >
         <form onSubmit={form.onSubmit(handleCreateCategory)}>
           <TextInput
-            label="Name"
-            placeholder="Category name"
+            label={t('categories.common.name')}
+            placeholder={t('categories.common.namePlaceholder')}
             required
             {...form.getInputProps('name')}
             mb="md"
           />
           <Textarea
-            label="Description"
-            placeholder="Category description"
+            label={t('tables.common.description')}
+            placeholder={t('categories.common.descriptionPlaceholder')}
             {...form.getInputProps('description')}
             mb="md"
           />
           <Group justify="flex-end">
-            <Button type="submit">Create</Button>
+            <Button type="submit">{t('categories.common.create')}</Button>
           </Group>
         </form>
       </Modal>
@@ -213,13 +222,10 @@ export default function IncomeCategoryTable() {
         onClose={() => {
           setIsDeleteModalOpen(false);
         }}
-        title="Confirm Deletion"
+        title={t('tables.common.confirmDeletion')}
       >
-        <p>Are you sure you want to delete this income category?</p>
-        <p>
-          If there are incomes with this category the category will NOT be
-          deleted.
-        </p>
+        <p>{t('categories.income.deleteConfirm')}</p>
+        <p>{t('categories.income.deleteWarning')}</p>
         <Group justify="flex-end">
           <Button
             variant="outline"
@@ -227,17 +233,19 @@ export default function IncomeCategoryTable() {
               setIsDeleteModalOpen(false);
             }}
           >
-            Cancel
+            {t('tables.common.cancel')}
           </Button>
           <Button color="red" onClick={handleDeleteCategory}>
-            Delete
+            {t('tables.common.delete')}
           </Button>
         </Group>
       </Modal>
 
       {/* Migrate category modal*/}
       <MigrateCategoryModal
-        title={`Migrate incomes from "${selectedCategoryName}" to`}
+        title={t('categories.migrate.incomeTitle', {
+          name: selectedCategoryName,
+        })}
         opened={isMigrateModalOpen}
         setIsModalOpen={setIsMigrateModalOpen}
         originCategoryId={selectedCategoryId ?? -1}

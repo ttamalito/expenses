@@ -16,6 +16,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
 import { IUpdateUserDto } from '@clients';
 import { usePostUpdate, useGetUserData } from '@requests/userRequests.ts';
 import { useGetAllCurrencies } from '@requests/currencyRequests.ts';
@@ -26,6 +27,7 @@ import useErrorHandling from '@hooks/useErrorHandling.tsx';
 import TagsTable from './TagsTable.tsx';
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { userData, setUserData } = useUserDataContext();
   const { handleError } = useErrorHandling();
   const [currencies, setCurrencies] = useState<any[]>([]);
@@ -83,25 +85,25 @@ export default function Profile() {
           })
           .catch((error) => {
             console.error('Error updating user data:', error);
-            handleError('Failed to fetch user data. E-101');
+            handleError(t('profile.notifications.fetchUserFailed'));
           });
         notifications.show({
-          title: 'Success',
-          message: 'User data updated successfully',
+          title: t('tables.common.successTitle'),
+          message: t('profile.notifications.updated'),
           color: 'green',
         });
       } else {
         notifications.show({
-          title: 'Error',
-          message: 'Failed to update user data - E-201', // missing username in userData
+          title: t('tables.common.errorTitle'),
+          message: t('profile.notifications.missingUsername'), // missing username in userData
           color: 'red',
         });
       }
     } catch (error) {
       console.error('Error updating user:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update user data',
+        title: t('tables.common.errorTitle'),
+        message: t('profile.notifications.updateFailed'),
         color: 'red',
       });
     }
@@ -119,7 +121,7 @@ export default function Profile() {
   return (
     <Container fluid>
       <Title order={1} mb="xl">
-        Profile
+        {t('profile.title')}
       </Title>
 
       {/* User Profile Box */}
@@ -145,7 +147,7 @@ export default function Profile() {
               />
               <FileInput
                 accept="image/*"
-                placeholder="Change profile picture"
+                placeholder={t('profile.changePicture')}
                 onChange={handleProfilePictureChange}
               />
             </Box>
@@ -163,23 +165,23 @@ export default function Profile() {
                 <Grid>
                   <Grid.Col span={{ base: 12, md: 6 }}>
                     <TextInput
-                      label="First Name"
-                      placeholder="Your first name"
+                      label={t('profile.fields.firstName')}
+                      placeholder={t('profile.fields.firstNamePlaceholder')}
                       {...form.getInputProps('firstName')}
                       mb="md"
                     />
                   </Grid.Col>
                   <Grid.Col span={{ base: 12, md: 6 }}>
                     <TextInput
-                      label="Last Name"
-                      placeholder="Your last name"
+                      label={t('profile.fields.lastName')}
+                      placeholder={t('profile.fields.lastNamePlaceholder')}
                       {...form.getInputProps('lastName')}
                       mb="md"
                     />
                   </Grid.Col>
                   <Grid.Col span={12}>
                     <NativeSelect
-                      label="Currency"
+                      label={t('profile.fields.currency')}
                       //placeholder="Select currency"
                       data={currencies.map((currency) => {
                         return {
@@ -194,16 +196,14 @@ export default function Profile() {
                   <Grid.Col span={12}>
                     <Group justify="flex-end">
                       <Tooltip
-                        label={
-                          'Cannot update profile, cannot read user information: E-101'
-                        }
+                        label={t('profile.tooltips.cannotUpdate')}
                         disabled={userData !== undefined}
                         color="teal"
                         withArrow
                         position="top"
                       >
                         <Button disabled={userData === undefined} type="submit">
-                          Save Changes
+                          {t('profile.buttons.save')}
                         </Button>
                       </Tooltip>
                     </Group>
@@ -218,7 +218,7 @@ export default function Profile() {
       {/* Expense Categories Box */}
       <Paper shadow="xs" p="md" mb="xl">
         <Title order={2} mb="md">
-          Expense Categories
+          {t('profile.sections.expenseCategories')}
         </Title>
         <ExpenseCategoryTable />
       </Paper>
@@ -226,7 +226,7 @@ export default function Profile() {
       {/* Income Categories Box */}
       <Paper shadow="xs" p="md" mb="xl">
         <Title order={2} mb="md">
-          Income Categories
+          {t('profile.sections.incomeCategories')}
         </Title>
         <IncomeCategoryTable />
       </Paper>
@@ -234,7 +234,7 @@ export default function Profile() {
       {/* Tags Box */}
       <Paper shadow="xs" p="md" mb="xl">
         <Title order={2} mb="md">
-          Tags
+          {t('profile.sections.tags')}
         </Title>
         <TagsTable />
       </Paper>

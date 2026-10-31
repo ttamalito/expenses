@@ -14,6 +14,7 @@ import { IconTrash, IconReplace } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
 import { ICreateExpenseCategoryDto, IGetExpenseCategoryDto } from '@clients';
 import {
   useDeleteExpenseCategory,
@@ -23,6 +24,7 @@ import {
 import MigrateCategoryModal from './MigrateCategoryModal.tsx';
 
 export default function ExpenseCategoryTable() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<IGetExpenseCategoryDto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,10 +42,12 @@ export default function ExpenseCategoryTable() {
   const form = useForm<ICreateExpenseCategoryDto>({
     validate: {
       name: (value) => {
-        return value ? null : 'Name is required';
+        return value ? null : t('categories.common.nameRequired');
       },
       budget: (value) => {
-        return value && value >= 0 ? null : 'Budget must be a positive number';
+        return value && value >= 0
+          ? null
+          : t('categories.expense.budgetInvalid');
       },
     },
   });
@@ -70,15 +74,15 @@ export default function ExpenseCategoryTable() {
       setIsModalOpen(false);
       fetchCategories();
       notifications.show({
-        title: 'Success',
-        message: 'Expense category created successfully',
+        title: t('tables.common.successTitle'),
+        message: t('categories.expense.created'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error creating expense category:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to create expense category',
+        title: t('tables.common.errorTitle'),
+        message: t('categories.expense.createFailed'),
         color: 'red',
       });
     }
@@ -91,15 +95,17 @@ export default function ExpenseCategoryTable() {
         setIsDeleteModalOpen(false);
         fetchCategories();
         notifications.show({
-          title: 'Success',
-          message: 'Expense category deleted successfully',
+          title: t('tables.common.successTitle'),
+          message: t('categories.expense.deleted'),
           color: 'green',
         });
       } catch (error: any) {
         console.error('Error deleting expense category:', error);
         notifications.show({
-          title: 'Error',
-          message: 'Failed to delete expense category: ' + error.response.data,
+          title: t('tables.common.errorTitle'),
+          message: t('categories.expense.deleteFailed', {
+            error: error.response.data,
+          }),
           color: 'red',
         });
       }
@@ -125,7 +131,7 @@ export default function ExpenseCategoryTable() {
             return setIsModalOpen(true);
           }}
         >
-          Add Expense Category
+          {t('categories.expense.addButton')}
         </Button>
       </Group>
 
@@ -135,19 +141,24 @@ export default function ExpenseCategoryTable() {
         withColumnBorders
         records={categories}
         columns={[
-          { accessor: 'name', title: 'Name', noWrap: true },
-          { accessor: 'description', title: 'Description' },
-          { accessor: 'budget', title: 'Budget' },
+          {
+            accessor: 'name',
+            title: t('categories.common.name'),
+            noWrap: true,
+          },
+          {
+            accessor: 'description',
+            title: t('tables.common.description'),
+          },
+          { accessor: 'budget', title: t('categories.expense.budget') },
           {
             accessor: 'actions',
-            title: 'Actions',
+            title: t('tables.common.actions'),
             textAlign: 'right',
             render: (category) => {
               return (
                 <Group gap={4} justify="right" wrap="nowrap">
-                  <Tooltip
-                    label={'Migrate all expenses to a different category'}
-                  >
+                  <Tooltip label={t('categories.expense.migrateTooltip')}>
                     <ActionIcon
                       size="sm"
                       variant="subtle"
@@ -163,7 +174,7 @@ export default function ExpenseCategoryTable() {
                       <IconReplace size={16} />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label={'Delete category'}>
+                  <Tooltip label={t('categories.common.deleteTooltip')}>
                     <ActionIcon
                       size="sm"
                       variant="subtle"
@@ -190,32 +201,32 @@ export default function ExpenseCategoryTable() {
           setIsModalOpen(false);
           form.reset();
         }}
-        title="Add Expense Category"
+        title={t('categories.expense.modalTitle')}
       >
         <form onSubmit={form.onSubmit(handleCreateCategory)}>
           <TextInput
-            label="Name"
-            placeholder="Category name"
+            label={t('categories.common.name')}
+            placeholder={t('categories.common.namePlaceholder')}
             required
             {...form.getInputProps('name')}
             mb="md"
           />
           <Textarea
-            label="Description"
-            placeholder="Category description"
+            label={t('tables.common.description')}
+            placeholder={t('categories.common.descriptionPlaceholder')}
             {...form.getInputProps('description')}
             mb="md"
           />
           <NumberInput
-            label="Budget"
-            placeholder="Budget amount"
+            label={t('categories.expense.budget')}
+            placeholder={t('categories.expense.budgetPlaceholder')}
             required
             min={0}
             {...form.getInputProps('budget')}
             mb="md"
           />
           <Group justify="flex-end">
-            <Button type="submit">Create</Button>
+            <Button type="submit">{t('categories.common.create')}</Button>
           </Group>
         </form>
       </Modal>
@@ -226,13 +237,10 @@ export default function ExpenseCategoryTable() {
         onClose={() => {
           return setIsDeleteModalOpen(false);
         }}
-        title="Confirm Deletion"
+        title={t('tables.common.confirmDeletion')}
       >
-        <p>Are you sure you want to delete this expense category?</p>
-        <p>
-          If there are expenses with this category the category will NOT be
-          deleted.
-        </p>
+        <p>{t('categories.expense.deleteConfirm')}</p>
+        <p>{t('categories.expense.deleteWarning')}</p>
         <Group justify="flex-end">
           <Button
             variant="outline"
@@ -240,17 +248,19 @@ export default function ExpenseCategoryTable() {
               return setIsDeleteModalOpen(false);
             }}
           >
-            Cancel
+            {t('tables.common.cancel')}
           </Button>
           <Button color="red" onClick={handleDeleteCategory}>
-            Delete
+            {t('tables.common.delete')}
           </Button>
         </Group>
       </Modal>
 
       {/* Migrate category modal*/}
       <MigrateCategoryModal
-        title={`Migrate expenses from "${selectedCategoryName}" to`}
+        title={t('categories.migrate.expenseTitle', {
+          name: selectedCategoryName,
+        })}
         opened={isMigrateModalOpen}
         setIsModalOpen={setIsMigrateModalOpen}
         originCategoryId={selectedCategoryId ?? -1}

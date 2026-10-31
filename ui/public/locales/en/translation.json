@@ -298,5 +298,102 @@
       "updated": "Budget updated successfully",
       "updateFailed": "Failed to update budget"
     }
+  },
+  "profile": {
+    "title": "Profile",
+    "changePicture": "Change profile picture",
+    "fields": {
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Your last name",
+      "currency": "Currency"
+    },
+    "buttons": {
+      "save": "Save Changes"
+    },
+    "tooltips": {
+      "cannotUpdate": "Cannot update profile, cannot read user information: E-101"
+    },
+    "sections": {
+      "expenseCategories": "Expense Categories",
+      "incomeCategories": "Income Categories",
+      "tags": "Tags"
+    },
+    "notifications": {
+      "updated": "User data updated successfully",
+      "missingUsername": "Failed to update user data - E-201",
+      "updateFailed": "Failed to update user data",
+      "fetchUserFailed": "Failed to fetch user data. E-101"
+    }
+  },
+  "categories": {
+    "common": {
+      "name": "Name",
+      "namePlaceholder": "Category name",
+      "descriptionPlaceholder": "Category description",
+      "nameRequired": "Name is required",
+      "create": "Create",
+      "deleteTooltip": "Delete category"
+    },
+    "expense": {
+      "addButton": "Add Expense Category",
+      "modalTitle": "Add Expense Category",
+      "budget": "Budget",
+      "budgetPlaceholder": "Budget amount",
+      "budgetInvalid": "Budget must be a positive number",
+      "migrateTooltip": "Migrate all expenses to a different category",
+      "deleteConfirm": "Are you sure you want to delete this expense category?",
+      "deleteWarning": "If there are expenses with this category the category will NOT be deleted.",
+      "created": "Expense category created successfully",
+      "createFailed": "Failed to create expense category",
+      "deleted": "Expense category deleted successfully",
+      "deleteFailed": "Failed to delete expense category: {{error}}"
+    },
+    "income": {
+      "addButton": "Add Income Category",
+      "modalTitle": "Add Income Category",
+      "migrateTooltip": "Migrate all incomes to a different category",
+      "deleteConfirm": "Are you sure you want to delete this income category?",
+      "deleteWarning": "If there are incomes with this category the category will NOT be deleted.",
+      "created": "Income category created successfully",
+      "createFailed": "Failed to create income category",
+      "deleted": "Income category deleted successfully",
+      "deleteFailed": "Failed to delete income category: {{error}}"
+    },
+    "migrate": {
+      "expenseTitle": "Migrate expenses from \"{{name}}\" to",
+      "incomeTitle": "Migrate incomes from \"{{name}}\" to",
+      "titleWithTarget": "{{title}} \"{{target}}\"",
+      "titleWithoutTarget": "{{title}} ...",
+      "selectLabel": "Select target category",
+      "selectPlaceholder": "Target category",
+      "categoryRequired": "Category is required",
+      "warning": "Every item will be migrated to \"{{name}}\" category!",
+      "migrate": "Migrate",
+      "success": "Items migrated to: \"{{name}}\"",
+      "failed": "Failed to migrate category"
+    }
+  },
+  "tags": {
+    "addButton": "Add Tag",
+    "addModalTitle": "Add Tag",
+    "updateModalTitle": "Update Tag",
+    "name": "Name",
+    "namePlaceholder": "Tag name",
+    "descriptionPlaceholder": "Tag description",
+    "nameRequired": "Name is required",
+    "color": "Color",
+    "tagColor": "Tag Color",
+    "create": "Create",
+    "update": "Update",
+    "deleteConfirm": "Are you sure you want to delete this tag?",
+    "deleteWarning": "If there are expenses/incomes with this tag the tag will NOT be deleted.",
+    "created": "Tag created successfully",
+    "createFailed": "Failed to create tag: {{error}}",
+    "updated": "Tag updated successfully",
+    "updateFailed": "Failed to update tag: {{error}}",
+    "deleted": "Tag deleted successfully",
+    "deleteFailed": "Failed to delete Tag: {{error}}"
   }
 }
