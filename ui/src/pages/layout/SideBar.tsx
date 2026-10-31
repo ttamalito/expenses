@@ -98,7 +98,7 @@ export default function SideBar({ onLogout }: SideBarProps) {
       >
         <IconCash size={20} color={theme.colors.teal[6]} />
         <Text fw={500} size="sm" c={theme.other.textColor}>
-          Expenses
+          {t('sideBar.title')}
         </Text>
       </Group>
 
@@ -160,8 +160,8 @@ export default function SideBar({ onLogout }: SideBarProps) {
             }}
             title={
               colorScheme === 'dark'
-                ? 'Switch to light mode'
-                : 'Switch to dark mode'
+                ? t('sideBar.lightMode')
+                : t('sideBar.darkMode')
             }
           >
             {colorScheme === 'dark' ? (
@@ -174,7 +174,7 @@ export default function SideBar({ onLogout }: SideBarProps) {
             variant="subtle"
             color="gray"
             onClick={handleLogout}
-            title="Logout"
+            title={t('sideBar.logout')}
           >
             <IconLogout size={16} />
           </ActionIcon>

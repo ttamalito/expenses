@@ -9,7 +9,11 @@
     "dashboard": "Dashboard",
     "statistics": "Statistics",
     "budget": "Budget",
-    "profile": "Profile"
+    "profile": "Profile",
+    "title": "Expenses Manager",
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode",
+    "logout": "Logout"
   },
   "home": {
     "title": "Dashboard",

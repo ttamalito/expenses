@@ -9,7 +9,11 @@
     "dashboard": "Panel",
     "statistics": "Estadísticas",
     "budget": "Presupuesto",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "title": "Gestor de Gastos",
+    "lightMode": "Activar el modo claro",
+    "darkMode": "Activar el modo oscuro",
+    "logout": "Cerrar Sesión"
   },
   "home": {
     "title": "Panel de control",
