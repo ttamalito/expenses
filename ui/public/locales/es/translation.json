@@ -13,7 +13,8 @@
     "title": "Gestor de Gastos",
     "lightMode": "Activar el modo claro",
     "darkMode": "Activar el modo oscuro",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "copyRight": "© {{currentYear}} Gestor de Gastos. Todos los derechos reservados."
   },
   "home": {
     "title": "Panel de control",

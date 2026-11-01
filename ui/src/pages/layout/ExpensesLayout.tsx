@@ -8,9 +8,11 @@ import useErrorHandling from '@hooks/useErrorHandling.tsx';
 import SideBar from './SideBar';
 import { notifications } from '@mantine/notifications';
 import { useGetTagsForUser } from '@requests/tagRequests.ts';
+import { useTranslation } from 'react-i18next';
 
 export default function ExpensesLayout() {
   const theme = useMantineTheme();
+  const { t } = useTranslation();
   const [getTagsForUser] = useGetTagsForUser();
   const { setUserData, setUserTags } = useUserDataContext();
   const [getUser] = useGetUserData();
@@ -101,8 +103,12 @@ export default function ExpensesLayout() {
             </Box>
           </Flex>
         </Box>
-        <Group id={'footer'}>
-          <Text>© {currentYear} Expenses Manager. All rights reserved.</Text>
+        <Group id={'footer'} w={'250px'}>
+          <Text>
+            {t('sideBar.copyRight', {
+              currentYear: currentYear,
+            })}
+          </Text>
         </Group>
       </Box>
     </Box>
