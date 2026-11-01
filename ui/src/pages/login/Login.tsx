@@ -20,6 +20,7 @@ import { useForm } from '@mantine/form';
 import { IUserLoginRequest } from '@clients';
 import { useDisclosure } from '@mantine/hooks';
 import { routes } from '@routes';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Login page to be used in home/login
@@ -29,6 +30,7 @@ import { routes } from '@routes';
 function Login() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { onLogin } = useAuth();
   const [visible, { open, close }] = useDisclosure(false);
   const formHook = useForm<IUserLoginRequest>({
@@ -60,10 +62,10 @@ function Login() {
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
-        Login
+        {t('login.title')}
       </Title>
       <Text c="dimmed" size="sm" ta="center" mt={5}>
-        Don't have an account yet?{' '}
+        {t('login.noAccount')}{' '}
         <Anchor
           onClick={() => {
             navigate(routes.register.index);
@@ -71,7 +73,7 @@ function Login() {
           size="sm"
           component="button"
         >
-          Register
+          {t('login.register')}
         </Anchor>
       </Text>
       <Text c="dimmed" size="sm" ta="center" mt={5}>
@@ -82,7 +84,7 @@ function Login() {
           size="sm"
           component="button"
         >
-          Go back home
+          {t('login.goHome')}
         </Anchor>
       </Text>
 
@@ -116,15 +118,15 @@ function Login() {
           })}
         >
           <TextInput
-            label="Username or Email"
-            placeholder="Enter your username or email"
+            label={t('login.usernameOrEmail')}
+            placeholder={t('login.usernameOrEmailPlaceholder')}
             required
             key={formHook.key('email')}
             {...formHook.getInputProps('email')}
           />
           <PasswordInput
-            label="Password"
-            placeholder="Enter your password"
+            label={t('login.password')}
+            placeholder={t('login.passwordPlaceholder')}
             required
             mt="md"
             key={formHook.key('password')}
@@ -132,7 +134,7 @@ function Login() {
           />
           <Group justify="space-between" mt="lg">
             <Checkbox
-              label="Remember me"
+              label={t('login.rememberMe')}
               key={formHook.key('rememberMe')}
               {...formHook.getInputProps('rememberMe', { type: 'checkbox' })}
             />
@@ -144,7 +146,7 @@ function Login() {
                 //navigate(routes.home.forgotPassword);
               }}
             >
-              Forgot password?
+              {t('login.forgotPassword')}
             </Anchor>
           </Group>
           <Button
@@ -153,7 +155,7 @@ function Login() {
             type={'submit'}
             leftSection={<IconArrowRight />}
           >
-            Login
+            {t('login.submit')}
           </Button>
         </form>
       </Paper>

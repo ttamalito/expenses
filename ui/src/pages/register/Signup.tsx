@@ -20,6 +20,7 @@ import { ICreateUserDto, IUserLoginRequest } from '@clients';
 import { useDisclosure } from '@mantine/hooks';
 import { routes } from '@routes';
 import { usePostSignup } from '../../hooks/requests/authRequests.ts';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Signup page to be used in register
@@ -29,6 +30,7 @@ import { usePostSignup } from '../../hooks/requests/authRequests.ts';
 function Signup() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { onLogin } = useAuth();
   const [visible, { open, close }] = useDisclosure(false);
   const [signupRequest] = usePostSignup();
@@ -39,31 +41,35 @@ function Signup() {
     validate: {
       username: (value) => {
         if (!value) {
-          return 'Username is required';
+          return t('signup.validation.usernameRequired');
         }
         return value.trim().length < 3
-          ? 'Username must be at least 3 characters'
+          ? t('signup.validation.usernameLength')
           : null;
       },
       email: (value) => {
         if (!value) {
-          return 'Email is required';
+          return t('signup.validation.emailRequired');
         }
-        return /^\S+@\S+$/.test(value) ? null : 'Invalid email';
+        return /^\S+@\S+$/.test(value)
+          ? null
+          : t('signup.validation.emailInvalid');
       },
       password: (value) => {
         if (!value) {
-          return 'Password is required';
+          return t('signup.validation.passwordRequired');
         }
         return value.trim().length < 6
-          ? 'Password must be at least 6 characters'
+          ? t('signup.validation.passwordLength')
           : null;
       },
       confirmPassword: (value, values) => {
         if (!value) {
-          return 'Please confirm your password';
+          return t('signup.validation.confirmRequired');
         }
-        return value !== values.password ? 'Passwords do not match' : null;
+        return value !== values.password
+          ? t('signup.validation.passwordsMismatch')
+          : null;
       },
     },
   });
@@ -117,10 +123,10 @@ function Signup() {
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
-        Create an Account
+        {t('signup.title')}
       </Title>
       <Text c="dimmed" size="sm" ta="center" mt={5}>
-        Already have an account?{' '}
+        {t('signup.haveAccount')}{' '}
         <Anchor
           onClick={() => {
             navigate(routes.login.index);
@@ -128,7 +134,7 @@ function Signup() {
           size="sm"
           component="button"
         >
-          Login instead
+          {t('signup.loginInstead')}
         </Anchor>
       </Text>
       <Text c="dimmed" size="sm" ta="center" mt={5}>
@@ -139,7 +145,7 @@ function Signup() {
           size="sm"
           component="button"
         >
-          Go back home
+          {t('signup.goHome')}
         </Anchor>
       </Text>
 
@@ -152,31 +158,31 @@ function Signup() {
         />
         <form onSubmit={formHook.onSubmit(handleSignup)}>
           <TextInput
-            label="Username"
-            placeholder="Your username"
+            label={t('signup.username')}
+            placeholder={t('signup.usernamePlaceholder')}
             required
             key={formHook.key('username')}
             {...formHook.getInputProps('username')}
           />
           <TextInput
-            label="Email"
-            placeholder="your@email.com"
+            label={t('signup.email')}
+            placeholder={t('signup.emailPlaceholder')}
             required
             mt="md"
             key={formHook.key('email')}
             {...formHook.getInputProps('email')}
           />
           <PasswordInput
-            label="Password"
-            placeholder="Your password"
+            label={t('signup.password')}
+            placeholder={t('signup.passwordPlaceholder')}
             required
             mt="md"
             key={formHook.key('password')}
             {...formHook.getInputProps('password')}
           />
           <PasswordInput
-            label="Confirm Password"
-            placeholder="Confirm your password"
+            label={t('signup.confirmPassword')}
+            placeholder={t('signup.confirmPasswordPlaceholder')}
             required
             mt="md"
             key={formHook.key('confirmPassword')}
@@ -190,7 +196,7 @@ function Signup() {
               }}
               variant="subtle"
             >
-              Already have an account
+              {t('signup.alreadyHaveAccount')}
             </Button>
           </Group>
 
@@ -200,7 +206,7 @@ function Signup() {
             type="submit"
             leftSection={<IconArrowRight />}
           >
-            Sign Up
+            {t('signup.submit')}
           </Button>
         </form>
       </Paper>
