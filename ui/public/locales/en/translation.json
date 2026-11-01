@@ -3,7 +3,33 @@
     "documentation": "Documentation",
     "login": "Login",
     "signUp": "Sign Up",
-    "createAccount": "Create Account"
+    "createAccount": "Create Account",
+    "title": "Manage Your Finances with Ease",
+    "subtitle": "Track expenses, monitor income, and take control of your financial future",
+    "getStarted": "Get Started",
+    "features": {
+      "trackExpenses": {
+        "title": "Track Expenses",
+        "description": "Easily record and categorize your daily expenses to understand where your money goes."
+      },
+      "monitorIncome": {
+        "title": "Monitor Income",
+        "description": "Keep track of all your income sources and see your earnings over time."
+      },
+      "visualizeData": {
+        "title": "Visualize Data",
+        "description": "View detailed charts and statistics to gain insights into your financial habits."
+      },
+      "personalizedBudget": {
+        "title": "Personalized Budget",
+        "description": "Create custom budgets tailored to your financial goals and lifestyle."
+      }
+    },
+    "cta": {
+      "title": "Ready to take control of your finances?",
+      "subtitle": "Join thousands of users who have improved their financial well-being with our platform.",
+      "viewDocumentation": "View Documentation"
+    }
   },
   "sideBar": {
     "dashboard": "Dashboard",
@@ -13,7 +39,8 @@
     "title": "Expenses Manager",
     "lightMode": "Switch to light mode",
     "darkMode": "Switch to dark mode",
-    "logout": "Logout"
+    "logout": "Logout",
+    "copyRight": "© {{currentYear}} Expenses Manager. All rights reserved."
   },
   "home": {
     "title": "Dashboard",
@@ -72,6 +99,183 @@
         "overspent": "Overspent"
       }
     }
+  },
+  "documentation": {
+    "backToHome": "Back to Home",
+    "title": "Expenses App User Guide",
+    "subtitle": "Learn how to use all features of the Expenses application to manage your finances effectively",
+    "intro": "Welcome to the Expenses application! This guide will help you understand how to use all the features available in the application. Whether you're tracking expenses, monitoring income, analyzing your spending patterns, or setting up budgets, this guide has you covered.",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "intro": "Before you can start using the application, you need to create an account and log in:",
+      "steps": [
+        "Click the \"Sign Up\" button on the home page.",
+        "Fill in your details in the registration form and submit.",
+        "Once registered, log in with your credentials.",
+        "After logging in, you'll be taken to the dashboard where you can start using the application."
+      ]
+    },
+    "mainFeatures": "Main Features",
+    "features": {
+      "expenses": {
+        "title": "Tracking Expenses",
+        "description": "Record and categorize your daily expenses to understand where your money goes.",
+        "addTitle": "How to Add an Expense:",
+        "addSteps": [
+          "Navigate to the Home page",
+          "Click the \"Add Expense\" button",
+          "Fill in the expense details (amount, date, category, description)",
+          "Click \"Save\" to record the expense"
+        ],
+        "manageTitle": "Managing Expense Categories:",
+        "manageSteps": [
+          "Go to the Profile page",
+          "Scroll to the \"Expense Categories\" section",
+          "Add new categories or edit existing ones",
+          "Categories help you organize and analyze your spending"
+        ]
+      },
+      "income": {
+        "title": "Monitoring Income",
+        "description": "Keep track of all your income sources and see your earnings over time.",
+        "addTitle": "How to Add Income:",
+        "addSteps": [
+          "Navigate to the Home page",
+          "Click the \"Add Income\" button",
+          "Fill in the income details (amount, date, category, description)",
+          "Click \"Save\" to record the income"
+        ],
+        "manageTitle": "Managing Income Categories:",
+        "manageSteps": [
+          "Go to the Profile page",
+          "Scroll to the \"Income Categories\" section",
+          "Add new categories or edit existing ones",
+          "Categories help you track different income sources"
+        ]
+      },
+      "statistics": {
+        "title": "Visualizing Data",
+        "description": "View detailed charts and statistics to gain insights into your financial habits.",
+        "viewTitle": "Viewing Statistics:",
+        "viewSteps": [
+          "Navigate to the Statistics page",
+          "View summary charts showing your income vs. expenses",
+          "See breakdowns of expenses by category",
+          "Track your spending trends over time"
+        ],
+        "viewsTitle": "Monthly and Yearly Views:",
+        "viewsSteps": [
+          "Click on \"Monthly View\" to see data for specific months",
+          "Click on \"Yearly View\" to see annual summaries",
+          "Use the date selectors to navigate between different time periods"
+        ]
+      },
+      "budget": {
+        "title": "Budget Management",
+        "description": "Create custom budgets tailored to your financial goals and lifestyle.",
+        "setupTitle": "Setting Up a Budget:",
+        "setupSteps": [
+          "Navigate to the Budget page",
+          "Click \"Create Budget\" to set up a new budget",
+          "Set budget amounts for different expense categories",
+          "Specify the time period for your budget (monthly, quarterly, etc.)"
+        ],
+        "monitorTitle": "Monitoring Budget Performance:",
+        "monitorSteps": [
+          "View your budget progress on the Budget page",
+          "See visual indicators of how your spending compares to your budget",
+          "Get alerts when you're approaching or exceeding budget limits"
+        ]
+      },
+      "profile": {
+        "title": "Profile Management",
+        "description": "Manage your account settings and customize your experience.",
+        "updateTitle": "Updating Profile Information:",
+        "updateSteps": [
+          "Navigate to the Profile page",
+          "Edit your personal information",
+          "Change your password if needed"
+        ],
+        "manageTitle": "Managing Categories:",
+        "manageSteps": [
+          "Create, edit, or delete expense and income categories",
+          "Customize categories to match your financial needs"
+        ]
+      }
+    },
+    "tips": {
+      "title": "Tips and Best Practices",
+      "regularUpdates": {
+        "title": "Regular Updates:",
+        "text": "Enter your expenses and income regularly to maintain accurate records."
+      },
+      "detailedDescriptions": {
+        "title": "Detailed Descriptions:",
+        "text": "Add detailed descriptions to your transactions to help you remember what they were for."
+      },
+      "useCategories": {
+        "title": "Use Categories Effectively:",
+        "text": "Create specific categories that match your spending habits for better analysis."
+      },
+      "reviewStatistics": {
+        "title": "Review Statistics Regularly:",
+        "text": "Check your statistics monthly to identify spending patterns and areas for improvement."
+      },
+      "realisticBudgets": {
+        "title": "Realistic Budgets:",
+        "text": "Set realistic budget goals based on your actual income and necessary expenses."
+      }
+    },
+    "cta": {
+      "title": "Ready to start managing your finances?",
+      "subtitle": "Now that you understand how to use the application, it's time to take control of your financial future."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "noAccount": "Don't have an account yet?",
+    "register": "Register",
+    "goHome": "Go back home",
+    "usernameOrEmail": "Username or Email",
+    "usernameOrEmailPlaceholder": "Enter your username or email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "submit": "Login"
+  },
+  "signup": {
+    "title": "Create an Account",
+    "haveAccount": "Already have an account?",
+    "loginInstead": "Login instead",
+    "goHome": "Go back home",
+    "username": "Username",
+    "usernamePlaceholder": "Your username",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "Your password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "alreadyHaveAccount": "Already have an account",
+    "submit": "Sign Up",
+    "validation": {
+      "usernameRequired": "Username is required",
+      "usernameLength": "Username must be at least 3 characters",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email",
+      "passwordRequired": "Password is required",
+      "passwordLength": "Password must be at least 6 characters",
+      "confirmRequired": "Please confirm your password",
+      "passwordsMismatch": "Passwords do not match"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "errorCode": "Error code: 404",
+    "description": "The page you are looking for doesn't exist or has been moved.",
+    "goBack": "Go Back",
+    "goHome": "Go to Home"
   },
   "statistics": {
     "title": "Statistics",

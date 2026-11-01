@@ -20,6 +20,7 @@ import {
 import classes from './Documentation.module.css';
 import { useNavigate } from 'react-router';
 import { routes } from '@routes';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Documentation page for the Expenses application
@@ -27,6 +28,26 @@ import { routes } from '@routes';
  */
 function Documentation() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  /**
+   * Renders a translated array (stored as a JSON array in the translation file)
+   * as a Mantine List
+   */
+  const renderList = (key: string) => {
+    const items = t(key, { returnObjects: true }) as unknown as string[];
+    return (
+      <List withPadding>
+        {items.map((item, index) => {
+          return <List.Item key={index}>{item}</List.Item>;
+        })}
+      </List>
+    );
+  };
+
+  const gettingStartedSteps = t('documentation.gettingStarted.steps', {
+    returnObjects: true,
+  }) as unknown as string[];
 
   return (
     <Container size="xl">
@@ -40,319 +61,207 @@ function Documentation() {
             return navigate(routes.home.index);
           }}
         >
-          Back to Home
+          {t('documentation.backToHome')}
         </Button>
       </Group>
 
       {/* Hero section */}
       <div>
-        <Title className={classes.title}>Expenses App User Guide</Title>
+        <Title className={classes.title}>{t('documentation.title')}</Title>
         <Text className={classes.subtitle} c="dimmed">
-          Learn how to use all features of the Expenses application to manage
-          your finances effectively
+          {t('documentation.subtitle')}
         </Text>
       </div>
 
       {/* Introduction */}
       <Paper shadow="md" p="xl" radius="md" withBorder mt={30}>
-        <Text>
-          Welcome to the Expenses application! This guide will help you
-          understand how to use all the features available in the application.
-          Whether you're tracking expenses, monitoring income, analyzing your
-          spending patterns, or setting up budgets, this guide has you covered.
-        </Text>
+        <Text>{t('documentation.intro')}</Text>
       </Paper>
 
       {/* Getting Started */}
       <Title order={2} className={classes.sectionTitle}>
-        Getting Started
+        {t('documentation.gettingStarted.title')}
       </Title>
       <Paper shadow="md" p="xl" radius="md" withBorder>
-        <Text mb="md">
-          Before you can start using the application, you need to create an
-          account and log in:
-        </Text>
+        <Text mb="md">{t('documentation.gettingStarted.intro')}</Text>
 
-        <div className={classes.instructionStep}>
-          <Text>
-            <span className={classes.stepNumber}>1.</span> Click the "Sign Up"
-            button on the home page.
-          </Text>
-        </div>
-
-        <div className={classes.instructionStep}>
-          <Text>
-            <span className={classes.stepNumber}>2.</span> Fill in your details
-            in the registration form and submit.
-          </Text>
-        </div>
-
-        <div className={classes.instructionStep}>
-          <Text>
-            <span className={classes.stepNumber}>3.</span> Once registered, log
-            in with your credentials.
-          </Text>
-        </div>
-
-        <div className={classes.instructionStep}>
-          <Text>
-            <span className={classes.stepNumber}>4.</span> After logging in,
-            you'll be taken to the dashboard where you can start using the
-            application.
-          </Text>
-        </div>
+        {gettingStartedSteps.map((step, index) => {
+          return (
+            <div key={index} className={classes.instructionStep}>
+              <Text>
+                <span className={classes.stepNumber}>{index + 1}.</span> {step}
+              </Text>
+            </div>
+          );
+        })}
       </Paper>
 
       {/* Main Features */}
       <Title order={2} className={classes.sectionTitle}>
-        Main Features
+        {t('documentation.mainFeatures')}
       </Title>
 
       <Accordion>
         {/* Tracking Expenses */}
         <Accordion.Item value="expenses">
           <Accordion.Control icon={<IconCoin size={20} />}>
-            <Text className={classes.featureTitle}>Tracking Expenses</Text>
+            <Text className={classes.featureTitle}>
+              {t('documentation.features.expenses.title')}
+            </Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Text className={classes.featureDescription}>
-              Record and categorize your daily expenses to understand where your
-              money goes.
+              {t('documentation.features.expenses.description')}
             </Text>
 
             <Title order={4} mt="md">
-              How to Add an Expense:
+              {t('documentation.features.expenses.addTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Navigate to the Home page</List.Item>
-              <List.Item>Click the "Add Expense" button</List.Item>
-              <List.Item>
-                Fill in the expense details (amount, date, category,
-                description)
-              </List.Item>
-              <List.Item>Click "Save" to record the expense</List.Item>
-            </List>
+            {renderList('documentation.features.expenses.addSteps')}
 
             <Title order={4} mt="md">
-              Managing Expense Categories:
+              {t('documentation.features.expenses.manageTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Go to the Profile page</List.Item>
-              <List.Item>Scroll to the "Expense Categories" section</List.Item>
-              <List.Item>Add new categories or edit existing ones</List.Item>
-              <List.Item>
-                Categories help you organize and analyze your spending
-              </List.Item>
-            </List>
+            {renderList('documentation.features.expenses.manageSteps')}
           </Accordion.Panel>
         </Accordion.Item>
 
         {/* Monitoring Income */}
         <Accordion.Item value="income">
           <Accordion.Control icon={<IconReportMoney size={20} />}>
-            <Text className={classes.featureTitle}>Monitoring Income</Text>
+            <Text className={classes.featureTitle}>
+              {t('documentation.features.income.title')}
+            </Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Text className={classes.featureDescription}>
-              Keep track of all your income sources and see your earnings over
-              time.
+              {t('documentation.features.income.description')}
             </Text>
 
             <Title order={4} mt="md">
-              How to Add Income:
+              {t('documentation.features.income.addTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Navigate to the Home page</List.Item>
-              <List.Item>Click the "Add Income" button</List.Item>
-              <List.Item>
-                Fill in the income details (amount, date, category, description)
-              </List.Item>
-              <List.Item>Click "Save" to record the income</List.Item>
-            </List>
+            {renderList('documentation.features.income.addSteps')}
 
             <Title order={4} mt="md">
-              Managing Income Categories:
+              {t('documentation.features.income.manageTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Go to the Profile page</List.Item>
-              <List.Item>Scroll to the "Income Categories" section</List.Item>
-              <List.Item>Add new categories or edit existing ones</List.Item>
-              <List.Item>
-                Categories help you track different income sources
-              </List.Item>
-            </List>
+            {renderList('documentation.features.income.manageSteps')}
           </Accordion.Panel>
         </Accordion.Item>
 
         {/* Visualizing Data */}
         <Accordion.Item value="statistics">
           <Accordion.Control icon={<IconChartPie size={20} />}>
-            <Text className={classes.featureTitle}>Visualizing Data</Text>
+            <Text className={classes.featureTitle}>
+              {t('documentation.features.statistics.title')}
+            </Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Text className={classes.featureDescription}>
-              View detailed charts and statistics to gain insights into your
-              financial habits.
+              {t('documentation.features.statistics.description')}
             </Text>
 
             <Title order={4} mt="md">
-              Viewing Statistics:
+              {t('documentation.features.statistics.viewTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Navigate to the Statistics page</List.Item>
-              <List.Item>
-                View summary charts showing your income vs. expenses
-              </List.Item>
-              <List.Item>See breakdowns of expenses by category</List.Item>
-              <List.Item>Track your spending trends over time</List.Item>
-            </List>
+            {renderList('documentation.features.statistics.viewSteps')}
 
             <Title order={4} mt="md">
-              Monthly and Yearly Views:
+              {t('documentation.features.statistics.viewsTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>
-                Click on "Monthly View" to see data for specific months
-              </List.Item>
-              <List.Item>
-                Click on "Yearly View" to see annual summaries
-              </List.Item>
-              <List.Item>
-                Use the date selectors to navigate between different time
-                periods
-              </List.Item>
-            </List>
+            {renderList('documentation.features.statistics.viewsSteps')}
           </Accordion.Panel>
         </Accordion.Item>
 
         {/* Budget Management */}
         <Accordion.Item value="budget">
           <Accordion.Control icon={<IconUser size={20} />}>
-            <Text className={classes.featureTitle}>Budget Management</Text>
+            <Text className={classes.featureTitle}>
+              {t('documentation.features.budget.title')}
+            </Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Text className={classes.featureDescription}>
-              Create custom budgets tailored to your financial goals and
-              lifestyle.
+              {t('documentation.features.budget.description')}
             </Text>
 
             <Title order={4} mt="md">
-              Setting Up a Budget:
+              {t('documentation.features.budget.setupTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Navigate to the Budget page</List.Item>
-              <List.Item>
-                Click "Create Budget" to set up a new budget
-              </List.Item>
-              <List.Item>
-                Set budget amounts for different expense categories
-              </List.Item>
-              <List.Item>
-                Specify the time period for your budget (monthly, quarterly,
-                etc.)
-              </List.Item>
-            </List>
+            {renderList('documentation.features.budget.setupSteps')}
 
             <Title order={4} mt="md">
-              Monitoring Budget Performance:
+              {t('documentation.features.budget.monitorTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>
-                View your budget progress on the Budget page
-              </List.Item>
-              <List.Item>
-                See visual indicators of how your spending compares to your
-                budget
-              </List.Item>
-              <List.Item>
-                Get alerts when you're approaching or exceeding budget limits
-              </List.Item>
-            </List>
+            {renderList('documentation.features.budget.monitorSteps')}
           </Accordion.Panel>
         </Accordion.Item>
 
         {/* Profile Management */}
         <Accordion.Item value="profile">
           <Accordion.Control icon={<IconSettings size={20} />}>
-            <Text className={classes.featureTitle}>Profile Management</Text>
+            <Text className={classes.featureTitle}>
+              {t('documentation.features.profile.title')}
+            </Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Text className={classes.featureDescription}>
-              Manage your account settings and customize your experience.
+              {t('documentation.features.profile.description')}
             </Text>
 
             <Title order={4} mt="md">
-              Updating Profile Information:
+              {t('documentation.features.profile.updateTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>Navigate to the Profile page</List.Item>
-              <List.Item>Edit your personal information</List.Item>
-              <List.Item>Change your password if needed</List.Item>
-            </List>
+            {renderList('documentation.features.profile.updateSteps')}
 
             <Title order={4} mt="md">
-              Managing Categories:
+              {t('documentation.features.profile.manageTitle')}
             </Title>
-            <List withPadding>
-              <List.Item>
-                Create, edit, or delete expense and income categories
-              </List.Item>
-              <List.Item>
-                Customize categories to match your financial needs
-              </List.Item>
-            </List>
+            {renderList('documentation.features.profile.manageSteps')}
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>
 
       {/* Tips and Best Practices */}
       <Title order={2} className={classes.sectionTitle}>
-        Tips and Best Practices
+        {t('documentation.tips.title')}
       </Title>
       <Paper shadow="md" p="xl" radius="md" withBorder>
         <List>
           <List.Item>
-            <Text fw={500}>Regular Updates:</Text>
-            <Text>
-              Enter your expenses and income regularly to maintain accurate
-              records.
-            </Text>
+            <Text fw={500}>{t('documentation.tips.regularUpdates.title')}</Text>
+            <Text>{t('documentation.tips.regularUpdates.text')}</Text>
           </List.Item>
           <Divider my="sm" />
 
           <List.Item>
-            <Text fw={500}>Detailed Descriptions:</Text>
-            <Text>
-              Add detailed descriptions to your transactions to help you
-              remember what they were for.
+            <Text fw={500}>
+              {t('documentation.tips.detailedDescriptions.title')}
             </Text>
+            <Text>{t('documentation.tips.detailedDescriptions.text')}</Text>
           </List.Item>
           <Divider my="sm" />
 
           <List.Item>
-            <Text fw={500}>Use Categories Effectively:</Text>
-            <Text>
-              Create specific categories that match your spending habits for
-              better analysis.
-            </Text>
+            <Text fw={500}>{t('documentation.tips.useCategories.title')}</Text>
+            <Text>{t('documentation.tips.useCategories.text')}</Text>
           </List.Item>
           <Divider my="sm" />
 
           <List.Item>
-            <Text fw={500}>Review Statistics Regularly:</Text>
-            <Text>
-              Check your statistics monthly to identify spending patterns and
-              areas for improvement.
+            <Text fw={500}>
+              {t('documentation.tips.reviewStatistics.title')}
             </Text>
+            <Text>{t('documentation.tips.reviewStatistics.text')}</Text>
           </List.Item>
           <Divider my="sm" />
 
           <List.Item>
-            <Text fw={500}>Realistic Budgets:</Text>
-            <Text>
-              Set realistic budget goals based on your actual income and
-              necessary expenses.
+            <Text fw={500}>
+              {t('documentation.tips.realisticBudgets.title')}
             </Text>
+            <Text>{t('documentation.tips.realisticBudgets.text')}</Text>
           </List.Item>
         </List>
       </Paper>
@@ -360,11 +269,10 @@ function Documentation() {
       {/* Call to action */}
       <Paper shadow="md" p="xl" radius="md" withBorder mt={50} ta="center">
         <Title order={2} mb="md">
-          Ready to start managing your finances?
+          {t('documentation.cta.title')}
         </Title>
         <Text size="lg" mb="xl">
-          Now that you understand how to use the application, it's time to take
-          control of your financial future.
+          {t('documentation.cta.subtitle')}
         </Text>
         <Group justify="center">
           <Button
@@ -374,7 +282,7 @@ function Documentation() {
             }}
             variant="outline"
           >
-            Login
+            {t('landingPage.login')}
           </Button>
           <Button
             size="lg"
@@ -382,7 +290,7 @@ function Documentation() {
               return navigate(routes.register.index);
             }}
           >
-            Create Account
+            {t('landingPage.createAccount')}
           </Button>
         </Group>
       </Paper>

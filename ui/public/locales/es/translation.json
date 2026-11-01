@@ -3,7 +3,33 @@
     "documentation": "Documentación",
     "login": "Iniciar Sesión",
     "signUp": "Registrarse",
-    "createAccount": "Crear una Cuenta"
+    "createAccount": "Crear una Cuenta",
+    "title": "Gestiona tus finanzas con facilidad",
+    "subtitle": "Registra tus gastos, controla tus ingresos y toma el control de tu futuro financiero",
+    "getStarted": "Empezar",
+    "features": {
+      "trackExpenses": {
+        "title": "Registra tus gastos",
+        "description": "Registra y categoriza fácilmente tus gastos diarios para entender a dónde va tu dinero."
+      },
+      "monitorIncome": {
+        "title": "Controla tus ingresos",
+        "description": "Lleva el control de todas tus fuentes de ingresos y observa cómo evolucionan con el tiempo."
+      },
+      "visualizeData": {
+        "title": "Visualiza tus datos",
+        "description": "Consulta gráficos y estadísticas detalladas para conocer mejor tus hábitos financieros."
+      },
+      "personalizedBudget": {
+        "title": "Presupuesto personalizado",
+        "description": "Crea presupuestos a medida según tus metas financieras y tu estilo de vida."
+      }
+    },
+    "cta": {
+      "title": "¿Listo para tomar el control de tus finanzas?",
+      "subtitle": "Únete a miles de usuarios que han mejorado su bienestar financiero con nuestra plataforma.",
+      "viewDocumentation": "Ver documentación"
+    }
   },
   "sideBar": {
     "dashboard": "Panel",
@@ -13,7 +39,8 @@
     "title": "Gestor de Gastos",
     "lightMode": "Activar el modo claro",
     "darkMode": "Activar el modo oscuro",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "copyRight": "© {{currentYear}} Gestor de Gastos. Todos los derechos reservados."
   },
   "home": {
     "title": "Panel de control",
@@ -72,6 +99,183 @@
         "overspent": "Exceso"
       }
     }
+  },
+  "documentation": {
+    "backToHome": "Volver al inicio",
+    "title": "Guía de usuario de la aplicación Expenses",
+    "subtitle": "Aprende a usar todas las funciones de la aplicación Expenses para gestionar tus finanzas de forma eficaz",
+    "intro": "¡Te damos la bienvenida a la aplicación Expenses! Esta guía te ayudará a entender cómo usar todas las funciones disponibles. Tanto si registras gastos, controlas ingresos, analizas tus patrones de gasto o configuras presupuestos, esta guía te será de ayuda.",
+    "gettingStarted": {
+      "title": "Primeros pasos",
+      "intro": "Antes de empezar a usar la aplicación, debes crear una cuenta e iniciar sesión:",
+      "steps": [
+        "Haz clic en el botón \"Registrarse\" de la página de inicio.",
+        "Rellena tus datos en el formulario de registro y envíalo.",
+        "Una vez registrado, inicia sesión con tus credenciales.",
+        "Después de iniciar sesión, accederás al panel principal, desde donde podrás empezar a usar la aplicación."
+      ]
+    },
+    "mainFeatures": "Funciones principales",
+    "features": {
+      "expenses": {
+        "title": "Registro de gastos",
+        "description": "Registra y categoriza tus gastos diarios para entender a dónde va tu dinero.",
+        "addTitle": "Cómo añadir un gasto:",
+        "addSteps": [
+          "Ve a la página de inicio",
+          "Haz clic en el botón \"Añadir gasto\"",
+          "Rellena los datos del gasto (importe, fecha, categoría, descripción)",
+          "Haz clic en \"Guardar\" para registrar el gasto"
+        ],
+        "manageTitle": "Gestión de categorías de gastos:",
+        "manageSteps": [
+          "Ve a la página de perfil",
+          "Desplázate hasta la sección \"Categorías de gastos\"",
+          "Añade nuevas categorías o edita las existentes",
+          "Las categorías te ayudan a organizar y analizar tus gastos"
+        ]
+      },
+      "income": {
+        "title": "Control de ingresos",
+        "description": "Lleva el control de todas tus fuentes de ingresos y observa cómo evolucionan con el tiempo.",
+        "addTitle": "Cómo añadir un ingreso:",
+        "addSteps": [
+          "Ve a la página de inicio",
+          "Haz clic en el botón \"Añadir ingreso\"",
+          "Rellena los datos del ingreso (importe, fecha, categoría, descripción)",
+          "Haz clic en \"Guardar\" para registrar el ingreso"
+        ],
+        "manageTitle": "Gestión de categorías de ingresos:",
+        "manageSteps": [
+          "Ve a la página de perfil",
+          "Desplázate hasta la sección \"Categorías de ingresos\"",
+          "Añade nuevas categorías o edita las existentes",
+          "Las categorías te ayudan a distinguir tus diferentes fuentes de ingresos"
+        ]
+      },
+      "statistics": {
+        "title": "Visualización de datos",
+        "description": "Consulta gráficos y estadísticas detalladas para conocer mejor tus hábitos financieros.",
+        "viewTitle": "Consultar estadísticas:",
+        "viewSteps": [
+          "Ve a la página de estadísticas",
+          "Consulta los gráficos resumen que comparan tus ingresos y gastos",
+          "Observa el desglose de gastos por categoría",
+          "Sigue la evolución de tus gastos a lo largo del tiempo"
+        ],
+        "viewsTitle": "Vistas mensual y anual:",
+        "viewsSteps": [
+          "Haz clic en \"Vista mensual\" para ver los datos de meses concretos",
+          "Haz clic en \"Vista anual\" para ver los resúmenes anuales",
+          "Usa los selectores de fecha para moverte entre distintos periodos"
+        ]
+      },
+      "budget": {
+        "title": "Gestión del presupuesto",
+        "description": "Crea presupuestos a medida según tus metas financieras y tu estilo de vida.",
+        "setupTitle": "Configurar un presupuesto:",
+        "setupSteps": [
+          "Ve a la página de presupuesto",
+          "Haz clic en \"Crear presupuesto\" para configurar uno nuevo",
+          "Define los importes del presupuesto para cada categoría de gasto",
+          "Especifica el periodo del presupuesto (mensual, trimestral, etc.)"
+        ],
+        "monitorTitle": "Seguimiento del presupuesto:",
+        "monitorSteps": [
+          "Consulta el progreso de tu presupuesto en la página de presupuesto",
+          "Observa indicadores visuales que comparan tus gastos con tu presupuesto",
+          "Recibe alertas cuando te acerques o superes los límites del presupuesto"
+        ]
+      },
+      "profile": {
+        "title": "Gestión del perfil",
+        "description": "Gestiona los ajustes de tu cuenta y personaliza tu experiencia.",
+        "updateTitle": "Actualizar la información del perfil:",
+        "updateSteps": [
+          "Ve a la página de perfil",
+          "Edita tu información personal",
+          "Cambia tu contraseña si es necesario"
+        ],
+        "manageTitle": "Gestión de categorías:",
+        "manageSteps": [
+          "Crea, edita o elimina categorías de gastos e ingresos",
+          "Personaliza las categorías según tus necesidades financieras"
+        ]
+      }
+    },
+    "tips": {
+      "title": "Consejos y buenas prácticas",
+      "regularUpdates": {
+        "title": "Actualizaciones frecuentes:",
+        "text": "Introduce tus gastos e ingresos con regularidad para mantener registros precisos."
+      },
+      "detailedDescriptions": {
+        "title": "Descripciones detalladas:",
+        "text": "Añade descripciones detalladas a tus transacciones para recordar de qué se trataban."
+      },
+      "useCategories": {
+        "title": "Usa bien las categorías:",
+        "text": "Crea categorías específicas que se ajusten a tus hábitos de gasto para un mejor análisis."
+      },
+      "reviewStatistics": {
+        "title": "Revisa las estadísticas con regularidad:",
+        "text": "Consulta tus estadísticas cada mes para identificar patrones de gasto y aspectos a mejorar."
+      },
+      "realisticBudgets": {
+        "title": "Presupuestos realistas:",
+        "text": "Fija metas de presupuesto realistas basadas en tus ingresos reales y tus gastos necesarios."
+      }
+    },
+    "cta": {
+      "title": "¿Listo para empezar a gestionar tus finanzas?",
+      "subtitle": "Ahora que sabes cómo usar la aplicación, es el momento de tomar el control de tu futuro financiero."
+    }
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "noAccount": "¿Aún no tienes una cuenta?",
+    "register": "Regístrate",
+    "goHome": "Volver al inicio",
+    "usernameOrEmail": "Usuario o correo electrónico",
+    "usernameOrEmailPlaceholder": "Introduce tu usuario o correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Introduce tu contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "submit": "Iniciar sesión"
+  },
+  "signup": {
+    "title": "Crear una cuenta",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "loginInstead": "Inicia sesión",
+    "goHome": "Volver al inicio",
+    "username": "Usuario",
+    "usernamePlaceholder": "Tu nombre de usuario",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@correo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Tu contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "confirmPasswordPlaceholder": "Confirma tu contraseña",
+    "alreadyHaveAccount": "Ya tengo una cuenta",
+    "submit": "Registrarse",
+    "validation": {
+      "usernameRequired": "El usuario es obligatorio",
+      "usernameLength": "El usuario debe tener al menos 3 caracteres",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailInvalid": "Correo electrónico no válido",
+      "passwordRequired": "La contraseña es obligatoria",
+      "passwordLength": "La contraseña debe tener al menos 6 caracteres",
+      "confirmRequired": "Por favor, confirma tu contraseña",
+      "passwordsMismatch": "Las contraseñas no coinciden"
+    }
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "errorCode": "Código de error: 404",
+    "description": "La página que buscas no existe o ha sido movida.",
+    "goBack": "Volver atrás",
+    "goHome": "Ir al inicio"
   },
   "statistics": {
     "title": "Estadísticas",
