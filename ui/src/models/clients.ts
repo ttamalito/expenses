@@ -1383,7 +1383,7 @@ export class Client {
     /**
      * @return OK
      */
-    getExpensesOfATagForAMonth(month: number, year: number, tagId: number): Promise<Expense[]> {
+    getExpensesOfATagForAMonth(month: number, year: number, tagId: number): Promise<GetExpenseDto[]> {
         let url_ = this.baseUrl + "/expenses/{month}/{year}/tag/{tagId}";
         if (month === undefined || month === null)
             throw new Error("The parameter 'month' must be defined.");
@@ -1408,7 +1408,7 @@ export class Client {
         });
     }
 
-    protected processGetExpensesOfATagForAMonth(response: Response): Promise<Expense[]> {
+    protected processGetExpensesOfATagForAMonth(response: Response): Promise<GetExpenseDto[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1418,7 +1418,7 @@ export class Client {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(Expense.fromJS(item));
+                    result200!.push(GetExpenseDto.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -1430,7 +1430,7 @@ export class Client {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<Expense[]>(null as any);
+        return Promise.resolve<GetExpenseDto[]>(null as any);
     }
 
     /**
@@ -1844,7 +1844,7 @@ export class Client {
     /**
      * @return OK
      */
-    getExpenseById(id: number): Promise<string> {
+    getExpenseById(id: number): Promise<GetExpenseDto> {
         let url_ = this.baseUrl + "/expenses/get/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1863,15 +1863,14 @@ export class Client {
         });
     }
 
-    protected processGetExpenseById(response: Response): Promise<string> {
+    protected processGetExpenseById(response: Response): Promise<GetExpenseDto> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
+            result200 = GetExpenseDto.fromJS(resultData200);
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -1879,7 +1878,7 @@ export class Client {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<GetExpenseDto>(null as any);
     }
 
     /**
@@ -4373,6 +4372,98 @@ export interface IGetIncomeDto {
     [key: string]: any;
 }
 
+export class GetExpenseDto implements IGetExpenseDto {
+    id?: number;
+    userId?: string;
+    amount?: number;
+    currencyId?: number;
+    tagId?: number;
+    date?: Date;
+    description?: string;
+    month?: number;
+    year?: number;
+    week?: number;
+    lastUpdate?: Date;
+    categoryId?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetExpenseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.userId = _data["userId"];
+            this.amount = _data["amount"];
+            this.currencyId = _data["currencyId"];
+            this.tagId = _data["tagId"];
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.description = _data["description"];
+            this.month = _data["month"];
+            this.year = _data["year"];
+            this.week = _data["week"];
+            this.lastUpdate = _data["lastUpdate"] ? new Date(_data["lastUpdate"].toString()) : <any>undefined;
+            this.categoryId = _data["categoryId"];
+        }
+    }
+
+    static fromJS(data: any): GetExpenseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetExpenseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["userId"] = this.userId;
+        data["amount"] = this.amount;
+        data["currencyId"] = this.currencyId;
+        data["tagId"] = this.tagId;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["description"] = this.description;
+        data["month"] = this.month;
+        data["year"] = this.year;
+        data["week"] = this.week;
+        data["lastUpdate"] = this.lastUpdate ? this.lastUpdate.toISOString() : <any>undefined;
+        data["categoryId"] = this.categoryId;
+        return data;
+    }
+}
+
+export interface IGetExpenseDto {
+    id?: number;
+    userId?: string;
+    amount?: number;
+    currencyId?: number;
+    tagId?: number;
+    date?: Date;
+    description?: string;
+    month?: number;
+    year?: number;
+    week?: number;
+    lastUpdate?: Date;
+    categoryId?: number;
+
+    [key: string]: any;
+}
+
 export class GetTotalSpentDto implements IGetTotalSpentDto {
     totalSpent?: number;
 
@@ -4422,7 +4513,7 @@ export interface IGetTotalSpentDto {
 }
 
 export class GetExpensesByTagDto implements IGetExpensesByTagDto {
-    expenses?: Expense[];
+    expenses?: GetExpenseDto[];
     totalSpent?: number;
 
     [key: string]: any;
@@ -4445,7 +4536,7 @@ export class GetExpensesByTagDto implements IGetExpensesByTagDto {
             if (Array.isArray(_data["expenses"])) {
                 this.expenses = [] as any;
                 for (let item of _data["expenses"])
-                    this.expenses!.push(Expense.fromJS(item));
+                    this.expenses!.push(GetExpenseDto.fromJS(item));
             }
             this.totalSpent = _data["totalSpent"];
         }
@@ -4475,7 +4566,7 @@ export class GetExpensesByTagDto implements IGetExpensesByTagDto {
 }
 
 export interface IGetExpensesByTagDto {
-    expenses?: Expense[];
+    expenses?: GetExpenseDto[];
     totalSpent?: number;
 
     [key: string]: any;

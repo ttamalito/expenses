@@ -153,7 +153,7 @@ export const useGetTotalSpentYearlyCategory = (): [
 };
 
 export const usePostModify = (): [
-  (body: IExpense) => Promise<AxiosResponse | undefined>,
+  (body: IExpense) => Promise<AxiosResponse | undefined>, // TODO: Add DTO to udpate expense
 ] => {
   const { post } = useApi();
   const callback = useCallback(
