@@ -52,6 +52,36 @@
         }
       }
     },
+    "/category/income/update": {
+      "put": {
+        "tags": [
+          "categories-controller"
+        ],
+        "operationId": "updateIncomeCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIncomeCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/category/income/create": {
       "put": {
         "tags": [
@@ -63,6 +93,36 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateIncomeCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/expense/update": {
+      "put": {
+        "tags": [
+          "categories-controller"
+        ],
+        "operationId": "updateExpenseCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenseCategoryDto"
               }
             }
           },
@@ -1968,6 +2028,21 @@
           }
         }
       },
+      "UpdateIncomeCategoryDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "CreateIncomeCategoryDto": {
         "type": "object",
         "properties": {
@@ -1976,6 +2051,25 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "UpdateExpenseCategoryDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "number",
+            "format": "float"
           }
         }
       },

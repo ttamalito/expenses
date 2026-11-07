@@ -96,6 +96,7 @@ export const routes = {
       return `/${constants.category}/${constants.expense}/${constants.get}/${categoryId}`;
     },
     expenseCreate: `/${constants.category}/${constants.expense}/${constants.create}`,
+    expenseUpdate: `/${constants.category}/${constants.expense}/${constants.update}`,
     expenseDelete: (categoryId: number) => {
       return `/${constants.category}/${constants.expense}/${constants.delete}/${categoryId}`;
     },
@@ -104,6 +105,7 @@ export const routes = {
       return `/${constants.category}/${constants.income}/${constants.get}/${categoryId}`;
     },
     incomeCreate: `/${constants.category}/${constants.income}/${constants.create}`,
+    incomeUpdate: `/${constants.category}/${constants.income}/${constants.update}`,
     incomeDelete: (categoryId: number) => {
       return `/${constants.category}/${constants.income}/${constants.delete}/${categoryId}`;
     },

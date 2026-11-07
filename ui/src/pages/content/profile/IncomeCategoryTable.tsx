@@ -9,16 +9,21 @@ import {
   Box,
   Tooltip,
 } from '@mantine/core';
-import { IconReplace, IconTrash } from '@tabler/icons-react';
+import { IconReplace, IconTrash, IconEdit } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { ICreateIncomeCategoryDto, IGetIncomeCategoryDto } from '@clients';
+import {
+  ICreateIncomeCategoryDto,
+  IGetIncomeCategoryDto,
+  IUpdateIncomeCategoryDto,
+} from '@clients';
 import {
   useDeleteIncomeCategory,
   useGetAllIncomeCategories,
   usePutIncomeCreate,
+  useUpdateIncomeCategory,
 } from '@requests/categoryRequests.ts';
 import MigrateCategoryModal from './MigrateCategoryModal.tsx';
 
@@ -27,6 +32,7 @@ export default function IncomeCategoryTable() {
   const [categories, setCategories] = useState<IGetIncomeCategoryDto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null,
   );
@@ -37,9 +43,18 @@ export default function IncomeCategoryTable() {
   const [isMigrateModalOpen, setIsMigrateModalOpen] = useState(false);
   const [getAllIncomeCategories] = useGetAllIncomeCategories();
   const [createIncomeCategory] = usePutIncomeCreate();
+  const [updateIncomeCategory] = useUpdateIncomeCategory();
   const [deleteIncomeCategory] = useDeleteIncomeCategory();
 
   const form = useForm<ICreateIncomeCategoryDto>({
+    validate: {
+      name: (value) => {
+        return value ? null : t('categories.common.nameRequired');
+      },
+    },
+  });
+
+  const editCategoryForm = useForm<IUpdateIncomeCategoryDto>({
     validate: {
       name: (value) => {
         return value ? null : t('categories.common.nameRequired');
@@ -83,6 +98,26 @@ export default function IncomeCategoryTable() {
     }
   };
 
+  const handleUpdateCategory = async (values: IUpdateIncomeCategoryDto) => {
+    try {
+      await updateIncomeCategory(values);
+      editCategoryForm.reset();
+      setIsEditModalOpen(false);
+      fetchCategories();
+      notifications.show({
+        title: t('tables.common.successTitle'),
+        message: t('categories.income.edited'),
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: t('tables.common.errorTitle'),
+        message: t('categories.income.editedFailed'),
+        color: 'red',
+      });
+    }
+  };
+
   const handleDeleteCategory = async () => {
     if (selectedCategoryId) {
       try {
@@ -117,6 +152,16 @@ export default function IncomeCategoryTable() {
     setSelectedCategoryName(categoryName);
     setIsMigrateModalOpen(true);
   };
+
+  const openEditModal = (category: IGetIncomeCategoryDto) => {
+    editCategoryForm.setValues({
+      categoryId: category.id,
+      name: category.name,
+      description: category.description,
+    });
+    setIsEditModalOpen(true);
+  };
+
   return (
     <Box>
       <Group justify="flex-end" mb="md">
@@ -167,6 +212,19 @@ export default function IncomeCategoryTable() {
                       <IconReplace size={16} />
                     </ActionIcon>
                   </Tooltip>
+                  <Tooltip label={t('categories.income.editCategoryTooltip')}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="green"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        openEditModal(category);
+                      }}
+                    >
+                      <IconEdit size={16} />
+                    </ActionIcon>
+                  </Tooltip>
                   <Tooltip label={t('categories.common.deleteTooltip')}>
                     <ActionIcon
                       size="sm"
@@ -212,6 +270,35 @@ export default function IncomeCategoryTable() {
           />
           <Group justify="flex-end">
             <Button type="submit">{t('categories.common.create')}</Button>
+          </Group>
+        </form>
+      </Modal>
+
+      {/* Edit Category Modal */}
+      <Modal
+        opened={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          editCategoryForm.reset();
+        }}
+        title={t('categories.income.editModalTitle')}
+      >
+        <form onSubmit={editCategoryForm.onSubmit(handleUpdateCategory)}>
+          <TextInput
+            label={t('categories.common.name')}
+            placeholder={t('categories.common.namePlaceholder')}
+            required
+            {...editCategoryForm.getInputProps('name')}
+            mb="md"
+          />
+          <Textarea
+            label={t('tables.common.description')}
+            placeholder={t('categories.common.descriptionPlaceholder')}
+            {...editCategoryForm.getInputProps('description')}
+            mb="md"
+          />
+          <Group justify="flex-end">
+            <Button type="submit">{t('categories.common.edit')}</Button>
           </Group>
         </form>
       </Modal>

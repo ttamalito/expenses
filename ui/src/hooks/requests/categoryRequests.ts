@@ -2,6 +2,8 @@ import {
   ICreateExpenseCategoryDto,
   ICreateIncomeCategoryDto,
   IMigrateCategoryDto,
+  IUpdateExpenseCategoryDto,
+  IUpdateIncomeCategoryDto,
 } from '@clients';
 import { AxiosResponse } from 'axios';
 import { useCallback } from 'react';
@@ -28,6 +30,19 @@ export const usePutExpenseCreate = (): [
   const callback = useCallback(
     (body: ICreateExpenseCategoryDto) => {
       return put(routes.category.expenseCreate, body);
+    },
+    [put],
+  );
+  return [callback];
+};
+
+export const useUpdateExpenseCategory = (): [
+  (body: IUpdateExpenseCategoryDto) => Promise<AxiosResponse | undefined>,
+] => {
+  const { put } = useApi();
+  const callback = useCallback(
+    (body: IUpdateExpenseCategoryDto) => {
+      return put(routes.category.expenseUpdate, body);
     },
     [put],
   );
@@ -67,6 +82,19 @@ export const usePutIncomeCreate = (): [
   const callback = useCallback(
     (body: ICreateIncomeCategoryDto) => {
       return put(routes.category.incomeCreate, body);
+    },
+    [put],
+  );
+  return [callback];
+};
+
+export const useUpdateIncomeCategory = (): [
+  (body: IUpdateIncomeCategoryDto) => Promise<AxiosResponse | undefined>,
+] => {
+  const { put } = useApi();
+  const callback = useCallback(
+    (body: IUpdateIncomeCategoryDto) => {
+      return put(routes.category.incomeUpdate, body);
     },
     [put],
   );
