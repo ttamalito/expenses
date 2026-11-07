@@ -216,7 +216,7 @@ const CategorySpendingTimelineChart: React.FC = () => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'USD', // TODO: Use correct currency, users currency or expenses currency?
     }).format(value);
   };
 

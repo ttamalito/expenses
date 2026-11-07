@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, DependencyList } from 'react';
 import { AxiosResponse } from 'axios';
 import { notifications } from '@mantine/notifications';
-import { IExpense, IGetIncomeDto } from '@clients';
+import { IGetExpenseDto, IGetIncomeDto } from '@clients';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -18,7 +18,7 @@ export interface PieChartEntry {
 }
 
 export interface TagTotalResult {
-  expenses: IExpense[];
+  expenses: IGetExpenseDto[];
   totalSpent: number;
 }
 
@@ -32,7 +32,7 @@ const PIE_CHART_COLORS = [
 ];
 
 const buildPieChartData = (
-  expenses: IExpense[],
+  expenses: IGetExpenseDto[],
   categories: CategoryOption[],
   t: TFunction,
 ): PieChartEntry[] => {
@@ -88,7 +88,7 @@ export function useExpensesAndIncomesSummary(
   periodKey: DependencyList,
   fetchers: PeriodDataFetchers,
 ) {
-  const [expenses, setExpenses] = useState<IExpense[]>([]);
+  const [expenses, setExpenses] = useState<IGetExpenseDto[]>([]);
   const [incomes, setIncomes] = useState<IGetIncomeDto[]>([]);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [totalSpent, setTotalSpent] = useState<number>(0);

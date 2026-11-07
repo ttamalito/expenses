@@ -5,10 +5,7 @@ import com.api.expenses.rest.exceptions.TransactionException;
 import com.api.expenses.rest.exceptions.UserException;
 import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.User;
-import com.api.expenses.rest.models.dtos.CategoryComparisonResponseDto;
-import com.api.expenses.rest.models.dtos.CreateExpenseDto;
-import com.api.expenses.rest.models.dtos.GetExpensesByTagDto;
-import com.api.expenses.rest.models.dtos.GetTotalSpentDto;
+import com.api.expenses.rest.models.dtos.*;
 import com.api.expenses.rest.services.ExpenseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,12 +46,12 @@ public class ExpensesController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<String> getExpenseById(@PathVariable int id)
-            throws JsonProcessingException, TransactionException {
+    public ResponseEntity<GetExpenseDto> getExpenseById(@PathVariable int id)
+            throws TransactionException {
         Expense expense = expenseService.getExpenseById(id)
                 .orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.EXPENSE_NOT_FOUND));
-        String expenseJson = objectMapper.writeValueAsString(expense);
-        return ResponseEntity.ok().body(expenseJson);
+        GetExpenseDto expenseDto = toDto(expense);
+        return ResponseEntity.ok(expenseDto);
     }
 
     @GetMapping("/monthly/{month}/{year}")
@@ -63,7 +60,7 @@ public class ExpensesController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<Expense> expenses = expenseService.getExpensesForAMonthOfAUser(user.getId(), (month), (year));
-        String expensesJson = objectMapper.writeValueAsString(expenses);
+        String expensesJson = objectMapper.writeValueAsString(toDtos(expenses));
         return ResponseEntity.ok().body(expensesJson);
 
     }
@@ -75,18 +72,18 @@ public class ExpensesController {
         UUID userId = getUserId();
 
         List<Expense> expenses = expenseService.getExpensesForAMonthOfAUserByCategory(userId, month, year, categoryId);
-        String expensesJson = objectMapper.writeValueAsString(expenses);
+        String expensesJson = objectMapper.writeValueAsString(toDtos(expenses));
         return ResponseEntity.ok().body(expensesJson);
     }
 
     @GetMapping("/{month}/{year}/tag/{tagId}")
-    public ResponseEntity<List<Expense>> getExpensesOfATagForAMonth(@PathVariable int month, @PathVariable int year,
-                                                                    @PathVariable int tagId) {
+    public ResponseEntity<List<GetExpenseDto>> getExpensesOfATagForAMonth(@PathVariable int month, @PathVariable int year,
+                                                                          @PathVariable int tagId) {
         UUID userId = getUserId();
 
         try {
             List<Expense> expenses = expenseService.getExpensesForAMonthOfAUserByTag(userId, month, year, tagId);
-            return ResponseEntity.ok(expenses);
+            return ResponseEntity.ok(toDtos(expenses));
         } catch (TransactionException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -115,13 +112,13 @@ public class ExpensesController {
 
     @GetMapping("/filter/{year}/tag/{tagId}") // Tested
     public ResponseEntity<GetExpensesByTagDto> getTotalSpentOnAYearForATag(@PathVariable int year,
-                                                                        @PathVariable int tagId)
+                                                                           @PathVariable int tagId)
             throws TransactionException {
         UUID userId = getUserId();
         Pair<List<Expense>, Float> result = expenseService.getExpensesForAYearOfAUserByTag(userId, year, tagId);
         List<Expense> expenses = result.getValue0();
         float totalSpent = result.getValue1();
-        GetExpensesByTagDto dto = new GetExpensesByTagDto(expenses, totalSpent);
+        GetExpensesByTagDto dto = new GetExpensesByTagDto(toDtos(expenses), totalSpent);
         return ResponseEntity.ok(dto);
     }
 
@@ -131,7 +128,7 @@ public class ExpensesController {
         UUID userId = getUserId();
 
         List<Expense> expenses = expenseService.getExpensesForAYearOfAUser(userId, (year));
-        String expensesJson = objectMapper.writeValueAsString(expenses);
+        String expensesJson = objectMapper.writeValueAsString(toDtos(expenses));
         return ResponseEntity.ok().body(expensesJson);
     }
 
@@ -141,7 +138,7 @@ public class ExpensesController {
         UUID userId = getUserId();
 
         List<Expense> expenses = expenseService.getExpensesForAYearOfAUserByCategory(userId, year, categoryId);
-        String expensesJson = objectMapper.writeValueAsString(expenses);
+        String expensesJson = objectMapper.writeValueAsString(toDtos(expenses));
         return ResponseEntity.ok().body(expensesJson);
     }
 
@@ -208,6 +205,30 @@ public class ExpensesController {
     private UUID getUserId() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user.getId();
+    }
+
+    /**
+     * Maps an Expense entity to the DTO that is sent to the client.
+     */
+    private GetExpenseDto toDto(Expense expense) {
+        return new GetExpenseDto(
+                expense.getId(),
+                expense.getUserId(),
+                expense.getAmount(),
+                expense.getCurrencyId(),
+                expense.getTagId(),
+                expense.getDate(),
+                expense.getDescription(),
+                expense.getMonth(),
+                expense.getYear(),
+                expense.getWeek(),
+                expense.getLastUpdate(),
+                expense.getCategoryId()
+        );
+    }
+
+    private List<GetExpenseDto> toDtos(List<Expense> expenses) {
+        return expenses.stream().map(this::toDto).toList();
     }
 
     /**

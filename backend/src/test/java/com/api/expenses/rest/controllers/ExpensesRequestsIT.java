@@ -1,7 +1,6 @@
 package com.api.expenses.rest.controllers;
 
 import com.api.expenses.rest.controllers.utils.AuthenticationHelper;
-import com.api.expenses.rest.models.Expense;
 import com.api.expenses.rest.models.dtos.*;
 import com.api.expenses.rest.utils.DateUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,17 +68,17 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expenseJson = expenseResult.andReturn().getResponse().getContentAsString();
-        Expense expense = objectMapper.readValue(expenseJson, Expense.class);
-        assertEquals(100f, expense.getAmount());
-        assertEquals(expenseId, String.valueOf(expense.getId()));
-        assertEquals("Test expense description", expense.getDescription());
-        assertEquals(categoryId, expense.getCategoryId());
-        assertEquals(1, expense.getCurrencyId());
-        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
-        assertEquals(1, expense.getMonth());
-        assertEquals(2025, expense.getYear());
-        assertTrue(expense.getWeek() > 0);
-        assertEquals("2025-01-05", expense.getDate().toString());
+        GetExpenseDto expense = objectMapper.readValue(expenseJson, GetExpenseDto.class);
+        assertEquals(100f, expense.amount());
+        assertEquals(expenseId, String.valueOf(expense.id()));
+        assertEquals("Test expense description", expense.description());
+        assertEquals(categoryId, expense.categoryId());
+        assertEquals(1, expense.currencyId());
+        assertNotNull(expense.userId());
+        assertEquals(1, expense.month());
+        assertEquals(2025, expense.year());
+        assertTrue(expense.week() > 0);
+        assertEquals("2025-01-05", expense.date().toString());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
                         .header("Authorization", bearerToken))
@@ -120,7 +119,7 @@ public class ExpensesRequestsIT {
         categoryIdsPairs.add(pair5);
 
         String expensesToAddAsJson = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs, "src/test/resources/expenses/singleMonth/expensesForAMonth.json");
-        
+
         List<CreateExpenseDto> expenses = new ArrayList<>();
         List<Integer> expenseIds = sendAndSaveExpenses(bearerToken, expensesToAddAsJson, expenses);
         // TODO: add a request with an expense that is not in the month and year
@@ -130,24 +129,24 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesJson = savedExpense.andReturn().getResponse().getContentAsString();
-        List<Expense> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
 
         assertEquals(expenses.size(), expensesFromServer.size());
         // compare the expeses that were sent to the server with the ones that were received
         for (int i = 0; i < expenses.size(); i++) {
             int expenseId = expenseIds.get(i);
             CreateExpenseDto sentExpense = expenses.get(i);
-            Optional<Expense> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.getId() == expenseId).findAny();
+            Optional<GetExpenseDto> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.id() == expenseId).findAny();
             assertTrue(receivedExpenseOptional.isPresent());
-            Expense receivedExpense = receivedExpenseOptional.get();
-            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
-            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
-            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
-            assertEquals(sentExpense.description(), receivedExpense.getDescription());
-            //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", receivedExpense.getUserId().toString());
-            assertTrue(1 == receivedExpense.getMonth());
-            assertTrue(2025 == receivedExpense.getYear());
-            assertTrue(receivedExpense.getWeek() > 0);
+            GetExpenseDto receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.amount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.categoryId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.date().toString());
+            assertEquals(sentExpense.description(), receivedExpense.description());
+            assertNotNull(receivedExpense.userId());
+            assertTrue(1 == receivedExpense.month());
+            assertTrue(2025 == receivedExpense.year());
+            assertTrue(receivedExpense.week() > 0);
         }
 
         for (int expenseId : expenseIds) {
@@ -165,10 +164,10 @@ public class ExpensesRequestsIT {
     @Test
     public void getExpensesForAMonthAndACategory() throws Exception {
         String bearerToken = AuthenticationHelper.loginUser(mockMvc, Optional.of(
-                    "coding.tamalito@gmail.com"),
-            Optional.empty(),
-            "123456"
-    );
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
 
         // create the three categories for the expenses that will not be queried
         List<Integer> undesirableCategoryIds = createMultipleExpenseCategories(bearerToken,
@@ -198,7 +197,7 @@ public class ExpensesRequestsIT {
         String expenseThatShouldNotBeQueried = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs,
                 "src/test/resources/expenses/singleMonthAndCategory/expensesNotToQuery.json");
 
-        
+
         List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
         List<Integer> expenseIdsToIgnore = sendAndSaveExpenses(bearerToken,
                 expenseThatShouldNotBeQueried, expensesToSendAndIgnore);
@@ -230,23 +229,23 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesJson = savedExpense.andReturn().getResponse().getContentAsString();
-        List<Expense> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
         assertEquals(expensesToBeQueried.size(), expensesFromServer.size()); // should be 2
 
         // compare the expeses that were sent to the server with the ones that were received
         for (int i = 0; i < expensesToBeQueried.size(); i++) {
             int expenseId = expenseIds.get(i);
             CreateExpenseDto sentExpense = expensesToBeQueried.get(i);
-            Optional<Expense> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.getId() == expenseId).findAny();
+            Optional<GetExpenseDto> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.id() == expenseId).findAny();
             assertTrue(receivedExpenseOptional.isPresent());
-            Expense receivedExpense = receivedExpenseOptional.get();
-            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
-            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
-            assertEquals(sentExpense.currencyId(), receivedExpense.getCurrencyId());
-            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
-            assertEquals(sentExpense.description(), receivedExpense.getDescription());
-            assertEquals(1, receivedExpense.getMonth());
-            assertEquals(2025, receivedExpense.getYear());
+            GetExpenseDto receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.amount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.categoryId());
+            assertEquals(sentExpense.currencyId(), receivedExpense.currencyId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.date().toString());
+            assertEquals(sentExpense.description(), receivedExpense.description());
+            assertEquals(1, receivedExpense.month());
+            assertEquals(2025, receivedExpense.year());
         }
 
         // delete the expenses
@@ -306,7 +305,7 @@ public class ExpensesRequestsIT {
         String expenseThatShouldNotBeQueried = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs,
                 "src/test/resources/expenses/singleYear/expensesNotToQuery.json");
 
-        
+
         // add expenses that should not be queried
         List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
         List<Integer> expenseIdsToIgnore = sendAndSaveExpenses(bearerToken,
@@ -336,27 +335,27 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesJson = savedExpense.andReturn().getResponse().getContentAsString();
-        List<Expense> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
         assertEquals(expensesToBeQueried.size(), expensesFromServer.size()); // should be 2
 
         // compare the expeses that were sent to the server with the ones that were received
         for (int i = 0; i < expensesToBeQueried.size(); i++) {
             int expenseId = expenseIds.get(i);
             CreateExpenseDto sentExpense = expensesToBeQueried.get(i);
-            Optional<Expense> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.getId() == expenseId).findAny();
+            Optional<GetExpenseDto> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.id() == expenseId).findAny();
             assertTrue(receivedExpenseOptional.isPresent());
-            Expense receivedExpense = receivedExpenseOptional.get();
-            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
-            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
-            assertEquals(sentExpense.currencyId(), receivedExpense.getCurrencyId());
-            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
-            assertEquals(sentExpense.description(), receivedExpense.getDescription());
+            GetExpenseDto receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.amount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.categoryId());
+            assertEquals(sentExpense.currencyId(), receivedExpense.currencyId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.date().toString());
+            assertEquals(sentExpense.description(), receivedExpense.description());
             if (sentExpense.amount() == 102) {
-                assertEquals(9, receivedExpense.getMonth());
+                assertEquals(9, receivedExpense.month());
             } else {
-                assertEquals(11, receivedExpense.getMonth());
+                assertEquals(11, receivedExpense.month());
             }
-            assertEquals(2025, receivedExpense.getYear());
+            assertEquals(2025, receivedExpense.year());
         }
 
         // delete the expenses
@@ -413,7 +412,7 @@ public class ExpensesRequestsIT {
         String expenseThatShouldNotBeQueried = addCategoryToListOfExpensesInSpecificPosition(categoryIdsPairs,
                 "src/test/resources/expenses/singleYearAndCategory/expensesNotToQuery.json");
 
-        
+
 
         // add expenses that should not be queried
         List<CreateExpenseDto> expensesToSendAndIgnore = new ArrayList<>();
@@ -446,27 +445,27 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesJson = savedExpense.andReturn().getResponse().getContentAsString();
-        List<Expense> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> expensesFromServer = objectMapper.readValue(expensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
         assertEquals(expensesToBeQueried.size(), expensesFromServer.size()); // should be 2
 
         // compare the expeses that were sent to the server with the ones that were received
         for (int i = 0; i < expensesToBeQueried.size(); i++) {
             int expenseId = expenseIds.get(i);
             CreateExpenseDto sentExpense = expensesToBeQueried.get(i);
-            Optional<Expense> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.getId() == expenseId).findAny();
+            Optional<GetExpenseDto> receivedExpenseOptional = expensesFromServer.stream().filter(expense -> expense.id() == expenseId).findAny();
             assertTrue(receivedExpenseOptional.isPresent());
-            Expense receivedExpense = receivedExpenseOptional.get();
-            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
-            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
-            assertEquals(sentExpense.currencyId(), receivedExpense.getCurrencyId());
-            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
-            assertEquals(sentExpense.description(), receivedExpense.getDescription());
+            GetExpenseDto receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.amount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.categoryId());
+            assertEquals(sentExpense.currencyId(), receivedExpense.currencyId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.date().toString());
+            assertEquals(sentExpense.description(), receivedExpense.description());
             if (sentExpense.amount() == 102) {
-                assertEquals(9, receivedExpense.getMonth());
+                assertEquals(9, receivedExpense.month());
             } else {
-                assertEquals(11, receivedExpense.getMonth());
+                assertEquals(11, receivedExpense.month());
             }
-            assertEquals(2025, receivedExpense.getYear());
+            assertEquals(2025, receivedExpense.year());
         }
 
         // delete the expenses
@@ -793,18 +792,22 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesForTheMonthJson = expensesForTheMonthResult.andReturn().getResponse().getContentAsString();
-        List<Expense> expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
 
         assertEquals(1, expensesForTheMonth.size());
-        Expense expense = expensesForTheMonth.get(0);
-        expense.setAmount(205.10f);
-        expense.setDescription("Modified description");
+        GetExpenseDto expense = expensesForTheMonth.get(0);
+        // The modify endpoint still receives the Expense entity as request body. The JSON of the DTO has
+        // the same fields, so we build a modified DTO and send it as the body.
+        GetExpenseDto expenseToModify = new GetExpenseDto(
+                expense.id(), expense.userId(), 205.10f, expense.currencyId(), expense.tagId(),
+                expense.date(), "Modified description", expense.month(), expense.year(), expense.week(),
+                expense.lastUpdate(), expense.categoryId());
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/expenses/modify")
                         .header("Authorization", bearerToken)
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(expense)))
+                        .content(objectMapper.writeValueAsString(expenseToModify)))
                 .andExpect(status().isNoContent());
 
 
@@ -814,11 +817,11 @@ public class ExpensesRequestsIT {
                 .andExpect(status().isOk());
 
         expensesForTheMonthJson = expensesForTheMonthResult.andReturn().getResponse().getContentAsString();
-        expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
         assertEquals(1, expensesForTheMonth.size());
-        Expense modifiedExpense = expensesForTheMonth.get(0);
-        assertEquals(205.10f, modifiedExpense.getAmount());
-        assertEquals("Modified description", modifiedExpense.getDescription());
+        GetExpenseDto modifiedExpense = expensesForTheMonth.get(0);
+        assertEquals(205.10f, modifiedExpense.amount());
+        assertEquals("Modified description", modifiedExpense.description());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
                         .header("Authorization", bearerToken))
@@ -850,22 +853,24 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expensesForTheMonthJson = expensesForTheMonthResult.andReturn().getResponse().getContentAsString();
-        List<Expense> expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
 
         int newCategoryId = createExpenseCategory(bearerToken, "src/test/resources/expenses/category.json");
 
 
         assertEquals(1, expensesForTheMonth.size());
-        Expense expense = expensesForTheMonth.get(0);
-        expense.setCategoryId(newCategoryId);
-        expense.setCurrencyId(2); // TODO: make it dynamically
+        GetExpenseDto expense = expensesForTheMonth.get(0);
+        GetExpenseDto expenseToModify = new GetExpenseDto(
+                expense.id(), expense.userId(), expense.amount(), 2 /* TODO: make it dynamically */, expense.tagId(),
+                expense.date(), expense.description(), expense.month(), expense.year(), expense.week(),
+                expense.lastUpdate(), newCategoryId);
 
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/expenses/modify")
                         .header("Authorization", bearerToken)
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(expense)))
+                        .content(objectMapper.writeValueAsString(expenseToModify)))
                 .andExpect(status().isNoContent());
 
 
@@ -875,13 +880,13 @@ public class ExpensesRequestsIT {
                 .andExpect(status().isOk());
 
         expensesForTheMonthJson = expensesForTheMonthResult.andReturn().getResponse().getContentAsString();
-        expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        expensesForTheMonth = objectMapper.readValue(expensesForTheMonthJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
         assertEquals(1, expensesForTheMonth.size());
-        Expense modifiedExpense = expensesForTheMonth.get(0);
-        assertEquals(100f, modifiedExpense.getAmount());
-        assertEquals("Test expense description", modifiedExpense.getDescription());
-        assertEquals(newCategoryId, modifiedExpense.getCategoryId());
-        assertEquals(2, modifiedExpense.getCurrencyId());  //TODO: Make id dynamically
+        GetExpenseDto modifiedExpense = expensesForTheMonth.get(0);
+        assertEquals(100f, modifiedExpense.amount());
+        assertEquals("Test expense description", modifiedExpense.description());
+        assertEquals(newCategoryId, modifiedExpense.categoryId());
+        assertEquals(2, modifiedExpense.currencyId());  //TODO: Make id dynamically
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
                         .header("Authorization", bearerToken))
@@ -923,18 +928,18 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expenseJson = expenseResult.andReturn().getResponse().getContentAsString();
-        Expense expense = objectMapper.readValue(expenseJson, Expense.class);
-        assertEquals(100f, expense.getAmount());
-        assertEquals(expenseId, String.valueOf(expense.getId()));
-        assertEquals("Test expense description", expense.getDescription());
-        assertEquals(categoryId, expense.getCategoryId());
-        assertEquals(1, expense.getCurrencyId());
-        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
-        assertEquals(7, expense.getMonth());
-        assertEquals(2025, expense.getYear());
-        assertTrue(expense.getWeek() > 0);
-        assertEquals("2025-07-05", expense.getDate().toString());
-        assertEquals(createdTagDto.id(), expense.getTagId());
+        GetExpenseDto expense = objectMapper.readValue(expenseJson, GetExpenseDto.class);
+        assertEquals(100f, expense.amount());
+        assertEquals(expenseId, String.valueOf(expense.id()));
+        assertEquals("Test expense description", expense.description());
+        assertEquals(categoryId, expense.categoryId());
+        assertEquals(1, expense.currencyId());
+        assertNotNull(expense.userId());
+        assertEquals(7, expense.month());
+        assertEquals(2025, expense.year());
+        assertTrue(expense.week() > 0);
+        assertEquals("2025-07-05", expense.date().toString());
+        assertEquals(createdTagDto.id(), expense.tagId());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
                         .header("Authorization", bearerToken))
@@ -981,7 +986,7 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expenseJson = expenseResult.andReturn().getResponse().getContentAsString();
-        Expense expense = objectMapper.readValue(expenseJson, Expense.class);
+        GetExpenseDto expense = objectMapper.readValue(expenseJson, GetExpenseDto.class);
 
         String tagAsString2 = new String(Files.readAllBytes(Path.of("src/test/resources/expenses/tags/secondTag.json")));
         ResultActions resultOfCreation2 = mockMvc.perform(post("/tags/create")
@@ -993,10 +998,10 @@ public class ExpensesRequestsIT {
         String createdTag2 = resultOfCreation2.andReturn().getResponse().getContentAsString();
         GetTagDto createdTagDto2 = objectMapper.readValue(createdTag2, GetTagDto.class);
 
-        // modify the expense
-        expense.setTagId(createdTagDto2.id());
+        // modify the expense (change the tag)
+        GetExpenseDto expenseWithSecondTag = withTagId(expense, createdTagDto2.id());
 
-        String json2 = objectMapper.writeValueAsString(expense);
+        String json2 = objectMapper.writeValueAsString(expenseWithSecondTag);
         mockMvc.perform(MockMvcRequestBuilders.post("/expenses/modify")
                         .header("Authorization", bearerToken)
                         .contentType("application/json")
@@ -1007,24 +1012,24 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expenseJsonModified = expenseResultModified.andReturn().getResponse().getContentAsString();
-        Expense expenseModified = objectMapper.readValue(expenseJsonModified, Expense.class);
+        GetExpenseDto expenseModified = objectMapper.readValue(expenseJsonModified, GetExpenseDto.class);
 
-        assertEquals(100f, expenseModified.getAmount());
-        assertEquals(expenseId, String.valueOf(expenseModified.getId()));
-        assertEquals("Test expense description", expenseModified.getDescription());
-        assertEquals(categoryId, expenseModified.getCategoryId());
-        assertEquals(1, expenseModified.getCurrencyId());
-        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
-        assertEquals(7, expenseModified.getMonth());
-        assertEquals(2025, expenseModified.getYear());
-        assertTrue(expenseModified.getWeek() > 0);
-        assertEquals("2025-07-05", expenseModified.getDate().toString());
-        assertEquals(createdTagDto2.id(), expenseModified.getTagId());
+        assertEquals(100f, expenseModified.amount());
+        assertEquals(expenseId, String.valueOf(expenseModified.id()));
+        assertEquals("Test expense description", expenseModified.description());
+        assertEquals(categoryId, expenseModified.categoryId());
+        assertEquals(1, expenseModified.currencyId());
+        assertNotNull(expenseModified.userId());
+        assertEquals(7, expenseModified.month());
+        assertEquals(2025, expenseModified.year());
+        assertTrue(expenseModified.week() > 0);
+        assertEquals("2025-07-05", expenseModified.date().toString());
+        assertEquals(createdTagDto2.id(), expenseModified.tagId());
 
 
         // Remove the tag
-        expenseModified.setTagId(null);
-        String json3 = objectMapper.writeValueAsString(expenseModified);
+        GetExpenseDto expenseWithoutTag = withTagId(expenseModified, null);
+        String json3 = objectMapper.writeValueAsString(expenseWithoutTag);
         mockMvc.perform(MockMvcRequestBuilders.post("/expenses/modify")
                         .header("Authorization", bearerToken)
                         .contentType("application/json")
@@ -1035,19 +1040,19 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk());
         String expenseJsonNoTag = expenseResulNoTag.andReturn().getResponse().getContentAsString();
-        Expense expenseNoTag = objectMapper.readValue(expenseJsonNoTag, Expense.class);
+        GetExpenseDto expenseNoTag = objectMapper.readValue(expenseJsonNoTag, GetExpenseDto.class);
 
-        assertEquals(100f, expenseNoTag.getAmount());
-        assertEquals(expenseId, String.valueOf(expenseNoTag.getId()));
-        assertEquals("Test expense description", expenseNoTag.getDescription());
-        assertEquals(categoryId, expenseNoTag.getCategoryId());
-        assertEquals(1, expenseNoTag.getCurrencyId());
-        //assertEquals("d229217c-d721-4116-9cd2-3dfe03360439", expense.getUserId().toString());
-        assertEquals(7, expenseNoTag.getMonth());
-        assertEquals(2025, expenseNoTag.getYear());
-        assertTrue(expenseNoTag.getWeek() > 0);
-        assertEquals("2025-07-05", expenseNoTag.getDate().toString());
-        assertNull(expenseNoTag.getTagId());
+        assertEquals(100f, expenseNoTag.amount());
+        assertEquals(expenseId, String.valueOf(expenseNoTag.id()));
+        assertEquals("Test expense description", expenseNoTag.description());
+        assertEquals(categoryId, expenseNoTag.categoryId());
+        assertEquals(1, expenseNoTag.currencyId());
+        assertNotNull(expenseNoTag.userId());
+        assertEquals(7, expenseNoTag.month());
+        assertEquals(2025, expenseNoTag.year());
+        assertTrue(expenseNoTag.week() > 0);
+        assertEquals("2025-07-05", expenseNoTag.date().toString());
+        assertNull(expenseNoTag.tagId());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/expenses/delete?expenseId=" + expenseId)
                         .header("Authorization", bearerToken))
@@ -1323,16 +1328,16 @@ public class ExpensesRequestsIT {
         for (int i = 0; i < expensesSentToServer.size(); i++) {
             int expenseId = expenseIds.get(i);
             CreateExpenseDto sentExpense = expensesSentToServer.get(i);
-            Optional<Expense> receivedExpenseOptional = returnedDto.expenses().stream().filter(expense -> expense.getId() == expenseId).findAny();
+            Optional<GetExpenseDto> receivedExpenseOptional = returnedDto.expenses().stream().filter(expense -> expense.id() == expenseId).findAny();
             assertTrue(receivedExpenseOptional.isPresent());
-            Expense receivedExpense = receivedExpenseOptional.get();
-            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
-            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
-            assertEquals(sentExpense.currencyId(), receivedExpense.getCurrencyId());
-            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
-            assertEquals(sentExpense.description(), receivedExpense.getDescription());
-            assertEquals(targetYear, receivedExpense.getYear());
-            assertEquals(desirableTagId, receivedExpense.getTagId());
+            GetExpenseDto receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.amount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.categoryId());
+            assertEquals(sentExpense.currencyId(), receivedExpense.currencyId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.date().toString());
+            assertEquals(sentExpense.description(), receivedExpense.description());
+            assertEquals(targetYear, receivedExpense.year());
+            assertEquals(desirableTagId, receivedExpense.tagId());
         }
 
         assertEquals(expectedTotal, returnedDto.totalSpent());
@@ -1456,24 +1461,24 @@ public class ExpensesRequestsIT {
                 .andExpect(content().contentType("application/json"));
 
         String listOfExpensesJson = resultFetchExpenses.andReturn().getResponse().getContentAsString();
-        List<Expense> fetchedExpenses = objectMapper.readValue(listOfExpensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        List<GetExpenseDto> fetchedExpenses = objectMapper.readValue(listOfExpensesJson, objectMapper.getTypeFactory().constructCollectionType(List.class, GetExpenseDto.class));
 
 
         // compare the expeses that were sent to the server with the ones that were received
         for (int i = 0; i < expensesSentToServer.size(); i++) {
             int expenseId = expenseIds.get(i);
             CreateExpenseDto sentExpense = expensesSentToServer.get(i);
-            Optional<Expense> receivedExpenseOptional = fetchedExpenses.stream().filter(expense -> expense.getId() == expenseId).findAny();
+            Optional<GetExpenseDto> receivedExpenseOptional = fetchedExpenses.stream().filter(expense -> expense.id() == expenseId).findAny();
             assertTrue(receivedExpenseOptional.isPresent());
-            Expense receivedExpense = receivedExpenseOptional.get();
-            assertEquals(sentExpense.amount(), receivedExpense.getAmount());
-            assertEquals(sentExpense.categoryId(), receivedExpense.getCategoryId());
-            assertEquals(sentExpense.currencyId(), receivedExpense.getCurrencyId());
-            assertEquals(sentExpense.date().toString(), receivedExpense.getDate().toString());
-            assertEquals(sentExpense.description(), receivedExpense.getDescription());
-            assertEquals(1, receivedExpense.getMonth());
-            assertEquals(2025, receivedExpense.getYear());
-            assertEquals(desirableTagId, receivedExpense.getTagId());
+            GetExpenseDto receivedExpense = receivedExpenseOptional.get();
+            assertEquals(sentExpense.amount(), receivedExpense.amount());
+            assertEquals(sentExpense.categoryId(), receivedExpense.categoryId());
+            assertEquals(sentExpense.currencyId(), receivedExpense.currencyId());
+            assertEquals(sentExpense.date().toString(), receivedExpense.date().toString());
+            assertEquals(sentExpense.description(), receivedExpense.description());
+            assertEquals(1, receivedExpense.month());
+            assertEquals(2025, receivedExpense.year());
+            assertEquals(desirableTagId, receivedExpense.tagId());
         }
         // delete the expenses
         for (int expenseId : expenseIds) {
@@ -1499,6 +1504,17 @@ public class ExpensesRequestsIT {
         deleteTag(bearerToken, desirableTagId);
     }
 
+
+    /**
+     * Returns a copy of the given expense DTO with a different tag id (or no tag if null).
+     * Used to build the request body for the modify endpoint, which still receives the entity.
+     */
+    private GetExpenseDto withTagId(GetExpenseDto expense, Integer tagId) {
+        return new GetExpenseDto(
+                expense.id(), expense.userId(), expense.amount(), expense.currencyId(), tagId,
+                expense.date(), expense.description(), expense.month(), expense.year(), expense.week(),
+                expense.lastUpdate(), expense.categoryId());
+    }
 
     /**
      * Reads the expenses from a file and sends them to the server
@@ -1575,7 +1591,7 @@ public class ExpensesRequestsIT {
      * @throws IOException
      */
     private String addCategoryIdToExpense(int categoryId, String pathToExpenseJson) throws IOException {
-        
+
         String expenseJson = new String(Files.readAllBytes(Path.of(pathToExpenseJson)));
         CreateExpenseDto expense = objectMapper.readValue(expenseJson, CreateExpenseDto.class);
         CreateExpenseDto modifiedExpense = new CreateExpenseDto(categoryId, expense.amount(), expense.currencyId(), expense.date(), expense.description(), Optional.empty());
@@ -1606,7 +1622,7 @@ public class ExpensesRequestsIT {
     private String addCategoryToListOfExpensesInSpecificPosition(List<Pair<Integer, Integer>> categoryIds, String pathToListOfExpenses)
             throws IOException {
         String expensesAsJson = new String(Files.readAllBytes(Path.of(pathToListOfExpenses)));
-        
+
         List<CreateExpenseDto> serializedExpenses = objectMapper.readValue(expensesAsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, CreateExpenseDto.class));
         List<CreateExpenseDto> modifiedExpenses = new ArrayList<>();
 
@@ -1676,7 +1692,7 @@ public class ExpensesRequestsIT {
         String categoriesToAdd = new String (Files.readAllBytes(Path.of(pathToCategoriesJson)));
         List<CreateExpenseCategoryDto> serializedCategories = objectMapper.readValue(
                 categoriesToAdd, objectMapper.getTypeFactory()
-                .constructCollectionType(List.class, CreateExpenseCategoryDto.class));
+                        .constructCollectionType(List.class, CreateExpenseCategoryDto.class));
 
         for (CreateExpenseCategoryDto category : serializedCategories) {
 
@@ -1760,7 +1776,7 @@ public class ExpensesRequestsIT {
                 "src/test/resources/expenses/categoryComparison/expensesFebruary2025.json");
 
         // Save expenses
-        
+
         List<CreateExpenseDto> januaryExpenses = new ArrayList<>();
         List<Integer> januaryExpenseIds = sendAndSaveExpenses(bearerToken, januaryExpensesJson, januaryExpenses);
 
@@ -1784,37 +1800,37 @@ public class ExpensesRequestsIT {
         System.out.println("[DEBUG_LOG] Response JSON: " + responseJson);
 
         // Verify the response contains the expected structure
-        assertTrue(responseJson.contains("\"currentPeriodLabel\":\"January 2025\""), 
+        assertTrue(responseJson.contains("\"currentPeriodLabel\":\"January 2025\""),
                 "Response should contain January 2025 as current period label");
-        assertTrue(responseJson.contains("\"previousPeriodLabel\":\"February 2025\""), 
+        assertTrue(responseJson.contains("\"previousPeriodLabel\":\"February 2025\""),
                 "Response should contain February 2025 as previous period label");
 
         // Verify the response contains categories array
-        assertTrue(responseJson.contains("\"categories\":["), 
+        assertTrue(responseJson.contains("\"categories\":["),
                 "Response should contain categories array");
 
         // Verify each category has the expected fields
-        assertTrue(responseJson.contains("\"categoryId\":"), 
+        assertTrue(responseJson.contains("\"categoryId\":"),
                 "Response should contain categoryId field");
-        assertTrue(responseJson.contains("\"categoryName\":"), 
+        assertTrue(responseJson.contains("\"categoryName\":"),
                 "Response should contain categoryName field");
-        assertTrue(responseJson.contains("\"currentPeriodAmount\":"), 
+        assertTrue(responseJson.contains("\"currentPeriodAmount\":"),
                 "Response should contain currentPeriodAmount field");
-        assertTrue(responseJson.contains("\"previousPeriodAmount\":"), 
+        assertTrue(responseJson.contains("\"previousPeriodAmount\":"),
                 "Response should contain previousPeriodAmount field");
-        assertTrue(responseJson.contains("\"difference\":"), 
+        assertTrue(responseJson.contains("\"difference\":"),
                 "Response should contain difference field");
-        assertTrue(responseJson.contains("\"percentageChange\":"), 
+        assertTrue(responseJson.contains("\"percentageChange\":"),
                 "Response should contain percentageChange field");
 
         // Verify the response contains totals
-        assertTrue(responseJson.contains("\"totalCurrentPeriod\":"), 
+        assertTrue(responseJson.contains("\"totalCurrentPeriod\":"),
                 "Response should contain totalCurrentPeriod field");
-        assertTrue(responseJson.contains("\"totalPreviousPeriod\":"), 
+        assertTrue(responseJson.contains("\"totalPreviousPeriod\":"),
                 "Response should contain totalPreviousPeriod field");
-        assertTrue(responseJson.contains("\"totalDifference\":"), 
+        assertTrue(responseJson.contains("\"totalDifference\":"),
                 "Response should contain totalDifference field");
-        assertTrue(responseJson.contains("\"totalPercentageChange\":"), 
+        assertTrue(responseJson.contains("\"totalPercentageChange\":"),
                 "Response should contain totalPercentageChange field");
 
         // Clean up

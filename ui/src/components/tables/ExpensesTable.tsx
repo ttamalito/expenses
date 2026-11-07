@@ -4,7 +4,7 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Button, Group, Modal, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconTrash, IconTag } from '@tabler/icons-react';
-import { IExpense } from '@clients';
+import { IGetExpenseDto } from '@clients';
 import { useDeleteExpense } from '@requests/expensesRequests.ts';
 import { useGetAllExpenseCategories } from '@requests/categoryRequests.ts';
 import sortBy from 'lodash/sortBy';
@@ -17,7 +17,7 @@ interface CategoryOption {
 }
 
 interface ExpensesTableProps {
-  expenses: IExpense[];
+  expenses: IGetExpenseDto[];
   onExpenseUpdated?: () => void;
 }
 
@@ -27,13 +27,17 @@ export function ExpensesTable({
 }: ExpensesTableProps) {
   const { t } = useTranslation();
   const { userTags } = useUserDataContext();
-  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<IExpense>>({
+  const [sortStatus, setSortStatus] = useState<
+    DataTableSortStatus<IGetExpenseDto>
+  >({
     columnAccessor: 'date',
     direction: 'desc',
   });
-  const [records, setRecords] = useState<IExpense[]>([]);
+  const [records, setRecords] = useState<IGetExpenseDto[]>([]);
   const [deleteConfirmOpened, setDeleteConfirmOpened] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState<IExpense | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<IGetExpenseDto | null>(
+    null,
+  );
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [deleteExpense] = useDeleteExpense();
   const [getAllCategories] = useGetAllExpenseCategories();
@@ -70,7 +74,10 @@ export function ExpensesTable({
   useEffect(() => {
     if (!expenses) return;
 
-    const data = sortBy(expenses, sortStatus.columnAccessor) as IExpense[];
+    const data = sortBy(
+      expenses,
+      sortStatus.columnAccessor,
+    ) as IGetExpenseDto[];
     setRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
   }, [sortStatus, expenses]);
 
@@ -81,7 +88,7 @@ export function ExpensesTable({
   // };
 
   // Handle delete button click
-  const handleDelete = (expense: IExpense) => {
+  const handleDelete = (expense: IGetExpenseDto) => {
     setSelectedExpense(expense);
     setDeleteConfirmOpened(true);
   };
