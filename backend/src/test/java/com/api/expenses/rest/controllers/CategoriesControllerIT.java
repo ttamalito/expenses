@@ -4,6 +4,8 @@ import com.api.expenses.rest.controllers.utils.AuthenticationHelper;
 import com.api.expenses.rest.models.ExpenseCategory;
 import com.api.expenses.rest.models.IncomeCategory;
 import com.api.expenses.rest.models.dtos.MigrateCategoryDto;
+import com.api.expenses.rest.models.dtos.UpdateExpenseCategoryDto;
+import com.api.expenses.rest.models.dtos.UpdateIncomeCategoryDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -589,5 +591,217 @@ public class CategoriesControllerIT {
         mockMvc.perform(delete("/category/expense/delete/" + categoryAId)
                 .header("Authorization", bearerToken)
         ).andExpect(status().isNoContent());
+    }
+
+    private String login() throws Exception {
+        return AuthenticationHelper.loginUser(mockMvc, Optional.of(
+                        "coding.tamalito@gmail.com"),
+                Optional.empty(),
+                "123456"
+        );
+    }
+
+    private String createCategoryFromFile(String bearerToken, String type, String path) throws Exception {
+        String json = new String(Files.readAllBytes(Path.of(path)));
+        return mockMvc.perform(put("/category/" + type + "/create")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    private void deleteCategory(String bearerToken, String type, String id) throws Exception {
+        mockMvc.perform(delete("/category/" + type + "/delete/" + id)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Update all fields of an expense category")
+    public void updateExpenseCategory() throws Exception {
+        String bearerToken = login();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String categoryId = createCategoryFromFile(bearerToken, "expense",
+                "src/test/resources/categories/expense/validCategory.json");
+
+        UpdateExpenseCategoryDto dto = new UpdateExpenseCategoryDto(
+                Integer.parseInt(categoryId), "Updated description", "Updated name", 250.5f);
+
+        mockMvc.perform(put("/category/expense/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+
+        String response = mockMvc.perform(get("/category/expense/get/" + categoryId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ExpenseCategory updated = objectMapper.readValue(response, ExpenseCategory.class);
+
+        assertEquals("Updated name", updated.getName());
+        assertEquals("Updated description", updated.getDescription());
+        assertEquals(250.5f, updated.getBudget());
+        assertEquals(categoryId, String.valueOf(updated.getId())); // id unchanged
+
+        deleteCategory(bearerToken, "expense", categoryId);
+    }
+
+    @Test
+    @DisplayName("Partial update of an expense category keeps the other fields")
+    public void updateExpenseCategoryPartially() throws Exception {
+        String bearerToken = login();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String categoryId = createCategoryFromFile(bearerToken, "expense",
+                "src/test/resources/categories/expense/validCategory.json");
+
+        // only the budget is sent
+        UpdateExpenseCategoryDto dto = new UpdateExpenseCategoryDto(
+                Integer.parseInt(categoryId), null, null, 99.99f);
+
+        mockMvc.perform(put("/category/expense/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+
+        String response = mockMvc.perform(get("/category/expense/get/" + categoryId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ExpenseCategory updated = objectMapper.readValue(response, ExpenseCategory.class);
+
+        assertEquals("Category to delete", updated.getName());
+        assertEquals("Test description", updated.getDescription());
+        assertEquals(99.99f, updated.getBudget());
+
+        deleteCategory(bearerToken, "expense", categoryId);
+    }
+
+    @Test
+    @DisplayName("Update an expense category that does not exist")
+    public void updateNonExistingExpenseCategory() throws Exception {
+        String bearerToken = login();
+        UpdateExpenseCategoryDto dto = new UpdateExpenseCategoryDto(
+                Integer.MAX_VALUE, "desc", "name", 10f);
+
+        mockMvc.perform(put("/category/expense/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Update an expense category with a blank name or negative budget")
+    public void updateExpenseCategoryWithInvalidValues() throws Exception {
+        String bearerToken = login();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String categoryId = createCategoryFromFile(bearerToken, "expense",
+                "src/test/resources/categories/expense/validCategory.json");
+        int id = Integer.parseInt(categoryId);
+
+        mockMvc.perform(put("/category/expense/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new UpdateExpenseCategoryDto(id, "desc", "   ", 10f))))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(put("/category/expense/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new UpdateExpenseCategoryDto(id, "desc", "name", -5f))))
+                .andExpect(status().isBadRequest());
+
+        deleteCategory(bearerToken, "expense", categoryId);
+    }
+
+    @Test
+    @DisplayName("Update an income category")
+    public void updateIncomeCategory() throws Exception {
+        String bearerToken = login();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String categoryId = createCategoryFromFile(bearerToken, "income",
+                "src/test/resources/categories/income/validCategory.json");
+
+        UpdateIncomeCategoryDto dto = new UpdateIncomeCategoryDto(
+                Integer.parseInt(categoryId), "Updated income description", "Updated income name");
+
+        mockMvc.perform(put("/category/income/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+
+        String response = mockMvc.perform(get("/category/income/get/" + categoryId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        IncomeCategory updated = objectMapper.readValue(response, IncomeCategory.class);
+
+        assertEquals("Updated income name", updated.getName());
+        assertEquals("Updated income description", updated.getDescription());
+        assertEquals(categoryId, String.valueOf(updated.getId()));
+
+        deleteCategory(bearerToken, "income", categoryId);
+    }
+
+    @Test
+    @DisplayName("Partial update of an income category keeps the other fields")
+    public void updateIncomeCategoryPartially() throws Exception {
+        String bearerToken = login();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String categoryId = createCategoryFromFile(bearerToken, "income",
+                "src/test/resources/categories/income/validCategory.json");
+
+        // only the name is sent
+        UpdateIncomeCategoryDto dto = new UpdateIncomeCategoryDto(
+                Integer.parseInt(categoryId), null, "Only name changed");
+
+        mockMvc.perform(put("/category/income/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+
+        String response = mockMvc.perform(get("/category/income/get/" + categoryId)
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        IncomeCategory updated = objectMapper.readValue(response, IncomeCategory.class);
+
+        assertEquals("Only name changed", updated.getName());
+        assertEquals("Test description income", updated.getDescription());
+
+        deleteCategory(bearerToken, "income", categoryId);
+    }
+
+    @Test
+    @DisplayName("Update an income category that does not exist or has a blank name")
+    public void updateIncomeCategoryInvalid() throws Exception {
+        String bearerToken = login();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        mockMvc.perform(put("/category/income/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new UpdateIncomeCategoryDto(Integer.MAX_VALUE, "desc", "name"))))
+                .andExpect(status().isNotFound());
+
+        String categoryId = createCategoryFromFile(bearerToken, "income",
+                "src/test/resources/categories/income/validCategory.json");
+
+        mockMvc.perform(put("/category/income/update")
+                        .header("Authorization", bearerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new UpdateIncomeCategoryDto(Integer.parseInt(categoryId), "desc", ""))))
+                .andExpect(status().isBadRequest());
+
+        deleteCategory(bearerToken, "income", categoryId);
     }
 }

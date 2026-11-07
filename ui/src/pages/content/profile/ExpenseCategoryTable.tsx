@@ -10,16 +10,21 @@ import {
   Box,
   Tooltip,
 } from '@mantine/core';
-import { IconTrash, IconReplace } from '@tabler/icons-react';
+import { IconTrash, IconReplace, IconEdit } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { ICreateExpenseCategoryDto, IGetExpenseCategoryDto } from '@clients';
+import {
+  ICreateExpenseCategoryDto,
+  IGetExpenseCategoryDto,
+  IUpdateExpenseCategoryDto,
+} from '@clients';
 import {
   useDeleteExpenseCategory,
   useGetAllExpenseCategories,
   usePutExpenseCreate,
+  useUpdateExpenseCategory,
 } from '@requests/categoryRequests.ts';
 import MigrateCategoryModal from './MigrateCategoryModal.tsx';
 
@@ -29,6 +34,7 @@ export default function ExpenseCategoryTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isMigrateModalOpen, setIsMigrateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null,
   );
@@ -37,9 +43,23 @@ export default function ExpenseCategoryTable() {
   >();
   const [getAllExpenseCategories] = useGetAllExpenseCategories();
   const [createExpenseCategory] = usePutExpenseCreate();
+  const [updateExpenseCategory] = useUpdateExpenseCategory();
   const [deleteExpenseCategory] = useDeleteExpenseCategory();
 
   const form = useForm<ICreateExpenseCategoryDto>({
+    validate: {
+      name: (value) => {
+        return value ? null : t('categories.common.nameRequired');
+      },
+      budget: (value) => {
+        return value && value >= 0
+          ? null
+          : t('categories.expense.budgetInvalid');
+      },
+    },
+  });
+
+  const editCategoryForm = useForm<IUpdateExpenseCategoryDto>({
     validate: {
       name: (value) => {
         return value ? null : t('categories.common.nameRequired');
@@ -88,6 +108,26 @@ export default function ExpenseCategoryTable() {
     }
   };
 
+  const handleUpdateCategory = async (values: IUpdateExpenseCategoryDto) => {
+    try {
+      await updateExpenseCategory(values);
+      editCategoryForm.reset();
+      setIsEditModalOpen(false);
+      fetchCategories();
+      notifications.show({
+        title: t('tables.common.successTitle'),
+        message: t('categories.expense.edited'),
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: t('tables.common.errorTitle'),
+        message: t('categories.expense.editedFailed'),
+        color: 'red',
+      });
+    }
+  };
+
   const handleDeleteCategory = async () => {
     if (selectedCategoryId) {
       try {
@@ -121,6 +161,16 @@ export default function ExpenseCategoryTable() {
     setSelectedCategoryId(categoryId);
     setSelectedCategoryName(categoryName);
     setIsMigrateModalOpen(true);
+  };
+
+  const openEditModal = (category: IGetExpenseCategoryDto) => {
+    editCategoryForm.setValues({
+      categoryId: category.id,
+      name: category.name,
+      description: category.description,
+      budget: category.budget,
+    });
+    setIsEditModalOpen(true);
   };
 
   return (
@@ -172,6 +222,19 @@ export default function ExpenseCategoryTable() {
                       }}
                     >
                       <IconReplace size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label={t('categories.expense.editCategoryTooltip')}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="green"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        openEditModal(category);
+                      }}
+                    >
+                      <IconEdit size={16} />
                     </ActionIcon>
                   </Tooltip>
                   <Tooltip label={t('categories.common.deleteTooltip')}>
@@ -227,6 +290,43 @@ export default function ExpenseCategoryTable() {
           />
           <Group justify="flex-end">
             <Button type="submit">{t('categories.common.create')}</Button>
+          </Group>
+        </form>
+      </Modal>
+
+      {/* Edit Category Modal */}
+      <Modal
+        opened={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          editCategoryForm.reset();
+        }}
+        title={t('categories.expense.editModalTitle')}
+      >
+        <form onSubmit={editCategoryForm.onSubmit(handleUpdateCategory)}>
+          <TextInput
+            label={t('categories.common.name')}
+            placeholder={t('categories.common.namePlaceholder')}
+            required
+            {...editCategoryForm.getInputProps('name')}
+            mb="md"
+          />
+          <Textarea
+            label={t('tables.common.description')}
+            placeholder={t('categories.common.descriptionPlaceholder')}
+            {...editCategoryForm.getInputProps('description')}
+            mb="md"
+          />
+          <NumberInput
+            label={t('categories.expense.budget')}
+            placeholder={t('categories.expense.budgetPlaceholder')}
+            required
+            min={0}
+            {...editCategoryForm.getInputProps('budget')}
+            mb="md"
+          />
+          <Group justify="flex-end">
+            <Button type="submit">{t('categories.common.edit')}</Button>
           </Group>
         </form>
       </Modal>

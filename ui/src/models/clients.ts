@@ -66,6 +66,48 @@ export class Client {
     /**
      * @return OK
      */
+    updateIncomeCategory(body: UpdateIncomeCategoryDto): Promise<string> {
+        let url_ = this.baseUrl + "/category/income/update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateIncomeCategory(_response);
+        });
+    }
+
+    protected processUpdateIncomeCategory(response: Response): Promise<string> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     saveIncomeCategory(body: CreateIncomeCategoryDto): Promise<string> {
         let url_ = this.baseUrl + "/category/income/create";
         url_ = url_.replace(/[?&]$/, "");
@@ -87,6 +129,48 @@ export class Client {
     }
 
     protected processSaveIncomeCategory(response: Response): Promise<string> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    updateExpenseCategory(body: UpdateExpenseCategoryDto): Promise<string> {
+        let url_ = this.baseUrl + "/category/expense/update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateExpenseCategory(_response);
+        });
+    }
+
+    protected processUpdateExpenseCategory(response: Response): Promise<string> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -2697,6 +2781,62 @@ export interface IUpdateTagDto {
     [key: string]: any;
 }
 
+export class UpdateIncomeCategoryDto implements IUpdateIncomeCategoryDto {
+    categoryId?: number;
+    description?: string;
+    name?: string;
+
+    [key: string]: any;
+
+    constructor(data?: IUpdateIncomeCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.categoryId = _data["categoryId"];
+            this.description = _data["description"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): UpdateIncomeCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateIncomeCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["categoryId"] = this.categoryId;
+        data["description"] = this.description;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IUpdateIncomeCategoryDto {
+    categoryId?: number;
+    description?: string;
+    name?: string;
+
+    [key: string]: any;
+}
+
 export class CreateIncomeCategoryDto implements ICreateIncomeCategoryDto {
     description?: string;
     name?: string;
@@ -2745,6 +2885,66 @@ export class CreateIncomeCategoryDto implements ICreateIncomeCategoryDto {
 export interface ICreateIncomeCategoryDto {
     description?: string;
     name?: string;
+
+    [key: string]: any;
+}
+
+export class UpdateExpenseCategoryDto implements IUpdateExpenseCategoryDto {
+    categoryId?: number;
+    description?: string;
+    name?: string;
+    budget?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUpdateExpenseCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.categoryId = _data["categoryId"];
+            this.description = _data["description"];
+            this.name = _data["name"];
+            this.budget = _data["budget"];
+        }
+    }
+
+    static fromJS(data: any): UpdateExpenseCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateExpenseCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["categoryId"] = this.categoryId;
+        data["description"] = this.description;
+        data["name"] = this.name;
+        data["budget"] = this.budget;
+        return data;
+    }
+}
+
+export interface IUpdateExpenseCategoryDto {
+    categoryId?: number;
+    description?: string;
+    name?: string;
+    budget?: number;
 
     [key: string]: any;
 }

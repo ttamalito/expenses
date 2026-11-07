@@ -10,6 +10,7 @@ import com.api.expenses.rest.services.ExpenseCategoryService;
 import com.api.expenses.rest.services.IncomeCategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -128,6 +129,74 @@ public class CategoriesController {
         }
 
         return ResponseEntity.badRequest().body("No user found with the token");
+    }
+
+    @PutMapping("/expense/update")
+    public ResponseEntity<String> updateExpenseCategory(@RequestBody UpdateExpenseCategoryDto dto) {
+        Optional<User> optionalUser = ControllersHelper.getUserFromSecurityContextHolder();
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("No user found with the token");
+        }
+
+        Optional<ExpenseCategory> optionalCategory = expenseCategoryService.getCategoryById(dto.categoryId());
+        if (optionalCategory.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
+        }
+
+        ExpenseCategory category = optionalCategory.get();
+        if (!category.getUserId().equals(optionalUser.get().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Category does not belong to the user");
+        }
+
+        //the id is never modified
+        if (dto.name() != null) {
+            if (dto.name().isBlank()) {
+                return ResponseEntity.badRequest().body("Name cannot be empty");
+            }
+            category.setName(dto.name());
+        }
+        if (dto.description() != null) {
+            category.setDescription(dto.description());
+        }
+        if (dto.budget() != null) {
+            if (dto.budget() < 0) {
+                return ResponseEntity.badRequest().body("Budget cannot be negative");
+            }
+            category.setBudget(dto.budget());
+        }
+
+        expenseCategoryService.saveCategory(category);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/income/update")
+    public ResponseEntity<String> updateIncomeCategory(@RequestBody UpdateIncomeCategoryDto dto) {
+        Optional<User> optionalUser = ControllersHelper.getUserFromSecurityContextHolder();
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("No user found with the token");
+        }
+
+        Optional<IncomeCategory> optionalCategory = incomeCategoryService.getCategoryById(dto.categoryId());
+        if (optionalCategory.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
+        }
+
+        IncomeCategory category = optionalCategory.get();
+        if (!category.getUserId().equals(optionalUser.get().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Category does not belong to the user");
+        }
+
+        if (dto.name() != null) {
+            if (dto.name().isBlank()) {
+                return ResponseEntity.badRequest().body("Name cannot be empty");
+            }
+            category.setName(dto.name());
+        }
+        if (dto.description() != null) {
+            category.setDescription(dto.description());
+        }
+        incomeCategoryService.updateCategory(category);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/expense/all")
