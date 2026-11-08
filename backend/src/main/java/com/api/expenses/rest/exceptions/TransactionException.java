@@ -1,7 +1,7 @@
 package com.api.expenses.rest.exceptions;
 
 public class TransactionException extends Exception {
-    public enum TransactionExceptionType { // TODO: Exceptions should be more specific #84
+    public enum TransactionExceptionType {
         USER_NOT_FOUND("User not found in the database for the transaction"),
         CATEGORY_NOT_FOUND("Category not found in the database for the transaction"),
         CURRENCY_NOT_FOUND("Currency not found in the database for the transaction"),
@@ -10,6 +10,7 @@ public class TransactionException extends Exception {
         INCOME_NOT_FOUND("Income not found in the database"),
 
         UNAUTHORIZED("User is trying to modify an expense that does not belong to him"),
+        FORBIDDEN_ACTION("User is not authorized to perform this action"),
         EXPENSE_NOT_FOUND("Expense not found in the database"),
         CATEGORY_HAS_LINKED_EXPENSES("Cannot delete category because it has linked expenses"),
         CATEGORY_HAS_LINKED_INCOMES("Cannot delete category because it has linked incomes"),
@@ -38,6 +39,12 @@ public class TransactionException extends Exception {
         super(type.getMessage());
         this.type = type;
     }
+
+    public TransactionException(TransactionExceptionType type, String message) {
+        super(message);
+        this.type = type;
+    }
+
 
     public TransactionExceptionType getType() {
         return type;

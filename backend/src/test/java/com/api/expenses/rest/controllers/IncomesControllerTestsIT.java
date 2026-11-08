@@ -358,7 +358,7 @@ public class IncomesControllerTestsIT {
                 .header("Authorization",bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(incomeAsJsonString)
-        ).andExpect(status().isBadRequest());
+        ).andExpect(status().isNotFound());
 
         mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
                 .header("Authorization", bearerToken)

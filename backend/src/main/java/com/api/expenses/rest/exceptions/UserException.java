@@ -2,7 +2,7 @@ package com.api.expenses.rest.exceptions;
 
 public class UserException extends Exception {
 
-    private final UserExceptionType type; // TODO: Exceptions should be more specific #84
+    private final UserExceptionType type;
 
     public UserException(UserExceptionType type) {
         super(type.getMessage());

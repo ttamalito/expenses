@@ -170,20 +170,18 @@ public class CategoriesController {
     }
 
     @PutMapping("/income/update")
-    public ResponseEntity<String> updateIncomeCategory(@RequestBody UpdateIncomeCategoryDto dto) {
+    public ResponseEntity<String> updateIncomeCategory(@RequestBody UpdateIncomeCategoryDto dto)
+            throws TransactionException {
         Optional<User> optionalUser = ControllersHelper.getUserFromSecurityContextHolder();
         if (optionalUser.isEmpty()) {
             return ResponseEntity.badRequest().body("No user found with the token");
         }
 
         Optional<IncomeCategory> optionalCategory = incomeCategoryService.getCategoryById(dto.categoryId());
-        if (optionalCategory.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
-        }
 
-        IncomeCategory category = optionalCategory.get();
+        IncomeCategory category = optionalCategory.orElseThrow(() -> new TransactionException(TransactionException.TransactionExceptionType.USER_NOT_FOUND));
         if (!category.getUserId().equals(optionalUser.get().getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Category does not belong to the user");
+            throw new TransactionException(TransactionException.TransactionExceptionType.FORBIDDEN_ACTION, "Category does not belong to the user");
         }
 
         if (dto.name() != null) {

@@ -1099,7 +1099,7 @@ public class ExpensesRequestsIT {
                         .header("Authorization", bearerToken)
                         .contentType("application/json")
                         .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
 
         mockMvc.perform(delete("/tags/delete/" + createdTagDto.id())
                 .header("Authorization", bearerToken)
