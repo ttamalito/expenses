@@ -4,6 +4,7 @@ import { Paper, Title, Text, Box, Loader, Center } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useGetTotalSpentMonthly } from '@requests/expensesRequests';
 import { useGetTotalEarnedMonth } from '@requests/incomesRequests';
+import roundToTwoDecimals from '../../../../utils/roundToTwoDecimals.ts';
 
 interface MonthlyValues {
   spent: number;
@@ -76,8 +77,8 @@ export default function HomeLineChart({ updateChart }: HomeLineChartProps) {
       );
       return {
         month: label.charAt(0).toUpperCase() + label.slice(1),
-        spent: value.spent,
-        earned: value.earned,
+        spent: roundToTwoDecimals(value.spent),
+        earned: roundToTwoDecimals(value.earned),
       };
     });
   }, [values, i18n.resolvedLanguage]);

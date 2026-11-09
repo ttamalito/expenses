@@ -424,7 +424,7 @@
     "statisticalSummaries": {
       "title": "Statistical Summaries",
       "description": "This section provides various financial statistics to help you understand your spending patterns and savings habits.",
-      "descriptionRange": "The data is from the last 2 years, anything older than that is not taken into account",
+      "descriptionRange": "The data is from the current and last year, anything else is not taken into account",
       "noData": "No statistical data available.",
       "error": "Failed to load statistical summaries",
       "unknownMonth": "Unknown",

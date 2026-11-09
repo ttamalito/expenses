@@ -424,7 +424,7 @@
     "statisticalSummaries": {
       "title": "Resúmenes estadísticos",
       "description": "Esta sección ofrece diversas estadísticas financieras para ayudarte a entender tus patrones de gasto y tus hábitos de ahorro.",
-      "descriptionRange": "Los datos corresponden a los últimos 2 años; lo anterior a eso no se tiene en cuenta",
+      "descriptionRange": "Los datos corresponden al año actual y al año anterior, otros datos a esos años no se tiene en cuenta",
       "noData": "No hay datos estadísticos disponibles.",
       "error": "No se pudieron cargar los resúmenes estadísticos",
       "unknownMonth": "Desconocido",
