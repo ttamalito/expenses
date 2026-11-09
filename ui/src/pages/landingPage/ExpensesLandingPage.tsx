@@ -82,7 +82,7 @@ function ExpensesLandingPage() {
       </div>
 
       {/* Features section */}
-      <Grid gutter="xl" mt={50}>
+      <Grid gap="xl" mt={50}>
         <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
           <Paper shadow="md" p="xl" radius="md" withBorder>
             <IconCoin size={40} color={theme.colors.blue[6]} />

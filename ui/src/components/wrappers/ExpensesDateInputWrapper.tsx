@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { DateInput, DateValue } from '@mantine/dates';
+import { DateInput } from '@mantine/dates';
 
 interface IExpensesDateInputWrapperProps {
   label?: string;
@@ -10,7 +10,12 @@ interface IExpensesDateInputWrapperProps {
    * Dayjs format to display input value, "MMMM D, YYYY" by default
    */
   valueFormat?: string;
-  onChange?: (value: DateValue) => void;
+  /**
+   * The onChange is provided by the use-form hook. This wrapper provides a Date
+   * to the onChange function because all the models (DTOs) expect a Date object
+   * @param value
+   */
+  onChange?: (value: Date | null) => void;
   dateParser?: (value: string) => Date | null;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -60,7 +65,13 @@ export default function ExpensesDateInputWrapper(
         props.defaultValue ? new Date(props.defaultValue) : undefined
       }
       valueFormat={props.valueFormat ? props.valueFormat : 'DD/MM/YYYY'}
-      onChange={props.onChange}
+      onChange={(value) => {
+        if (!props.onChange) return;
+        if (value === null) {
+          return props.onChange(null);
+        }
+        return props.onChange(new Date(value));
+      }}
       dateParser={props.dateParser ? props.dateParser : parseDayMonthYear}
       onFocus={props.onFocus}
       onBlur={props.onBlur}
