@@ -52,7 +52,6 @@ export default function HomeDonutBudgetChart({
       // Fetch budget
       const budgetResponse = await getBudget();
       const budgets: any[] = budgetResponse?.data.budget;
-      console.log(budgetResponse);
       const totalBudget: number = budgets.reduce(
         (accumulator, currentValue) => {
           return accumulator + currentValue.budget;
