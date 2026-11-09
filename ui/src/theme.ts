@@ -150,7 +150,7 @@ const theme = createTheme({
 
     Text: Text.extend({
       defaultProps: {
-        color: 'var(--app-text-primary)',
+        c: 'var(--app-text-primary)',
       },
     }),
 
@@ -203,7 +203,7 @@ const theme = createTheme({
 
     Anchor: Anchor.extend({
       defaultProps: {
-        color: 'teal',
+        c: 'teal',
       },
     }),
 
