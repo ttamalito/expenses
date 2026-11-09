@@ -235,7 +235,7 @@ public class StatisticsService {
                     float income = incomeService.getTotalEarnedForAMonthForAUser(userId, month, year);
                     float expenses = expenseService.getTotalSpentForAMonthOfAUser(userId, month, year);
                     
-                    // Skip months with no income, mainly to avoid adding months in the future, TODO: Fix this and use the actual last 24 months
+                    // Skip months with no income, mainly to avoid adding months in the future
                     if (income <= 0) {
                         continue;
                     }
