@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useGetTotalSpentMonthly } from '@requests/expensesRequests';
 import { useGetBudget } from '@requests/budgetRequests';
 import { useUserDataContext } from '@hooks/useUserDataContext.tsx';
+import roundToTwoDecimals from '../../../../utils/roundToTwoDecimals';
 
 interface ChartData {
   name: string;
@@ -78,12 +79,12 @@ export default function HomeDonutBudgetChart({
       return [
         {
           name: t('home.budgetChart.slices.spent'),
-          value: totalSpent,
+          value: roundToTwoDecimals(totalSpent),
           color: 'blue.6',
         },
         {
           name: t('home.budgetChart.slices.remaining'),
-          value: Math.max(0, budget - totalSpent),
+          value: roundToTwoDecimals(Math.max(0, budget - totalSpent)),
           color: 'teal.6',
         },
       ];
@@ -92,12 +93,12 @@ export default function HomeDonutBudgetChart({
     return [
       {
         name: t('home.budgetChart.slices.budget'),
-        value: budget,
+        value: roundToTwoDecimals(budget),
         color: 'red.6',
       },
       {
         name: t('home.budgetChart.slices.overspent'),
-        value: totalSpent - budget,
+        value: roundToTwoDecimals(totalSpent - budget),
         color: 'amber.6',
       },
     ];
